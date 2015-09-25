@@ -12,29 +12,34 @@ size_t const sWinHeight = 480;
 GLchar const* sVertexShader = R"(#version 330 core
 
 layout(location = 0) in vec3 position;
+out vec3 vertColor;
 
 void main()
 {
     gl_Position = vec4(position, 1.0f);
+    vertColor = abs(position * 2);
 })";
 
 GLchar const* sFragmentShaderOrange = R"(#version 330 core
 
+in vec3 vertColor;
 out vec4 color;
+uniform vec4 uniColor;
 
 void main()
 {
-    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    color = uniColor;//vec4(vertColor, 1.0f);//vec4(1.0f, 0.5f, 0.2f, 1.0f);
 }
 )";
 
 GLchar const* sFragmentShaderYellow = R"(#version 330 core
 
+in vec3 vertColor;
 out vec4 color;
 
 void main()
 {
-    color = vec4(5.0f, 1.0f, 0.2f, 1.0f);
+    color = vec4(vertColor, 1.0f);//vec4(5.0f, 1.0f, 0.2f, 1.0f);
 }
 )";
 
@@ -188,7 +193,15 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLfloat curTime = glfwGetTime();
+        auto val = (std::sin(32.0f * curTime + 3.14f * std::sin(curTime * 8.0f)) / 2.0f) + 0.5f;
+        GLfloat redColor = val;
+        GLfloat greenColor = val;
+        GLfloat blueColor = val;
+        GLint uniColorLocation = glGetUniformLocation(shaderProgOr, "uniColor");
+        
         glUseProgram(shaderProgOr);
+        glUniform4f(uniColorLocation, redColor, greenColor, blueColor, 1.0f);
         glBindVertexArray(VAO[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
