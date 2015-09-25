@@ -15,8 +15,7 @@ program::~program()
 bool program::create()
 {
     mProg = glCreateProgram();
-    if (!mProg)
-        return false;
+    return mProg != 0;
 }
 
 void program::attach(shader const& sh)
@@ -31,8 +30,7 @@ bool program::link()
     glLinkProgram(mProg);
     GLint success;
     glGetProgramiv(mProg, GL_LINK_STATUS, &success);
-    if (!success)
-        return false;
+    return success == GL_TRUE;
 }
 
 void program::use()
