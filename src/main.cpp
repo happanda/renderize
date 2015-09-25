@@ -1,13 +1,14 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <vector>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-size_t const sWinWidth = 640;
-size_t const sWinHeight = 480;
+size_t const sWinWidth = 320;
+size_t const sWinHeight = 240;
 
 GLchar const* sVertexShader = R"(#version 330 core
 
@@ -16,8 +17,8 @@ out vec3 vertColor;
 
 void main()
 {
-    gl_Position = vec4(position, 1.0f);
-    vertColor = abs(position * 2);
+    gl_Position = vec4(position.x, position.y, position.z, 1.0f);
+    vertColor = vec3(0.0f, 0.0f, 0.0f);
 })";
 
 GLchar const* sFragmentShaderOrange = R"(#version 330 core
@@ -28,7 +29,7 @@ uniform vec4 uniColor;
 
 void main()
 {
-    color = uniColor;//vec4(vertColor, 1.0f);//vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    color = uniColor;
 }
 )";
 
@@ -152,33 +153,40 @@ int main(void)
     glDeleteShader(fragmentShaderYe);
 
     // Geometry to draw
-    GLfloat vertices[] = {
-        0.5f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f,
-         0.0f, -0.5f, 0.0f
-    };
-
-    GLuint VBO[2];
-    glGenBuffers(2, VBO);
-    GLuint VAO[2];
-    glGenVertexArrays(2, VAO);
-    glBindVertexArray(VAO[0]);
+    float const PI2 = 8.0f * atan(1.0f);
+    int const numVerts = 10;
+    std::vector<GLfloat> vertices;
+    vertices.push_back(0.0f);
+    vertices.push_back(0.0f);
+    vertices.push_back(0.0f);
+    for (int i = 0; i < numVerts; ++i)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(0));
-        glEnableVertexAttribArray(0);
+        GLfloat xPos = std::sin(PI2 * i / numVerts);
+        GLfloat yPos = std::cos(PI2 * i / numVerts);
+        vertices.push_back(xPos);
+        vertices.push_back(yPos);
+        vertices.push_back(0.0f);
     }
-    glBindVertexArray(0);
-    glBindVertexArray(VAO[1]);
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) / 2, vertices + sizeof(vertices) / sizeof(vertices[0]) / 2, GL_STATIC_DRAW);
+    vertices.push_back(vertices[3]);
+    vertices.push_back(vertices[4]);
+    vertices.push_back(vertices[5]);
 
+    std::vector<GLint> indices;
+    for (int i = 0; i < numVerts + 2; ++i)
+    {
+        indices.push_back(i);
+    }
+
+
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_DYNAMIC_DRAW);
+        
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(0));
         glEnableVertexAttribArray(0);
     }
@@ -202,15 +210,9 @@ int main(void)
         
         glUseProgram(shaderProgOr);
         glUniform4f(uniColorLocation, redColor, greenColor, blueColor, 1.0f);
-        glBindVertexArray(VAO[0]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, numVerts + 2);
         glBindVertexArray(0);
-
-        glUseProgram(shaderProgYe);
-        glBindVertexArray(VAO[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
-
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         //glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
