@@ -9,6 +9,20 @@
 size_t const sWinWidth = 640;
 size_t const sWinHeight = 480;
 
+GLchar const* sVertexShader = "\
+#version 330 core\n\
+\n\
+layout(location = 0) in vec3 position;\n\
+\n\
+void main()\n\
+{\n\
+    gl_Position = vec4(position, 1.0);\n\
+}\n";
+
+std::basic_string<GLchar> const sFragmentShader("\
+\
+");
+
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
 
@@ -48,6 +62,7 @@ int main(void)
         // Initialize some GLFW callback
     glfwSetKeyCallback(window, keyCallback);
 
+        // Geometry to draw
     GLfloat vertices[] = {
         -0.5f, 0.5f, 0.0f,
          0.5f, 0.5f, 0.0f,
@@ -57,6 +72,21 @@ int main(void)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        // Shaders
+    GLuint vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &sVertexShader, nullptr);
+    glCompileShader(vertexShader);
+    GLint success;
+    GLchar infoLog[1024];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 1024, nullptr, infoLog);
+        std::cerr << "Error compiling vertex shader: " << infoLog << std::endl;
+        return -1;
+    }
 
         // Game Loop
     while (!glfwWindowShouldClose(window))
