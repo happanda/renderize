@@ -9,22 +9,29 @@
 size_t const sWinWidth = 640;
 size_t const sWinHeight = 480;
 
-GLchar const* sVertexShader = "\
-#version 330 core\n\
-\n\
-layout(location = 0) in vec3 position;\n\
-\n\
-void main()\n\
-{\n\
-    gl_Position = vec4(position, 1.0);\n\
-}\n";
+GLchar const* sVertexShader = R"(#version 330 core
 
-std::basic_string<GLchar> const sFragmentShader("\
-\
-");
+layout(location = 0) in vec3 position;
+
+void main()
+{
+    gl_Position = vec4(position, 1.0f);
+})";
+
+GLchar const* sFragmentShader = R"(#version 330 core
+
+out vec4 color;
+
+void main()
+{
+    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+}
+)";
+
 
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
+
 
 int main(void)
 {
@@ -87,6 +94,36 @@ int main(void)
         std::cerr << "Error compiling vertex shader: " << infoLog << std::endl;
         return -1;
     }
+
+    GLuint fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &sFragmentShader, nullptr);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 1024, nullptr, infoLog);
+        std::cerr << "Error compiling fragment shader: " << infoLog << std::endl;
+        return -1;
+    }
+
+        // Shader program
+    GLuint shaderProg;
+    shaderProg = glCreateProgram();
+    glAttachShader(shaderProg, vertexShader);
+    glAttachShader(shaderProg, fragmentShader);
+    glLinkProgram(shaderProg);
+    glGetProgramiv(shaderProg, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProg, 1024, nullptr, infoLog);
+        std::cerr << "Error linking shader program: " << infoLog << std::endl;
+        return -1;
+    }
+
+    glUseProgram(shaderProg);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
         // Game Loop
     while (!glfwWindowShouldClose(window))
