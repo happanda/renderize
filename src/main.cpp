@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "shaders/shader.h"
+#include "shaders/program.h"
 
 
 size_t const sWinWidth = 800;
@@ -89,57 +89,57 @@ int main(void)
         // Initialize some GLFW callback
     glfwSetKeyCallback(window, keyCallback);
 
+
+    program shaderProgOr;
+    program shaderProgYe;
+    if (!shaderProgOr.create())
+    {
+        std::cerr << shaderProgOr.lastError() << std::endl;
+        return -1;
+    }
+    if (!shaderProgYe.create())
+    {
+        std::cerr << shaderProgYe.lastError() << std::endl;
+        return -1;
+    }
+
+    {
         // Shaders
-    shader vertexShader;
-    if (!vertexShader.compile(sVertexShader, GL_VERTEX_SHADER))
-    {
-        std::cerr << vertexShader.lastError() << std::endl;
-        return -1;
-    }
-    shader fragmentShaderOr;
-    if (!fragmentShaderOr.compile(sFragmentShaderOrange, GL_FRAGMENT_SHADER))
-    {
-        std::cerr << fragmentShaderOr.lastError() << std::endl;
-        return -1;
-    }
-    shader fragmentShaderYe;
-    if (!fragmentShaderYe.compile(sFragmentShaderYellow, GL_FRAGMENT_SHADER))
-    {
-        std::cerr << fragmentShaderYe.lastError() << std::endl;
-        return -1;
-    }
+        shader vertexShader;
+        if (!vertexShader.compile(sVertexShader, GL_VERTEX_SHADER))
+        {
+            std::cerr << vertexShader.lastError() << std::endl;
+            return -1;
+        }
+        shader fragmentShaderOr;
+        if (!fragmentShaderOr.compile(sFragmentShaderOrange, GL_FRAGMENT_SHADER))
+        {
+            std::cerr << fragmentShaderOr.lastError() << std::endl;
+            return -1;
+        }
+        shader fragmentShaderYe;
+        if (!fragmentShaderYe.compile(sFragmentShaderYellow, GL_FRAGMENT_SHADER))
+        {
+            std::cerr << fragmentShaderYe.lastError() << std::endl;
+            return -1;
+        }
 
         // Shader program
-    GLuint shaderProgOr;
-    shaderProgOr = glCreateProgram();
-    glAttachShader(shaderProgOr, vertexShader);
-    glAttachShader(shaderProgOr, fragmentShaderOr);
-    glLinkProgram(shaderProgOr);
-    GLint success;
-    GLchar infoLog[1024];
-    glGetProgramiv(shaderProgOr, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgOr, 1024, nullptr, infoLog);
-        std::cerr << "Error linking shader program: " << infoLog << std::endl;
-        return -1;
+        shaderProgOr.attach(vertexShader);
+        shaderProgOr.attach(fragmentShaderOr);
+        if (!shaderProgOr.link())
+        {
+            std::cerr << shaderProgOr.lastError() << std::endl;
+            return -1;
+        }
+        shaderProgYe.attach(vertexShader);
+        shaderProgYe.attach(fragmentShaderOr);
+        if (!shaderProgYe.link())
+        {
+            std::cerr << shaderProgYe.lastError() << std::endl;
+            return -1;
+        }
     }
-    GLuint shaderProgYe;
-    shaderProgYe = glCreateProgram();
-    glAttachShader(shaderProgYe, vertexShader);
-    glAttachShader(shaderProgYe, fragmentShaderYe);
-    glLinkProgram(shaderProgYe);
-    glGetProgramiv(shaderProgYe, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgYe, 1024, nullptr, infoLog);
-        std::cerr << "Error linking shader program: " << infoLog << std::endl;
-        return -1;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShaderOr);
-    glDeleteShader(fragmentShaderYe);
 
     // Geometry to draw
     float const PI2 = 8.0f * atan(1.0f);
@@ -209,7 +209,7 @@ int main(void)
         GLfloat blueColor = val;
         GLint uniColorLocation = glGetUniformLocation(shaderProgOr, "uniColor");
         
-        glUseProgram(shaderProgOr);
+        shaderProgOr.use();
         glUniform4f(uniColorLocation, redColor, greenColor, blueColor, 1.0f);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2 * (numVerts + 2));
