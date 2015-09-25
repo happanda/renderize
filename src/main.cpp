@@ -69,17 +69,6 @@ int main(void)
         // Initialize some GLFW callback
     glfwSetKeyCallback(window, keyCallback);
 
-        // Geometry to draw
-    GLfloat vertices[] = {
-        -0.5f, 0.5f, 0.0f,
-         0.5f, 0.5f, 0.0f,
-         0.0f, 0.0f, 0.0f
-    };
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
         // Shaders
     GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -121,10 +110,39 @@ int main(void)
         return -1;
     }
 
-    glUseProgram(shaderProg);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    // Geometry to draw
+    GLfloat vertices[] = {
+         0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f
+    };
+    GLuint indices[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    GLuint EBO;
+    glGenBuffers(1, &EBO);
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(0));
+        glEnableVertexAttribArray(0);
+    }
+    glBindVertexArray(0);
+    
         // Game Loop
     while (!glfwWindowShouldClose(window))
     {
@@ -133,6 +151,12 @@ int main(void)
             // Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProg);
+        glBindVertexArray(VAO);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
     }
