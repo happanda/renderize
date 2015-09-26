@@ -143,33 +143,11 @@ int main(void)
     }
 
     // Geometry to draw
-    float const PI2 = 8.0f * atan(1.0f);
-    int const numVerts = 20;
+    float const PI = 4.0f * atan(1.0f);
+    int const numVerts = 500;
     std::vector<GLfloat> vertices;
-    vertices.push_back(0.0f);
-    vertices.push_back(0.0f);
-    vertices.push_back(0.0f);
-    vertices.push_back(1.0f);
-    vertices.push_back(1.0f);
-    vertices.push_back(1.0f);
-    for (int i = 0; i < numVerts; ++i)
-    {
-        GLfloat xPos = std::sin(PI2 * i / numVerts);
-        GLfloat yPos = std::cos(PI2 * i / numVerts);
-        vertices.push_back(xPos);
-        vertices.push_back(yPos);
-        vertices.push_back(0.0f);
-        vertices.push_back(xPos);
-        vertices.push_back(yPos);
-        vertices.push_back(xPos * yPos);
-    }
-    vertices.push_back(vertices[6]);
-    vertices.push_back(vertices[7]);
-    vertices.push_back(vertices[8]);
-    vertices.push_back(vertices[6]);
-    vertices.push_back(vertices[7]);
-    vertices.push_back(vertices[8]);
 
+    
     std::vector<GLint> indices;
     for (int i = 0; i < numVerts + 2; ++i)
     {
@@ -181,18 +159,7 @@ int main(void)
     glGenBuffers(1, &VBO);
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_DYNAMIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(0));
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
-    }
-    glBindVertexArray(0);
+    
     
         // Game Loop
     while (!glfwWindowShouldClose(window))
@@ -210,12 +177,48 @@ int main(void)
         GLfloat blueColor = val;
         GLint uniColorLocation = glGetUniformLocation(shaderProgOr, "uniColor");
 
-        GLint shiftPosLocation = glGetUniformLocation(shaderProgOr, "shiftPos");
-        glUniform3f(shiftPosLocation, std::sin(curTime), 0.0f, 0.0f);
+        //GLint shiftPosLocation = glGetUniformLocation(shaderProgOr, "shiftPos");
+        //glUniform3f(shiftPosLocation, std::sin(curTime), 0.0f, 0.0f);
         
         shaderProgOr.use();
         glUniform4f(uniColorLocation, redColor, greenColor, blueColor, 1.0f);
+        
         glBindVertexArray(VAO);
+        {
+            vertices.clear();
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(1.0f);
+            vertices.push_back(1.0f);
+            vertices.push_back(1.0f);
+            for (int i = 0; i < numVerts; ++i)
+            {
+                float const alpha = 2.0f * PI * i / numVerts;
+                GLfloat xPos = std::cos(alpha) * (0.5f + 0.000015f * std::sin(2 * curTime) + 0.05f * std::sin(3 * (alpha + curTime / 2.0f)));
+                GLfloat yPos = std::sin(alpha) * (0.5f + 0.000015f * std::sin(2 * curTime) + 0.05f * std::sin(3 * (alpha + curTime / 2.0f)));
+                vertices.push_back(xPos);
+                vertices.push_back(yPos);
+                vertices.push_back(0.0f);
+                vertices.push_back(xPos);
+                vertices.push_back(yPos);
+                vertices.push_back(xPos * yPos);
+            }
+            vertices.push_back(vertices[6]);
+            vertices.push_back(vertices[7]);
+            vertices.push_back(vertices[8]);
+            vertices.push_back(vertices[6]);
+            vertices.push_back(vertices[7]);
+            vertices.push_back(vertices[8]);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_DYNAMIC_DRAW);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(0));
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+            glEnableVertexAttribArray(1);
+        }
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2 * (numVerts + 2));
         glBindVertexArray(0);
 
