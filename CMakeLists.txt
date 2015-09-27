@@ -29,8 +29,16 @@ set(GLFWPath ${ExtPath}/glfw-3.1.1)
 add_subdirectory(${GLFWPath})
 include_directories(${GLFWPath}/include)
 target_link_libraries(Renderize glfw ${GLFW_LIBRARIES})
+
 ### GLEW ###
 set(GLEWPath ${ExtPath}/glew-1.13.0)
 include_directories(${GLEWPath}/include)
 target_link_libraries(Renderize debug ${GLEWPath}/lib/Debug/Win32/glew32sd.lib)
 target_link_libraries(Renderize optimized ${GLEWPath}/lib/Release/Win32/glew32s.lib)
+
+### SOIL ###
+set(SOILPath ${ExtPath}/SOIL)
+include_directories(${SOILPath})
+target_link_libraries(Renderize debug ${SOILPath}/lib/Debug/SOIL.lib)
+target_link_libraries(Renderize optimized ${SOILPath}/lib/Release/SOIL.lib)
+
