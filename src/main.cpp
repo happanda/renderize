@@ -7,6 +7,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "shaders/program.h"
 #include "SOIL.h"
 
@@ -14,18 +18,22 @@
 size_t const sWinWidth = 800;
 size_t const sWinHeight = 800;
 
+float sMixCoeff = 0.5f;
+
 GLchar const* sVertexShader = R"(#version 330 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 color;
 layout(location = 2) in vec2 texCoords;
+
 out vec3 vertColor;
 out vec2 texCoord;
-uniform vec3 shiftPos;
+
+uniform mat4 transform;
 
 void main()
 {
-    gl_Position = vec4(position + shiftPos, 1.0f);
+    gl_Position = vec4(position, 1.0f);
     vertColor = color;
     texCoord = vec2(texCoords.x, 1.0f - texCoords.y);
 })";
@@ -36,13 +44,13 @@ in vec3 vertColor;
 in vec2 texCoord;
 out vec4 color;
 
-uniform vec4 uniColor;
 uniform sampler2D texData1;
 uniform sampler2D texData2;
+uniform float mixCoeff;
 
 void main()
 {
-    color = mix(texture(texData1, texCoord), texture(texData2, texCoord), 0.2);// * vec4(vertColor, 1.0f);
+    color = mix(texture(texData1, texCoord), texture(texData2, texCoord), mixCoeff);
 }
 )";
 
@@ -155,6 +163,11 @@ int main(void)
     glGenTextures(2, textures);
 
     glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     int texWidth{ 0 }, texHeight{ 0 };
     auto image = SOIL_load_image("../../tex/crate.jpg", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
@@ -162,7 +175,13 @@ int main(void)
     SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+
     glBindTexture(GL_TEXTURE_2D, textures[1]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     image = SOIL_load_image("../../tex/awesomeface.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -181,12 +200,6 @@ int main(void)
     GLuint indices[] = {
         0, 1, 3,   // First Triangle
         1, 2, 3    // Second Triangle
-    };
-
-    GLfloat texCoords[] = {
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        0.5f, 1.0f
     };
 
 
@@ -214,10 +227,6 @@ int main(void)
         glEnableVertexAttribArray(2);
     }
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
         // Game Loop
     while (!glfwWindowShouldClose(window))
@@ -228,31 +237,54 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        GLfloat curTime = static_cast<float>(glfwGetTime());
-        auto val = (std::sin(32.0f * curTime + 3.14f * std::sin(curTime * 8.0f)) / 2.0f) + 0.5f;
-        GLfloat redColor = val;
-        GLfloat greenColor = val;
-        GLfloat blueColor = val;
-        GLint uniColorLocation = glGetUniformLocation(shaderProgOr, "uniColor");
-
         shaderProgOr.use();
-        glUniform4f(uniColorLocation, redColor, greenColor, blueColor, 1.0f);
+
+        GLfloat curTime = static_cast<float>(glfwGetTime());
+
+        glm::mat4 trans;
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, curTime, glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+
+        glm::mat4 trans2;
+        trans2 = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+        trans2 = glm::scale(trans, glm::vec3(std::sin(curTime), std::sin(curTime), std::sin(curTime)));
+
+
+        //GLint transformLocation = glGetUniformLocation(shaderProgOr, "transform");
+        GLint mixCoeffLocation = glGetUniformLocation(shaderProgOr, "mixCoeff");
+
+        //glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+        glUniform1f(mixCoeffLocation, sMixCoeff);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glUniform1i(glGetUniformLocation(shaderProgOr, "texData1"), 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textures[1]);
         glUniform1i(glGetUniformLocation(shaderProgOr, "texData2"), 1);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans2));
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
 
         glfwSwapBuffers(window);
+
+
+        /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);*/
     }
 
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO);
     glfwTerminate();
     return 0;
 }
@@ -266,4 +298,12 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+    else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    {
+        sMixCoeff += 0.05f;
+    }
+    else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+    {
+        sMixCoeff -= 0.05f;
+    }
 }

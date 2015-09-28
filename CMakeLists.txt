@@ -42,3 +42,7 @@ include_directories(${SOILPath})
 target_link_libraries(Renderize debug ${SOILPath}/lib/Debug/SOIL.lib)
 target_link_libraries(Renderize optimized ${SOILPath}/lib/Release/SOIL.lib)
 
+### GLM ###
+set(GLMPath ${ExtPath}/glm-0.9.7.1)
+include_directories(${GLMPath})
+
