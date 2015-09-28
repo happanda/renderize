@@ -298,7 +298,7 @@ int main(void)
         glm::mat4 model;
         model = glm::rotate(model, curTime * glm::radians(50.0f), glm::vec3(1.0f, 0.5f, 0.0f));
         glm::mat4 view;
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, (-1.0f + std::sin(curTime)) * 3.0f));
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(45.0f), static_cast<float>(sWinWidth) / sWinHeight, 0.1f, 100.0f);
 
