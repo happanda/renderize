@@ -33,7 +33,7 @@ uniform mat4 transform;
 
 void main()
 {
-    gl_Position = vec4(position, 1.0f);
+    gl_Position = transform * vec4(position, 1.0f);
     vertColor = color;
     texCoord = vec2(texCoords.x, 1.0f - texCoords.y);
 })";
@@ -226,7 +226,11 @@ int main(void)
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
         glEnableVertexAttribArray(2);
     }
-    
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
         // Game Loop
     while (!glfwWindowShouldClose(window))
@@ -247,31 +251,31 @@ int main(void)
         trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
         glm::mat4 trans2;
-        trans2 = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-        trans2 = glm::scale(trans, glm::vec3(std::sin(curTime), std::sin(curTime), std::sin(curTime)));
+        trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+        trans2 = glm::scale(trans2, glm::vec3(std::sin(curTime), std::sin(curTime), std::sin(curTime)));
 
 
-        //GLint transformLocation = glGetUniformLocation(shaderProgOr, "transform");
+        GLint transformLocation = glGetUniformLocation(shaderProgOr, "transform");
         GLint mixCoeffLocation = glGetUniformLocation(shaderProgOr, "mixCoeff");
 
-        //glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
+        glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans));
         glUniform1f(mixCoeffLocation, sMixCoeff);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
         glUniform1i(glGetUniformLocation(shaderProgOr, "texData1"), 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textures[1]);
         glUniform1i(glGetUniformLocation(shaderProgOr, "texData2"), 1);
-        glBindTexture(GL_TEXTURE_2D, 0);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        //glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans2));
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(trans2));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         glfwSwapBuffers(window);
 
