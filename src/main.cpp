@@ -104,6 +104,8 @@ int main(void)
     
     glViewport(0, 0, sWinWidth, sWinHeight);
 
+    glEnable(GL_DEPTH_TEST);
+
         // Initialize some GLFW callback
     glfwSetKeyCallback(window, keyCallback);
 
@@ -273,7 +275,7 @@ int main(void)
 
             // Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderProgOr.use();
 
