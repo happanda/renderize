@@ -23,6 +23,7 @@ struct camera
 
     void pos(glm::vec3 const& v);
     void front(glm::vec3 const& v);
+    void front(float pitch, float yaw);
     void up(glm::vec3 const& v);
 
     glm::mat4 view() const;

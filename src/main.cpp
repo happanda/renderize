@@ -19,6 +19,8 @@
 size_t const sWinWidth = 200;
 size_t const sWinHeight = 200;
 camera sCamera(sWinWidth, sWinHeight);
+float sYaw = 0.0f;
+float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 
 float sMixCoeff = 0.5f;
@@ -72,6 +74,7 @@ void main()
 
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
+void mouseCallback(GLFWwindow* window, double x, double y);
 void moveCamera(float dt);
 
 int main(void)
@@ -110,7 +113,10 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
 
         // Initialize some GLFW callback
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, keyCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    
 
 
     program shaderProgOr;
@@ -383,6 +389,23 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
     }
 }
 
+void mouseCallback(GLFWwindow* window, double x, double y)
+{
+    static GLfloat lastX = x, lastY = y;
+    GLfloat xDiff = x - lastX;
+    GLfloat yDiff = y - lastY;
+
+    lastX = x;
+    lastY = y;
+
+    GLfloat sensitivity = 0.05f;
+    xDiff *= sensitivity;
+    yDiff *= sensitivity;
+
+    sYaw += xDiff;
+    sPitch = glm::clamp(sPitch - yDiff, -89.0f, 89.0f);
+}
+
 void moveCamera(float dt)
 {
     GLfloat cameraSpeed = 5.0f * dt;
@@ -396,4 +419,5 @@ void moveCamera(float dt)
     if (sKeys[GLFW_KEY_D])
         camPos += glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
     sCamera.pos(camPos);
+    sCamera.front(sPitch, sYaw);
 }
