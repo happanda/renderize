@@ -18,11 +18,11 @@ struct camera
     glm::mat4 projection() const;
     
     glm::vec3 const& pos() const;
-    glm::vec3 const& target() const;
+    glm::vec3 const& front() const;
     glm::vec3 const& up() const;
 
     void pos(glm::vec3 const& v);
-    void target(glm::vec3 const& v);
+    void front(glm::vec3 const& v);
     void up(glm::vec3 const& v);
 
     glm::mat4 view() const;
@@ -35,6 +35,6 @@ private:
     float mFov;
     
     glm::vec3 mPos;
-    glm::vec3 mTarget;
+    glm::vec3 mFront;
     glm::vec3 mUp;
 };

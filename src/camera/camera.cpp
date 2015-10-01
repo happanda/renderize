@@ -11,7 +11,7 @@ camera::camera(size_t width, size_t height)
     , mFar(100.0f)
     , mFov(45.0f)
     , mPos(0.0f, 0.0f, 3.0f)
-    , mTarget(0.0f, 0.0f, 0.0f)
+    , mFront(0.0f, 0.0f, -1.0f)
     , mUp(0.0f, 1.0f, 0.0f)
 {
 }
@@ -58,9 +58,9 @@ glm::vec3 const& camera::pos() const
     return mPos;
 }
 
-glm::vec3 const& camera::target() const
+glm::vec3 const& camera::front() const
 {
-    return mTarget;
+    return mFront;
 }
 
 glm::vec3 const& camera::up() const
@@ -73,9 +73,9 @@ void camera::pos(glm::vec3 const& v)
     mPos = v;
 }
 
-void camera::target(glm::vec3 const& v)
+void camera::front(glm::vec3 const& v)
 {
-    mTarget = v;
+    mFront = glm::normalize(v);
 }
 
 void camera::up(glm::vec3 const& v)
@@ -85,6 +85,6 @@ void camera::up(glm::vec3 const& v)
 
 glm::mat4 camera::view() const
 {
-    return glm::lookAt(mPos, mTarget, mUp);
+    return glm::lookAt(mPos, mPos + mFront, mUp);
 }
 

@@ -19,6 +19,7 @@
 size_t const sWinWidth = 200;
 size_t const sWinHeight = 200;
 camera sCamera(sWinWidth, sWinHeight);
+std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 
 float sMixCoeff = 0.5f;
 
@@ -71,7 +72,7 @@ void main()
 
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
-
+void moveCamera(float dt);
 
 int main(void)
 {
@@ -284,23 +285,24 @@ int main(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
+    float lastTime = static_cast<float>(glfwGetTime());
+    float dt = 0.0f;
         // Game Loop
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
+
+        float curTime = static_cast<float>(glfwGetTime());
+        dt = curTime - lastTime;
+        lastTime = curTime;
+
+        moveCamera(dt);
 
             // Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderProgOr.use();
-
-        GLfloat curTime = static_cast<float>(glfwGetTime());
-
-        GLfloat radius = 10.0f;
-        GLfloat camX = std::sin(glfwGetTime()) * radius;
-        GLfloat camZ = std::cos(glfwGetTime()) * radius;
-        sCamera.pos(glm::vec3(camX, 0.0f, camZ));
 
         glm::mat4 view;
         view = sCamera.view();
@@ -364,6 +366,11 @@ void glfwErrorReporting(int errCode, char const* msg)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
 {
+    if (action == GLFW_PRESS)
+        sKeys[key] = true;
+    if (action == GLFW_RELEASE)
+        sKeys[key] = false;
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
@@ -374,4 +381,19 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
     {
         sMixCoeff -= 0.05f;
     }
+}
+
+void moveCamera(float dt)
+{
+    GLfloat cameraSpeed = 5.0f * dt;
+    auto camPos = sCamera.pos();
+    if (sKeys[GLFW_KEY_W])
+        camPos += cameraSpeed * sCamera.front();
+    if (sKeys[GLFW_KEY_S])
+        camPos -= cameraSpeed * sCamera.front();
+    if (sKeys[GLFW_KEY_A])
+        camPos -= glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
+    if (sKeys[GLFW_KEY_D])
+        camPos += glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
+    sCamera.pos(camPos);
 }
