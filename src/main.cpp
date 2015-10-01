@@ -11,12 +11,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "camera/camera.h"
 #include "shaders/program.h"
 #include "SOIL.h"
 
 
-size_t const sWinWidth = 800;
-size_t const sWinHeight = 800;
+size_t const sWinWidth = 200;
+size_t const sWinHeight = 200;
+camera sCamera(sWinWidth, sWinHeight);
 
 float sMixCoeff = 0.5f;
 
@@ -295,12 +297,15 @@ int main(void)
 
         GLfloat curTime = static_cast<float>(glfwGetTime());
 
-        glm::mat4 model;
-        model = glm::rotate(model, curTime * glm::radians(50.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+        GLfloat radius = 10.0f;
+        GLfloat camX = std::sin(glfwGetTime()) * radius;
+        GLfloat camZ = std::cos(glfwGetTime()) * radius;
+        sCamera.pos(glm::vec3(camX, 0.0f, camZ));
+
         glm::mat4 view;
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, (-1.0f + std::sin(curTime)) * 3.0f));
+        view = sCamera.view();
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), static_cast<float>(sWinWidth) / sWinHeight, 0.1f, 100.0f);
+        projection = sCamera.projection();
 
 
         GLint modelLocation = glGetUniformLocation(shaderProgOr, "model");
@@ -323,6 +328,7 @@ int main(void)
         glBindVertexArray(VAO);
         for (int i = 0; i < 10; ++i)
         {
+            glm::mat4 model;
             model = glm::mat4();
             model = glm::translate(model, cubePositions[i]);
             GLfloat angle = 20.0f * i;
