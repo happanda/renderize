@@ -16,8 +16,8 @@
 #include "SOIL.h"
 
 
-size_t const sWinWidth = 200;
-size_t const sWinHeight = 200;
+size_t const sWinWidth = 600;
+size_t const sWinHeight = 600;
 camera sCamera(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
@@ -75,6 +75,7 @@ void main()
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
 void mouseCallback(GLFWwindow* window, double x, double y);
+void scrollCallback(GLFWwindow* window, double xDiff, double yDiff);
 void moveCamera(float dt);
 
 int main(void)
@@ -116,7 +117,7 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetCursorPosCallback(window, mouseCallback);
-    
+    glfwSetScrollCallback(window, scrollCallback);
 
 
     program shaderProgOr;
@@ -387,6 +388,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
     {
         sMixCoeff -= 0.05f;
     }
+    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+    {
+        sCamera.fov(sCamera.fov() + 5);
+    }
+    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+    {
+        sCamera.fov(sCamera.fov() - 5);
+    }
 }
 
 void mouseCallback(GLFWwindow* window, double x, double y)
@@ -404,6 +413,11 @@ void mouseCallback(GLFWwindow* window, double x, double y)
 
     sYaw += xDiff;
     sPitch = glm::clamp(sPitch - yDiff, -89.0f, 89.0f);
+}
+
+void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
+{
+    sCamera.fov(sCamera.fov() - yDiff);
 }
 
 void moveCamera(float dt)

@@ -50,7 +50,7 @@ void camera::fov(float val)
 
 glm::mat4 camera::projection() const
 {
-    return glm::perspective(mFov, static_cast<GLfloat>(mWidth) / static_cast<GLfloat>(mHeight), mNear, mFar);
+    return glm::perspective(glm::radians(mFov), static_cast<GLfloat>(mWidth) / static_cast<GLfloat>(mHeight), mNear, mFar);
 }
 
 glm::vec3 const& camera::pos() const
@@ -86,7 +86,7 @@ void camera::front(float pitch, float yaw)
     front.z = std::cos(glm::radians(pitch)) * std::sin(glm::radians(yaw));
     mFront = glm::normalize(front);
     glm::vec3 right = glm::normalize(glm::cross(mUp, mFront));
-    mUp = glm::cross(mFront, right);
+    mUp = glm::normalize(glm::cross(mFront, right));
 }
 
 void camera::up(glm::vec3 const& v)
