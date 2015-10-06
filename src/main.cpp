@@ -31,7 +31,7 @@ void mouseCallback(GLFWwindow* window, double x, double y);
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff);
 void moveCamera(float dt);
 
-int main(void)
+int main(int argc, char* argv[])
 {
     if (GL_FALSE == glfwInit())
         return -1;
@@ -66,7 +66,7 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
 
-        // Initialize some GLFW callback
+        // Initialize some GLFW callbacks
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetCursorPosCallback(window, mouseCallback);
@@ -214,11 +214,6 @@ int main(void)
         glEnableVertexAttribArray(1);
     }
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
     float lastTime = static_cast<float>(glfwGetTime());
     float dt = 0.0f;
         // Game Loop
@@ -273,17 +268,10 @@ int main(void)
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glfwSwapBuffers(window);
-
-
-        /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);*/
     }
 
     glDeleteVertexArrays(1, &VAO);
