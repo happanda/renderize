@@ -80,12 +80,15 @@ void camera::front(glm::vec3 const& v)
 
 void camera::front(float pitch, float yaw)
 {
+    float const pitchRad = glm::radians(pitch);
+    float const yawRad = glm::radians(yaw - 90);
+
     glm::vec3 front;
-    front.x = std::cos(glm::radians(pitch)) * std::cos(glm::radians(yaw));
-    front.y = std::sin(glm::radians(pitch));
-    front.z = std::cos(glm::radians(pitch)) * std::sin(glm::radians(yaw));
+    front.x = std::cos(pitchRad) * std::cos(yawRad);
+    front.y = std::sin(pitchRad);
+    front.z = std::cos(pitchRad) * std::sin(yawRad);
     mFront = glm::normalize(front);
-    glm::vec3 right = glm::normalize(glm::cross(mUp, mFront));
+    glm::vec3 const right = glm::normalize(glm::cross(mUp, mFront));
     mUp = glm::normalize(glm::cross(mFront, right));
 }
 

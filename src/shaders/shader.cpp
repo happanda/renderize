@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "shader.h"
 
@@ -54,4 +55,14 @@ GLenum shader::type() const
 shader::operator GLenum() const
 {
     return mShader;
+}
+
+std::string readAllText(std::string const& path)
+{
+    std::ifstream ifstr(path);
+    if (!ifstr)
+        return std::string();
+    std::stringstream text;
+    ifstr >> text.rdbuf();
+    return text.str();
 }

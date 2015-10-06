@@ -22,3 +22,5 @@ struct shader
 private:
     GLuint mShader;
 };
+
+std::string readAllText(std::string const& path);

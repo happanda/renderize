@@ -25,53 +25,6 @@ std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 
 float sMixCoeff = 0.5f;
 
-GLchar const* sVertexShader = R"(#version 330 core
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 texCoords;
-
-out vec3 vertColor;
-out vec2 texCoord;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-void main()
-{
-    gl_Position = projection * view * model * vec4(position, 1.0f);
-    vertColor = vec3(0.0f, 0.0f, 0.0f);
-    texCoord = vec2(texCoords.x, 1.0f - texCoords.y);
-})";
-
-GLchar const* sFragmentShaderOrange = R"(#version 330 core
-
-in vec3 vertColor;
-in vec2 texCoord;
-out vec4 color;
-
-uniform sampler2D texData1;
-uniform sampler2D texData2;
-uniform float mixCoeff;
-
-void main()
-{
-    color = mix(texture(texData1, texCoord), texture(texData2, texCoord), mixCoeff);
-}
-)";
-
-GLchar const* sFragmentShaderYellow = R"(#version 330 core
-
-in vec3 vertColor;
-out vec4 color;
-
-void main()
-{
-    color = vec4(vertColor, 1.0f);//vec4(5.0f, 1.0f, 0.2f, 1.0f);
-}
-)";
-
-
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
 void mouseCallback(GLFWwindow* window, double x, double y);
@@ -120,53 +73,34 @@ int main(void)
     glfwSetScrollCallback(window, scrollCallback);
 
 
-    program shaderProgOr;
-    program shaderProgYe;
-    if (!shaderProgOr.create())
+    program shaderProg;
+    if (!shaderProg.create())
     {
-        std::cerr << shaderProgOr.lastError() << std::endl;
-        return -1;
-    }
-    if (!shaderProgYe.create())
-    {
-        std::cerr << shaderProgYe.lastError() << std::endl;
+        std::cerr << shaderProg.lastError() << std::endl;
         return -1;
     }
 
     {
         // Shaders
         shader vertexShader;
-        if (!vertexShader.compile(sVertexShader, GL_VERTEX_SHADER))
+        if (!vertexShader.compile(readAllText("../../src/shaders/vert_simple.c"), GL_VERTEX_SHADER))
         {
             std::cerr << vertexShader.lastError() << std::endl;
             return -1;
         }
-        shader fragmentShaderOr;
-        if (!fragmentShaderOr.compile(sFragmentShaderOrange, GL_FRAGMENT_SHADER))
+        shader fragmentShader;
+        if (!fragmentShader.compile(readAllText("../../src/shaders/frag_simple.c"), GL_FRAGMENT_SHADER))
         {
-            std::cerr << fragmentShaderOr.lastError() << std::endl;
-            return -1;
-        }
-        shader fragmentShaderYe;
-        if (!fragmentShaderYe.compile(sFragmentShaderYellow, GL_FRAGMENT_SHADER))
-        {
-            std::cerr << fragmentShaderYe.lastError() << std::endl;
+            std::cerr << fragmentShader.lastError() << std::endl;
             return -1;
         }
 
         // Shader program
-        shaderProgOr.attach(vertexShader);
-        shaderProgOr.attach(fragmentShaderOr);
-        if (!shaderProgOr.link())
+        shaderProg.attach(vertexShader);
+        shaderProg.attach(fragmentShader);
+        if (!shaderProg.link())
         {
-            std::cerr << shaderProgOr.lastError() << std::endl;
-            return -1;
-        }
-        shaderProgYe.attach(vertexShader);
-        shaderProgYe.attach(fragmentShaderOr);
-        if (!shaderProgYe.link())
-        {
-            std::cerr << shaderProgYe.lastError() << std::endl;
+            std::cerr << shaderProg.lastError() << std::endl;
             return -1;
         }
     }
@@ -309,7 +243,7 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shaderProgOr.use();
+        shaderProg.use();
 
         glm::mat4 view;
         view = sCamera.view();
@@ -317,10 +251,10 @@ int main(void)
         projection = sCamera.projection();
 
 
-        GLint modelLocation = glGetUniformLocation(shaderProgOr, "model");
-        GLint viewLocation = glGetUniformLocation(shaderProgOr, "view");
-        GLint projectionLocation = glGetUniformLocation(shaderProgOr, "projection");
-        GLint mixCoeffLocation = glGetUniformLocation(shaderProgOr, "mixCoeff");
+        GLint modelLocation = glGetUniformLocation(shaderProg, "model");
+        GLint viewLocation = glGetUniformLocation(shaderProg, "view");
+        GLint projectionLocation = glGetUniformLocation(shaderProg, "projection");
+        GLint mixCoeffLocation = glGetUniformLocation(shaderProg, "mixCoeff");
 
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
@@ -328,11 +262,11 @@ int main(void)
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
-        glUniform1i(glGetUniformLocation(shaderProgOr, "texData1"), 0);
+        glUniform1i(glGetUniformLocation(shaderProg, "texData1"), 0);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textures[1]);
-        glUniform1i(glGetUniformLocation(shaderProgOr, "texData2"), 1);
+        glUniform1i(glGetUniformLocation(shaderProg, "texData2"), 1);
 
         glBindVertexArray(VAO);
         for (int i = 0; i < 10; ++i)
