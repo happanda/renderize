@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     {
         // Shaders
         shader vertexShader;
-        if (!vertexShader.compile(readAllText("../../src/shaders/vert_simple.c"), GL_VERTEX_SHADER))
+        if (!vertexShader.compile(readAllText("../../src/shaders/simple.vert"), GL_VERTEX_SHADER))
         {
             std::cerr << vertexShader.lastError() << std::endl;
             return -1;
