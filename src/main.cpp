@@ -16,8 +16,8 @@
 #include "SOIL.h"
 
 
-size_t const sWinWidth = 600;
-size_t const sWinHeight = 600;
+size_t const sWinWidth = 1200;
+size_t const sWinHeight = 800;
 camera sCamera(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
@@ -393,6 +393,10 @@ void moveCamera(float dt)
         camPos -= glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
     if (sKeys[GLFW_KEY_D])
         camPos += glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
+    if (sKeys[GLFW_KEY_SPACE])
+        camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
+    if (sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
+        camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     sCamera.pos(camPos);
     sCamera.front(sPitch, sYaw);
 }

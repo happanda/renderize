@@ -88,7 +88,7 @@ void camera::front(float pitch, float yaw)
     front.y = std::sin(pitchRad);
     front.z = std::cos(pitchRad) * std::sin(yawRad);
     mFront = glm::normalize(front);
-    glm::vec3 const right = glm::normalize(glm::cross(mUp, mFront));
+    glm::vec3 const right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), mFront));
     mUp = glm::normalize(glm::cross(mFront, right));
 }
 
