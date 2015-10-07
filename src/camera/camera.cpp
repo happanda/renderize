@@ -10,7 +10,7 @@ camera::camera(size_t width, size_t height)
     , mNear(0.1f)
     , mFar(100.0f)
     , mFov(45.0f)
-    , mPos(0.0f, 0.0f, 3.0f)
+    , mPos(0.0f, 0.0f, 5.0f)
     , mFront(0.0f, 0.0f, -1.0f)
     , mUp(0.0f, 1.0f, 0.0f)
 {
