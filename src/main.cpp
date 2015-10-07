@@ -22,7 +22,7 @@ camera sCamera(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
-glm::vec3 sLightPos(10.0f, 1.0f, 2.0f);
+glm::vec3 sLightPos(3.0f, 1.0f, 2.0f);
 glm::vec3 sLightColor(1.0f, 1.0f, 1.0f);
 
 void glfwErrorReporting(int errCode, char const* msg);
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
             glUniform3f(lightColorLocLamp, sLightColor.x, sLightColor.y, sLightColor.z);
 
             glm::mat4 model;
-            model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
+            //model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
             model = glm::translate(model, sLightPos);
             model = glm::scale(model, glm::vec3(0.2f));
             actualLightPos = model * glm::vec4(sLightPos, 1.0f);
@@ -298,6 +298,8 @@ int main(int argc, char* argv[])
             GLint lightColorLoc = glGetUniformLocation(shaderCube, "lightColor");
             glUniform3f(objColorLoc, 0.5f, 0.5f, 0.11f);
             glUniform3f(lightColorLoc, sLightColor.x, sLightColor.y, sLightColor.z);
+            GLint viewerPosLoc = glGetUniformLocation(shaderCube, "viewerPos");
+            glUniform3f(viewerPosLoc, sCamera.pos().x, sCamera.pos().y, sCamera.pos().z);
             GLint lightPosLoc = glGetUniformLocation(shaderCube, "lightPos");
             glUniform3f(lightPosLoc, actualLightPos.x, actualLightPos.y, actualLightPos.z);
 
@@ -307,7 +309,7 @@ int main(int argc, char* argv[])
                 glm::mat4 model;
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
-                model = glm::rotate(model, glm::radians(angle)/* + curTime*/, glm::vec3(1.0f, 0.1f * i, 0.5f));
+                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
