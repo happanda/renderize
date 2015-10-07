@@ -12,8 +12,9 @@ ${SourcePath}/shaders/shader.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
-${SourcePath}/shaders/simple.vert
-${SourcePath}/shaders/simple.frag
+${SourcePath}/shaders/cube.vert
+${SourcePath}/shaders/cube.frag
+${SourcePath}/shaders/lamp.frag
 )
 
 set(SOURCE_FILES

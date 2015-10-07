@@ -89,13 +89,13 @@ int main(int argc, char* argv[])
     {
         // Shaders
         shader vertexShader;
-        if (!vertexShader.compile(readAllText("../../src/shaders/simple.vert"), GL_VERTEX_SHADER))
+        if (!vertexShader.compile(readAllText("../../src/shaders/cube.vert"), GL_VERTEX_SHADER))
         {
             std::cerr << vertexShader.lastError() << std::endl;
             return -1;
         }
         shader fragCube;
-        if (!fragCube.compile(readAllText("../../src/shaders/simple.frag"), GL_FRAGMENT_SHADER))
+        if (!fragCube.compile(readAllText("../../src/shaders/cube.frag"), GL_FRAGMENT_SHADER))
         {
             std::cerr << fragCube.lastError() << std::endl;
             return -1;
