@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 3.0.0)
 project(Renderize)
 
 # useful variables
@@ -12,15 +12,22 @@ include_directories(${ExtPath})
 
 # CMAKE flags
 set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/build/debug)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build/release)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
 
 # C++ compilation flags
 # no flags :)
 
 include(CMakeSrc.cmake)
 add_executable(Renderize ${SOURCE_FILES_ALL})
+
 
 
 ### External projects ###
@@ -50,3 +57,28 @@ include_directories(${GLMPath})
 set(ATBPath ${ExtPath}/AntTweakBar)
 include_directories(${ATBPath}/include)
 target_link_libraries(Renderize ${ATBPath}/lib/AntTweakBar.lib)
+
+
+
+### Copying stuff ###
+add_custom_command(TARGET Renderize PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+add_custom_command(TARGET Renderize PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders)
+
+add_custom_target(CopyShaderFiles)
+foreach(ShaderFile ${SOURCE_FILES_SHADERS_SOURCE})
+    get_filename_component(ShaderFileName ${ShaderFile} NAME)
+    add_custom_command(TARGET CopyShaderFiles PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${ShaderFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/${ShaderFileName})
+endforeach()
+add_dependencies(Renderize CopyShaderFiles)
+
+add_custom_target(CopyDlls)
+foreach(DllFile ${ATBPath}/lib/AntTweakBar.dll)
+    get_filename_component(DllFileName ${DllFile} NAME)
+    add_custom_command(TARGET CopyDlls PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${DllFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DllFileName})
+endforeach()
+add_dependencies(Renderize CopyDlls)
+
