@@ -18,8 +18,8 @@
 #include "SOIL.h"
 
 
-size_t const sWinWidth = 400;
-size_t const sWinHeight = 400;
+size_t sWinWidth = 400;
+size_t sWinHeight = 400;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
@@ -29,12 +29,15 @@ float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 glm::vec3 sLightPos(3.0f, 1.0f, 2.0f);
 glm::vec3 sLightColor(1.0f, 1.0f, 1.0f);
+glm::vec3 sObjColor(0.5f, 0.5f, 0.11f);
 
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
 void mouseCallback(GLFWwindow* window, double x, double y);
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff);
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers);
+void charCallback(GLFWwindow* window, unsigned int symb);
+void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY);
 void moveCamera(float dt);
 
 
@@ -46,7 +49,7 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     glfwSetErrorCallback(glfwErrorReporting);
 
@@ -65,6 +68,9 @@ int main(int argc, char* argv[])
     {
         TwWindowSize(sWinWidth, sWinHeight);
         sATB = TwNewBar("Tweak");
+
+        TwAddVarRW(sATB, "Light", TW_TYPE_COLOR3F, glm::value_ptr(sLightColor), " label='Light color' ");
+        TwAddVarRW(sATB, "Cube", TW_TYPE_COLOR3F, glm::value_ptr(sObjColor), " label='Cube color' ");
     }
     else
         std::cerr << TwGetLastError() << std::endl;
@@ -89,8 +95,8 @@ int main(int argc, char* argv[])
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetScrollCallback(window, scrollCallback);
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
-    glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW);
-    glfwSetWindowSizeCallback(window, (GLFWwindowsizefun)TwWindowSize);
+    glfwSetCharCallback(window, charCallback);
+    glfwSetWindowSizeCallback(window, windowSizeCallback);
 
 
     program shaderCube;
@@ -316,7 +322,7 @@ int main(int argc, char* argv[])
             glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
             GLint objColorLoc = glGetUniformLocation(shaderCube, "objectColor");
             GLint lightColorLoc = glGetUniformLocation(shaderCube, "lightColor");
-            glUniform3f(objColorLoc, 0.5f, 0.5f, 0.11f);
+            glUniform3f(objColorLoc, sObjColor.x, sObjColor.y, sObjColor.z);
             glUniform3f(lightColorLoc, sLightColor.x, sLightColor.y, sLightColor.z);
             GLint viewerPosLoc = glGetUniformLocation(shaderCube, "viewerPos");
             glUniform3f(viewerPosLoc, sCamera.pos().x, sCamera.pos().y, sCamera.pos().z);
@@ -410,6 +416,19 @@ void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
 {
     TwEventMouseButtonGLFW(button, action);
+}
+
+void charCallback(GLFWwindow* window, unsigned int symb)
+{
+    TwEventCharGLFW(symb, GLFW_PRESS);
+}
+
+void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
+{
+    sWinWidth = sizeX;
+    sWinHeight = sizeY;
+    glViewport(0, 0, sWinWidth, sWinHeight);
+    TwWindowSize(sWinWidth, sWinHeight);
 }
 
 void moveCamera(float dt)
