@@ -18,8 +18,8 @@
 #include "SOIL.h"
 
 
-size_t sWinWidth = 400;
-size_t sWinHeight = 400;
+size_t sWinWidth = 500;
+size_t sWinHeight = 500;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
@@ -27,9 +27,14 @@ camera sCamera(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
-glm::vec3 sLightPos(3.0f, 1.0f, 2.0f);
+glm::vec3 sLightPos(8.0f, 1.0f, 2.0f);
 glm::vec3 sLightColor(1.0f, 1.0f, 1.0f);
-glm::vec3 sObjColor(0.5f, 0.5f, 0.11f);
+glm::vec3 sObjColor(0.2f, 0.3f, 0.6f);
+float sAmbientStr{ 0.3f };
+float sDiffuseStr{ 0.3f };
+float sSpecularStr{ 0.8f };
+int sSpecularShine{ 32 };
+
 
 void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
@@ -71,6 +76,10 @@ int main(int argc, char* argv[])
 
         TwAddVarRW(sATB, "Light", TW_TYPE_COLOR3F, glm::value_ptr(sLightColor), " label='Light color' ");
         TwAddVarRW(sATB, "Cube", TW_TYPE_COLOR3F, glm::value_ptr(sObjColor), " label='Cube color' ");
+        TwAddVarRW(sATB, "Ambient", TW_TYPE_FLOAT, &sAmbientStr, " label='Ambient strength' min=-1.0 max=1.0 step=0.05 ");
+        TwAddVarRW(sATB, "Diffuse", TW_TYPE_FLOAT, &sDiffuseStr, " label='Diffuse strength' min=-1.0 max=1.0 step=0.05 ");
+        TwAddVarRW(sATB, "Specular", TW_TYPE_FLOAT, &sSpecularStr, " label='Specular Strength' min=-1.0 max=1.0 step=0.05 ");
+        TwAddVarRW(sATB, "Shininess", TW_TYPE_INT32, &sSpecularShine, " label='Specular shininess' min=-32 max=512 step=1 ");
     }
     else
         std::cerr << TwGetLastError() << std::endl;
@@ -321,13 +330,20 @@ int main(int argc, char* argv[])
             glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
             glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
             GLint objColorLoc = glGetUniformLocation(shaderCube, "objectColor");
-            GLint lightColorLoc = glGetUniformLocation(shaderCube, "lightColor");
             glUniform3f(objColorLoc, sObjColor.x, sObjColor.y, sObjColor.z);
+            GLint lightColorLoc = glGetUniformLocation(shaderCube, "lightColor");
             glUniform3f(lightColorLoc, sLightColor.x, sLightColor.y, sLightColor.z);
             GLint viewerPosLoc = glGetUniformLocation(shaderCube, "viewerPos");
             glUniform3f(viewerPosLoc, sCamera.pos().x, sCamera.pos().y, sCamera.pos().z);
             GLint lightPosLoc = glGetUniformLocation(shaderCube, "lightPos");
             glUniform3f(lightPosLoc, actualLightPos.x, actualLightPos.y, actualLightPos.z);
+
+            GLint ambientLoc = glGetUniformLocation(shaderCube, "ambientStrength");
+            glUniform1f(ambientLoc, sAmbientStr);
+            GLint specLoc = glGetUniformLocation(shaderCube, "specularStrength");
+            glUniform1f(specLoc, sSpecularStr);
+            GLint shineLoc = glGetUniformLocation(shaderCube, "specularShine");
+            glUniform1i(shineLoc, sSpecularShine);
 
             glBindVertexArray(VAO);
             for (int i = 0; i < 10; ++i)
@@ -335,7 +351,7 @@ int main(int argc, char* argv[])
                 glm::mat4 model;
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
-                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+                model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }

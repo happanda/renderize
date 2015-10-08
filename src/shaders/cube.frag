@@ -9,20 +9,22 @@ uniform vec3 lightPos;
 uniform vec3 objectColor;
 uniform vec3 lightColor;
 
+uniform float ambientStrength;
+uniform float specularStrength;
+uniform int specularShine;
+
 void main()
 {
-    float ambientStrenth = 0.3f;
-    float ambient = ambientStrenth;// * lightColor;
+    float ambient = ambientStrength;// * lightColor;
     
     vec3 normal = normalize(Normal);
     vec3 lightDir = normalize(lightPos.xyz - FragPos);
     float diff = max(dot(normal, lightDir), 0.0f);
     float diffuse = diff;// * lightColor;
     
-    float specularStrength = 0.8f;
     vec3 viewDir = normalize(viewerPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), specularShine);
     float specular = specularStrength * spec;// * lightColor;
     
     color = vec4((ambient + diffuse + specular) * lightColor * objectColor, 1.0f);
