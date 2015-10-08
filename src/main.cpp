@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include <AntTweakBar.h>
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -16,8 +18,11 @@
 #include "SOIL.h"
 
 
-size_t const sWinWidth = 1200;
-size_t const sWinHeight = 800;
+size_t const sWinWidth = 400;
+size_t const sWinHeight = 400;
+TwBar* sATB{ nullptr };
+bool sMouseVisible{ false };
+
 camera sCamera(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
@@ -29,13 +34,15 @@ void glfwErrorReporting(int errCode, char const* msg);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
 void mouseCallback(GLFWwindow* window, double x, double y);
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff);
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers);
 void moveCamera(float dt);
+
 
 int main(int argc, char* argv[])
 {
     if (GL_FALSE == glfwInit())
         return -1;
-    // Provide some hints for the GLFW
+        // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -43,7 +50,7 @@ int main(int argc, char* argv[])
 
     glfwSetErrorCallback(glfwErrorReporting);
 
-    // Create a window
+        // Create a window
     GLFWwindow* window = glfwCreateWindow(sWinWidth, sWinHeight, "Renderize", nullptr, nullptr);
     if (!window)
     {
@@ -52,7 +59,18 @@ int main(int argc, char* argv[])
     }
     glfwMakeContextCurrent(window);
 
-    // Initialize Glew
+
+        // AntTweakBar
+    if (TwInit(TW_OPENGL_CORE, NULL))
+    {
+        TwWindowSize(sWinWidth, sWinHeight);
+        sATB = TwNewBar("Tweak");
+    }
+    else
+        std::cerr << TwGetLastError() << std::endl;
+
+
+        // Initialize Glew
 
     glewExperimental = GL_TRUE;
     GLenum glewCode = glewInit();
@@ -63,14 +81,16 @@ int main(int argc, char* argv[])
     }
 
     glViewport(0, 0, sWinWidth, sWinHeight);
-
     glEnable(GL_DEPTH_TEST);
 
     // Initialize some GLFW callbacks
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetScrollCallback(window, scrollCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW);
+    glfwSetWindowSizeCallback(window, (GLFWwindowsizefun)TwWindowSize);
 
 
     program shaderCube;
@@ -317,8 +337,13 @@ int main(int argc, char* argv[])
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        TwDraw();
+
         glfwSwapBuffers(window);
     }
+
+    TwDeleteBar(sATB);
+    sATB = nullptr;
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
@@ -333,6 +358,8 @@ void glfwErrorReporting(int errCode, char const* msg)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
 {
+    if (TwEventKeyGLFW(key, action))
+        return;
     if (action == GLFW_PRESS)
         sKeys[key] = true;
     if (action == GLFW_RELEASE)
@@ -340,19 +367,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
-    else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    else if ((key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT) && action == GLFW_PRESS)
     {
-    }
-    else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-    {
-    }
-    else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-    {
-        sCamera.fov(sCamera.fov() + 5);
-    }
-    else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-    {
-        sCamera.fov(sCamera.fov() - 5);
+        sMouseVisible = !sMouseVisible;
+        glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
 }
 
@@ -360,15 +378,21 @@ void mouseCallback(GLFWwindow* window, double x, double y)
 {
     float const xFloat = static_cast<GLfloat>(x);
     float const yFloat = static_cast<GLfloat>(y);
-
     static GLfloat lastX = xFloat, lastY = yFloat;
+
+    if (sMouseVisible)
+    {
+        lastX = xFloat;
+        lastY = yFloat;
+        TwEventMousePosGLFW(static_cast<int>(x), static_cast<int>(y));
+        return;
+    }
+    
     GLfloat xDiff = xFloat - lastX;
     GLfloat yDiff = yFloat - lastY;
-
     lastX = xFloat;
     lastY = yFloat;
-
-    GLfloat sensitivity = 0.08f;
+    GLfloat const sensitivity = 0.08f;
     xDiff *= sensitivity;
     yDiff *= sensitivity;
 
@@ -378,11 +402,20 @@ void mouseCallback(GLFWwindow* window, double x, double y)
 
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
 {
+    if (TwEventMouseWheelGLFW(static_cast<int>(yDiff)))
+        return;
     sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
+{
+    TwEventMouseButtonGLFW(button, action);
 }
 
 void moveCamera(float dt)
 {
+    if (sMouseVisible)
+        return;
     GLfloat cameraSpeed = 5.0f * dt;
     auto camPos = sCamera.pos();
     if (sKeys[GLFW_KEY_W])

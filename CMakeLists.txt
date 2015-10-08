@@ -46,3 +46,7 @@ target_link_libraries(Renderize optimized ${SOILPath}/lib/Release/SOIL.lib)
 set(GLMPath ${ExtPath}/glm-0.9.7.1)
 include_directories(${GLMPath})
 
+### AntTweakBar ###
+set(ATBPath ${ExtPath}/AntTweakBar)
+include_directories(${ATBPath}/include)
+target_link_libraries(Renderize ${ATBPath}/lib/AntTweakBar.lib)
