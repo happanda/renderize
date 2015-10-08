@@ -30,10 +30,10 @@ std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 glm::vec3 sLightPos(8.0f, 1.0f, 2.0f);
 glm::vec3 sLightColor(1.0f, 1.0f, 1.0f);
 glm::vec3 sObjColor(0.2f, 0.3f, 0.6f);
-float sAmbientStr{ 0.3f };
-float sDiffuseStr{ 0.3f };
-float sSpecularStr{ 0.8f };
-int sSpecularShine{ 32 };
+float sAmbientStr{ 0.5f };
+float sDiffuseStr{ 0.9f };
+float sSpecularStr{ 0.5f };
+int sSpecularShine{ 128 };
 
 
 void glfwErrorReporting(int errCode, char const* msg);
@@ -340,6 +340,8 @@ int main(int argc, char* argv[])
 
             GLint ambientLoc = glGetUniformLocation(shaderCube, "ambientStrength");
             glUniform1f(ambientLoc, sAmbientStr);
+            GLint diffLoc = glGetUniformLocation(shaderCube, "diffuseStrength");
+            glUniform1f(diffLoc, sDiffuseStr);
             GLint specLoc = glGetUniformLocation(shaderCube, "specularStrength");
             glUniform1f(specLoc, sSpecularStr);
             GLint shineLoc = glGetUniformLocation(shaderCube, "specularShine");
@@ -351,7 +353,7 @@ int main(int argc, char* argv[])
                 glm::mat4 model;
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
-                model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
