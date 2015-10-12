@@ -36,7 +36,7 @@ struct material
 };
 struct light
 {
-    glm::vec3 position;
+    glm::vec3 direction;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -48,7 +48,7 @@ material sCube{
     { 0.6f, 0.6f, 0.6f },
     128.0f };
 light sLight{
-    { 8.0f, 1.0f, 2.0f },
+    { -1.0f, -1.0f, -0.3f },
     { 0.1f, 0.1f, 0.1f },
     { 0.8f, 0.8f, 0.8f },
     { 0.8f, 0.8f, 0.8f },
@@ -98,9 +98,9 @@ int main(int argc, char* argv[])
         TwAddVarRW(sATB, "mat.spe", TW_TYPE_COLOR3F, glm::value_ptr(sCube.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "mat.shi", TW_TYPE_FLOAT, &sCube.shininess, " label='Shininess' min=-32 max=512 step=1 ");
 
-        TwAddVarRW(sATB, "light.pos.x", TW_TYPE_FLOAT, &sLight.position.x, " label='Light pos x' step=0.1 ");
-        TwAddVarRW(sATB, "light.pos.y", TW_TYPE_FLOAT, &sLight.position.y, " label='Light pos y' step=0.1 ");
-        TwAddVarRW(sATB, "light.pos.z", TW_TYPE_FLOAT, &sLight.position.z, " label='Light pos z' step=0.1 ");
+        TwAddVarRW(sATB, "light.dir.x", TW_TYPE_FLOAT, &sLight.direction.x, " label='Light pos x' step=0.1 ");
+        TwAddVarRW(sATB, "light.dir.y", TW_TYPE_FLOAT, &sLight.direction.y, " label='Light pos y' step=0.1 ");
+        TwAddVarRW(sATB, "light.dir.z", TW_TYPE_FLOAT, &sLight.direction.z, " label='Light pos z' step=0.1 ");
         TwAddVarRW(sATB, "light.amb", TW_TYPE_COLOR3F, glm::value_ptr(sLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "light.dif", TW_TYPE_COLOR3F, glm::value_ptr(sLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "light.spe", TW_TYPE_COLOR3F, glm::value_ptr(sLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
@@ -330,8 +330,8 @@ int main(int argc, char* argv[])
         glm::vec4 actualLightPos;
         {
             shaderLamp.use();
-            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.position");
-            glUniform3f(lightPosLoc, sLight.position.x, sLight.position.y, sLight.position.z);
+            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.direction");
+            glUniform3f(lightPosLoc, sLight.direction.x, sLight.direction.y, sLight.direction.z);
             GLint lightAmbLoc = glGetUniformLocation(shaderCube, "light.ambient");
             glUniform3f(lightAmbLoc, sLight.ambient.x, sLight.ambient.y, sLight.ambient.z);
             GLint lightDifLoc = glGetUniformLocation(shaderCube, "light.diffuse");
@@ -341,9 +341,9 @@ int main(int argc, char* argv[])
 
             glm::mat4 model;
             //model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::translate(model, sLight.position);
+            model = glm::translate(model, sLight.direction);
             model = glm::scale(model, glm::vec3(0.2f));
-            actualLightPos = model * glm::vec4(sLight.position, 1.0f);
+            actualLightPos = model * glm::vec4(sLight.direction, 1.0f);
             glBindVertexArray(lightVAO);
             GLint modelLocation = glGetUniformLocation(shaderLamp, "model");
             GLint viewLocation = glGetUniformLocation(shaderLamp, "view");
@@ -379,8 +379,8 @@ int main(int argc, char* argv[])
             GLint matShiLoc = glGetUniformLocation(shaderCube, "material.shininess");
             glUniform1f(matShiLoc, sCube.shininess);
 
-            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.position");
-            glUniform3f(lightPosLoc, sLight.position.x, sLight.position.y, sLight.position.z);
+            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.direction");
+            glUniform3f(lightPosLoc, sLight.direction.x, sLight.direction.y, sLight.direction.z);
             GLint lightAmbLoc = glGetUniformLocation(shaderCube, "light.ambient");
             glUniform3f(lightAmbLoc, sLight.ambient.x, sLight.ambient.y, sLight.ambient.z);
             GLint lightDifLoc = glGetUniformLocation(shaderCube, "light.diffuse");
