@@ -29,9 +29,6 @@ float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 struct material
 {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
     float shininess;
 };
 struct light
@@ -42,11 +39,7 @@ struct light
     glm::vec3 specular;
 };
 
-material sCube{
-    { 0.1f, 0.1f, 0.1f },
-    { 0.3f, 0.4f, 0.6f },
-    { 0.6f, 0.6f, 0.6f },
-    128.0f };
+material sCube{ 128.0f };
 light sLight{
     { -1.0f, -1.0f, -0.3f },
     { 0.1f, 0.1f, 0.1f },
@@ -93,14 +86,9 @@ int main(int argc, char* argv[])
         TwWindowSize(sWinWidth, sWinHeight);
         sATB = TwNewBar("Tweak");
 
-        TwAddVarRW(sATB, "mat.amb", TW_TYPE_COLOR3F, glm::value_ptr(sCube.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "mat.dif", TW_TYPE_COLOR3F, glm::value_ptr(sCube.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "mat.spe", TW_TYPE_COLOR3F, glm::value_ptr(sCube.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "mat.shi", TW_TYPE_FLOAT, &sCube.shininess, " label='Shininess' min=-32 max=512 step=1 ");
 
-        TwAddVarRW(sATB, "light.dir.x", TW_TYPE_FLOAT, &sLight.direction.x, " label='Light pos x' step=0.1 ");
-        TwAddVarRW(sATB, "light.dir.y", TW_TYPE_FLOAT, &sLight.direction.y, " label='Light pos y' step=0.1 ");
-        TwAddVarRW(sATB, "light.dir.z", TW_TYPE_FLOAT, &sLight.direction.z, " label='Light pos z' step=0.1 ");
+        TwAddVarRW(sATB, "light.dir", TW_TYPE_DIR3F, glm::value_ptr(sLight.direction), " label='Light dir' ");
         TwAddVarRW(sATB, "light.amb", TW_TYPE_COLOR3F, glm::value_ptr(sLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "light.dif", TW_TYPE_COLOR3F, glm::value_ptr(sLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
         TwAddVarRW(sATB, "light.spe", TW_TYPE_COLOR3F, glm::value_ptr(sLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
@@ -374,8 +362,6 @@ int main(int argc, char* argv[])
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, textures[1]);
 
-            GLint matSpeLoc = glGetUniformLocation(shaderCube, "material.specular");
-            glUniform3f(matSpeLoc, sCube.specular.x, sCube.specular.y, sCube.specular.z);
             GLint matShiLoc = glGetUniformLocation(shaderCube, "material.shininess");
             glUniform1f(matShiLoc, sCube.shininess);
 
