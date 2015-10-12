@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    image = SOIL_load_image("../tex/awesomeface.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
+    image = SOIL_load_image("../tex/crate_specular.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
     SOIL_free_image_data(image);
@@ -369,6 +369,10 @@ int main(int argc, char* argv[])
             glUniform1i(matDifLoc, 0);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textures[0]);
+            GLint matSpecLoc = glGetUniformLocation(shaderCube, "material.specular");
+            glUniform1i(matSpecLoc, 1);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, textures[1]);
 
             GLint matSpeLoc = glGetUniformLocation(shaderCube, "material.specular");
             glUniform3f(matSpeLoc, sCube.specular.x, sCube.specular.y, sCube.specular.z);
