@@ -1,17 +1,21 @@
 #version 330 core
-struct Light
+out vec4 color;
+
+struct PLight
 {
     vec3 position;
-    
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float constCoeff;
+    float linCoeff;
+    float quadCoeff;
 };
-out vec4 color;
 
-uniform Light light;
+uniform PLight pLight;
+
 
 void main()
 {
-    color = vec4(light.diffuse, 1.0f);
+    color = vec4(pLight.diffuse, 1.0f);
 }

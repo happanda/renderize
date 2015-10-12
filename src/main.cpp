@@ -18,8 +18,8 @@
 #include "SOIL.h"
 
 
-size_t sWinWidth = 500;
-size_t sWinHeight = 500;
+size_t sWinWidth = 1280;
+size_t sWinHeight = 800;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
@@ -31,20 +31,38 @@ struct material
 {
     float shininess;
 };
-struct light
+struct dir_light
 {
     glm::vec3 direction;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
 };
+struct point_light
+{
+    glm::vec3 position;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float constCoeff;
+    float linCoeff;
+    float quadCoeff;
+};
 
 material sCube{ 128.0f };
-light sLight{
+dir_light sDirLight{
     { -1.0f, -1.0f, -0.3f },
+    { 0.1f, 0.1f, 0.1f },
+    { 0.2f, 0.2f, 0.2f },
+    { 0.2f, 0.2f, 0.2f },
+};
+point_light sPLight
+{
+    { -1.0f, -1.0f, 0.0f },
     { 0.1f, 0.1f, 0.1f },
     { 0.8f, 0.8f, 0.8f },
     { 0.8f, 0.8f, 0.8f },
+    1.0f, 0.09f, 0.032f
 };
 
 
@@ -87,11 +105,21 @@ int main(int argc, char* argv[])
         sATB = TwNewBar("Tweak");
 
         TwAddVarRW(sATB, "mat.shi", TW_TYPE_FLOAT, &sCube.shininess, " label='Shininess' min=-32 max=512 step=1 ");
+        
+        TwAddVarRW(sATB, "dlight.dir", TW_TYPE_DIR3F, glm::value_ptr(sDirLight.direction), " label='Light dir' ");
+        TwAddVarRW(sATB, "dlight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "dlight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "dlight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
 
-        TwAddVarRW(sATB, "light.dir", TW_TYPE_DIR3F, glm::value_ptr(sLight.direction), " label='Light dir' ");
-        TwAddVarRW(sATB, "light.amb", TW_TYPE_COLOR3F, glm::value_ptr(sLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "light.dif", TW_TYPE_COLOR3F, glm::value_ptr(sLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "light.spe", TW_TYPE_COLOR3F, glm::value_ptr(sLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.pos.x", TW_TYPE_FLOAT, &sPLight.position.x, " label='Light pos.x' ");
+        TwAddVarRW(sATB, "plight.pos.y", TW_TYPE_FLOAT, &sPLight.position.y, " label='Light pos.y' ");
+        TwAddVarRW(sATB, "plight.pos.z", TW_TYPE_FLOAT, &sPLight.position.z, " label='Light pos.z' ");
+        TwAddVarRW(sATB, "plight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.const", TW_TYPE_FLOAT, &sPLight.constCoeff, " label='Const coeff' step=0.05 ");
+        TwAddVarRW(sATB, "plight.lin", TW_TYPE_FLOAT, &sPLight.linCoeff, " label='Linear coeff' step=0.05 ");
+        TwAddVarRW(sATB, "plight.quad", TW_TYPE_FLOAT, &sPLight.quadCoeff, " label='Quadratic coeff' step=0.05 ");
     }
     else
         std::cerr << TwGetLastError() << std::endl;
@@ -315,23 +343,29 @@ int main(int argc, char* argv[])
         glm::mat4 projection;
         projection = sCamera.projection();
 
-        glm::vec4 actualLightPos;
         {
             shaderLamp.use();
-            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.direction");
-            glUniform3f(lightPosLoc, sLight.direction.x, sLight.direction.y, sLight.direction.z);
-            GLint lightAmbLoc = glGetUniformLocation(shaderCube, "light.ambient");
-            glUniform3f(lightAmbLoc, sLight.ambient.x, sLight.ambient.y, sLight.ambient.z);
-            GLint lightDifLoc = glGetUniformLocation(shaderCube, "light.diffuse");
-            glUniform3f(lightDifLoc, sLight.diffuse.x, sLight.diffuse.y, sLight.diffuse.z);
-            GLint lightSpeLoc = glGetUniformLocation(shaderCube, "light.specular");
-            glUniform3f(lightSpeLoc, sLight.specular.x, sLight.specular.y, sLight.specular.z);
+            {
+                GLint lightPosLoc = glGetUniformLocation(shaderLamp, "pLight.position");
+                GLint lightAmbLoc = glGetUniformLocation(shaderLamp, "pLight.ambient");
+                GLint lightDifLoc = glGetUniformLocation(shaderLamp, "pLight.diffuse");
+                GLint lightSpeLoc = glGetUniformLocation(shaderLamp, "pLight.specular");
+                GLint lightConstCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.constCoeff");
+                GLint lightLinCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.linCoeff");
+                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.quadCoeff");
+                glUniform3f(lightPosLoc, sPLight.position.x, sPLight.position.y, sPLight.position.z);
+                glUniform3f(lightAmbLoc, sPLight.ambient.x, sPLight.ambient.y, sPLight.ambient.z);
+                glUniform3f(lightDifLoc, sPLight.diffuse.x, sPLight.diffuse.y, sPLight.diffuse.z);
+                glUniform3f(lightSpeLoc, sPLight.specular.x, sPLight.specular.y, sPLight.specular.z);
+                glUniform1f(lightConstCoeffLoc, sPLight.constCoeff);
+                glUniform1f(lightLinCoeffLoc, sPLight.linCoeff);
+                glUniform1f(lightQuadCoeffLoc, sPLight.quadCoeff);
+            }
 
             glm::mat4 model;
             //model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::translate(model, sLight.direction);
+            model = glm::translate(model, sPLight.position);
             model = glm::scale(model, glm::vec3(0.2f));
-            actualLightPos = model * glm::vec4(sLight.direction, 1.0f);
             glBindVertexArray(lightVAO);
             GLint modelLocation = glGetUniformLocation(shaderLamp, "model");
             GLint viewLocation = glGetUniformLocation(shaderLamp, "view");
@@ -350,6 +384,7 @@ int main(int argc, char* argv[])
             GLint projectionLocation = glGetUniformLocation(shaderCube, "projection");
             glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
             glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+
             GLint viewerPosLoc = glGetUniformLocation(shaderCube, "viewerPos");
             glUniform3f(viewerPosLoc, sCamera.pos().x, sCamera.pos().y, sCamera.pos().z);
 
@@ -365,14 +400,33 @@ int main(int argc, char* argv[])
             GLint matShiLoc = glGetUniformLocation(shaderCube, "material.shininess");
             glUniform1f(matShiLoc, sCube.shininess);
 
-            GLint lightPosLoc = glGetUniformLocation(shaderCube, "light.direction");
-            glUniform3f(lightPosLoc, sLight.direction.x, sLight.direction.y, sLight.direction.z);
-            GLint lightAmbLoc = glGetUniformLocation(shaderCube, "light.ambient");
-            glUniform3f(lightAmbLoc, sLight.ambient.x, sLight.ambient.y, sLight.ambient.z);
-            GLint lightDifLoc = glGetUniformLocation(shaderCube, "light.diffuse");
-            glUniform3f(lightDifLoc, sLight.diffuse.x, sLight.diffuse.y, sLight.diffuse.z);
-            GLint lightSpeLoc = glGetUniformLocation(shaderCube, "light.specular");
-            glUniform3f(lightSpeLoc, sLight.specular.x, sLight.specular.y, sLight.specular.z);
+            {
+                GLint lightPosLoc = glGetUniformLocation(shaderCube, "dirLight.direction");
+                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "dirLight.ambient");
+                GLint lightDifLoc = glGetUniformLocation(shaderCube, "dirLight.diffuse");
+                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "dirLight.specular");
+                glUniform3f(lightPosLoc, sDirLight.direction.x, sDirLight.direction.y, sDirLight.direction.z);
+                glUniform3f(lightAmbLoc, sDirLight.ambient.x, sDirLight.ambient.y, sDirLight.ambient.z);
+                glUniform3f(lightDifLoc, sDirLight.diffuse.x, sDirLight.diffuse.y, sDirLight.diffuse.z);
+                glUniform3f(lightSpeLoc, sDirLight.specular.x, sDirLight.specular.y, sDirLight.specular.z);
+            }
+            {
+                GLint lightPosLoc = glGetUniformLocation(shaderCube, "pLight.position");
+                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "pLight.ambient");
+                GLint lightDifLoc = glGetUniformLocation(shaderCube, "pLight.diffuse");
+                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "pLight.specular");
+                GLint lightConstCoeffLoc = glGetUniformLocation(shaderCube, "pLight.constCoeff");
+                GLint lightLinCoeffLoc = glGetUniformLocation(shaderCube, "pLight.linCoeff");
+                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderCube, "pLight.quadCoeff");
+                glUniform3f(lightPosLoc, sPLight.position.x, sPLight.position.y, sPLight.position.z);
+                glUniform3f(lightAmbLoc, sPLight.ambient.x, sPLight.ambient.y, sPLight.ambient.z);
+                glUniform3f(lightDifLoc, sPLight.diffuse.x, sPLight.diffuse.y, sPLight.diffuse.z);
+                glUniform3f(lightSpeLoc, sPLight.specular.x, sPLight.specular.y, sPLight.specular.z);
+                glUniform1f(lightConstCoeffLoc, sPLight.constCoeff);
+                glUniform1f(lightLinCoeffLoc, sPLight.linCoeff);
+                glUniform1f(lightQuadCoeffLoc, sPLight.quadCoeff);
+            }
+
 
             glBindVertexArray(VAO);
             for (int i = 0; i < 10; ++i)
@@ -380,7 +434,7 @@ int main(int argc, char* argv[])
                 glm::mat4 model;
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
-                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+                model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
                 glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
