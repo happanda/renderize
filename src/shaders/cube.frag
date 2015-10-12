@@ -22,6 +22,19 @@ struct PLight
     float linCoeff;
     float quadCoeff;
 };
+struct SpotLight
+{
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float constCoeff;
+    float linCoeff;
+    float quadCoeff;
+    vec3 direction;
+    float cutOff;
+};
+
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -31,6 +44,7 @@ out vec4 color;
 uniform Material material;
 uniform DirLight dirLight;
 uniform PLight pLight;
+uniform SpotLight spLight;
 uniform vec3 viewerPos;
 
 vec4 compDirLight()
@@ -70,8 +84,34 @@ vec4 compPLight()
     return vec4((ambient + diffuse + specular) * attenuation, 1.0f);
 }
 
+vec4 compSpotLight()
+{
+    vec3 lightDir = normalize(spLight.position - FragPos);
+    float angle = dot(lightDir, normalize(-spLight.direction));
+    if (angle > spLight.cutOff)
+    {
+        vec3 ambient = spLight.ambient * vec3(texture(material.diffuse, TexCoords));
+        
+        vec3 normal = normalize(Normal);
+        float diff = max(dot(normal, lightDir), 0.0f);
+        vec3 diffuse = diff * spLight.diffuse * vec3(texture(material.diffuse, TexCoords));
+        
+        vec3 viewDir = normalize(viewerPos - FragPos);
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+        vec3 specular = spec * spLight.specular * vec3(texture(material.specular, TexCoords));
+        
+        float distance = length(spLight.position - FragPos);
+        float attenuation = 1.0f / (spLight.constCoeff + spLight.linCoeff * distance + spLight.quadCoeff * distance * distance);
+        
+        return vec4((ambient + diffuse + specular) * attenuation, 1.0f);
+    }
+    else
+        return vec4(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 
 void main()
 {
-    color = compPLight();//compDirLight() + compPLight();
+    color = compSpotLight() + compPLight();//compDirLight() + compPLight();
 }

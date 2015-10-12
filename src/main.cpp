@@ -48,6 +48,11 @@ struct point_light
     float linCoeff;
     float quadCoeff;
 };
+struct spot_light : public point_light
+{
+    glm::vec3 direction;
+    float cutOff;
+};
 
 material sCube{ 128.0f };
 dir_light sDirLight{
@@ -64,6 +69,7 @@ point_light sPLight
     { 0.8f, 0.8f, 0.8f },
     1.0f, 0.09f, 0.032f
 };
+spot_light sSPLight;
 
 
 void glfwErrorReporting(int errCode, char const* msg);
@@ -78,6 +84,14 @@ void moveCamera(float dt);
 
 int main(int argc, char* argv[])
 {
+    sSPLight.ambient = sPLight.ambient;
+    sSPLight.diffuse = sPLight.diffuse;
+    sSPLight.specular = sPLight.specular;
+    sSPLight.constCoeff = sPLight.constCoeff;
+    sSPLight.linCoeff = sPLight.linCoeff;
+    sSPLight.quadCoeff = sPLight.quadCoeff;
+    sSPLight.cutOff = 0.3f;
+
     if (GL_FALSE == glfwInit())
         return -1;
         // Provide some hints for the GLFW
@@ -401,11 +415,11 @@ int main(int argc, char* argv[])
             glUniform1f(matShiLoc, sCube.shininess);
 
             {
-                GLint lightPosLoc = glGetUniformLocation(shaderCube, "dirLight.direction");
+                GLint lightDirsLoc = glGetUniformLocation(shaderCube, "dirLight.direction");
                 GLint lightAmbLoc = glGetUniformLocation(shaderCube, "dirLight.ambient");
                 GLint lightDifLoc = glGetUniformLocation(shaderCube, "dirLight.diffuse");
                 GLint lightSpeLoc = glGetUniformLocation(shaderCube, "dirLight.specular");
-                glUniform3f(lightPosLoc, sDirLight.direction.x, sDirLight.direction.y, sDirLight.direction.z);
+                glUniform3f(lightDirsLoc, sDirLight.direction.x, sDirLight.direction.y, sDirLight.direction.z);
                 glUniform3f(lightAmbLoc, sDirLight.ambient.x, sDirLight.ambient.y, sDirLight.ambient.z);
                 glUniform3f(lightDifLoc, sDirLight.diffuse.x, sDirLight.diffuse.y, sDirLight.diffuse.z);
                 glUniform3f(lightSpeLoc, sDirLight.specular.x, sDirLight.specular.y, sDirLight.specular.z);
@@ -425,6 +439,28 @@ int main(int argc, char* argv[])
                 glUniform1f(lightConstCoeffLoc, sPLight.constCoeff);
                 glUniform1f(lightLinCoeffLoc, sPLight.linCoeff);
                 glUniform1f(lightQuadCoeffLoc, sPLight.quadCoeff);
+            }
+            {
+                sSPLight.position = sCamera.pos();
+                sSPLight.direction = sCamera.front();
+                GLint lightPosLoc = glGetUniformLocation(shaderCube, "spLight.position");
+                GLint lightDirLoc = glGetUniformLocation(shaderCube, "spLight.direction");
+                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "spLight.ambient");
+                GLint lightDifLoc = glGetUniformLocation(shaderCube, "spLight.diffuse");
+                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "spLight.specular");
+                GLint lightConstCoeffLoc = glGetUniformLocation(shaderCube, "spLight.constCoeff");
+                GLint lightLinCoeffLoc = glGetUniformLocation(shaderCube, "spLight.linCoeff");
+                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderCube, "spLight.quadCoeff");
+                GLint lightCutOffLoc = glGetUniformLocation(shaderCube, "spLight.cutOff");
+                glUniform3f(lightPosLoc, sSPLight.position.x, sSPLight.position.y, sSPLight.position.z);
+                glUniform3f(lightDirLoc, sSPLight.direction.x, sSPLight.direction.y, sSPLight.direction.z);
+                glUniform3f(lightAmbLoc, sSPLight.ambient.x, sSPLight.ambient.y, sSPLight.ambient.z);
+                glUniform3f(lightDifLoc, sSPLight.diffuse.x, sSPLight.diffuse.y, sSPLight.diffuse.z);
+                glUniform3f(lightSpeLoc, sSPLight.specular.x, sSPLight.specular.y, sSPLight.specular.z);
+                glUniform1f(lightConstCoeffLoc, sSPLight.constCoeff);
+                glUniform1f(lightLinCoeffLoc, sSPLight.linCoeff);
+                glUniform1f(lightQuadCoeffLoc, sSPLight.quadCoeff);
+                glUniform1f(lightCutOffLoc, glm::cos(sSPLight.cutOff));
             }
 
 
