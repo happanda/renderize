@@ -91,8 +91,8 @@ int main(int argc, char* argv[])
     sSPLight.constCoeff = sPLight.constCoeff;
     sSPLight.linCoeff = sPLight.linCoeff;
     sSPLight.quadCoeff = sPLight.quadCoeff;
-    sSPLight.cutOff = 0.1f;
-    sSPLight.outerCutOff = 0.33f;
+    sSPLight.cutOff = 0.05f;
+    sSPLight.outerCutOff = 0.2f;
 
     if (GL_FALSE == glfwInit())
         return -1;
