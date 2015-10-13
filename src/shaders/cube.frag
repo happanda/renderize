@@ -86,9 +86,13 @@ vec4 compPLight()
 
 vec4 compSpotLight()
 {
+    float lightOuterCutOff = spLight.cutOff * 0.95f;
     vec3 lightDir = normalize(spLight.position - FragPos);
-    float angle = dot(lightDir, normalize(-spLight.direction));
-    if (angle > spLight.cutOff)
+    float theta = dot(lightDir, normalize(-spLight.direction));
+    float epsilon = spLight.cutOff - lightOuterCutOff;
+    float intens = clamp((theta - lightOuterCutOff) / epsilon, 0.0f, 1.0f);
+    
+    if (theta > lightOuterCutOff)
     {
         vec3 ambient = spLight.ambient * vec3(texture(material.diffuse, TexCoords));
         
@@ -104,7 +108,7 @@ vec4 compSpotLight()
         float distance = length(spLight.position - FragPos);
         float attenuation = 1.0f / (spLight.constCoeff + spLight.linCoeff * distance + spLight.quadCoeff * distance * distance);
         
-        return vec4((ambient + diffuse + specular) * attenuation, 1.0f);
+        return vec4((ambient + diffuse * intens + specular * intens) * attenuation, 1.0f);
     }
     else
         return vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -113,5 +117,5 @@ vec4 compSpotLight()
 
 void main()
 {
-    color = compSpotLight() + compPLight();//compDirLight() + compPLight();
+    color = compSpotLight();// + compPLight();//compDirLight() + compPLight();
 }
