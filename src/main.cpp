@@ -52,6 +52,7 @@ struct spot_light : public point_light
 {
     glm::vec3 direction;
     float cutOff;
+    float outerCutOff;
 };
 
 material sCube{ 128.0f };
@@ -90,7 +91,8 @@ int main(int argc, char* argv[])
     sSPLight.constCoeff = sPLight.constCoeff;
     sSPLight.linCoeff = sPLight.linCoeff;
     sSPLight.quadCoeff = sPLight.quadCoeff;
-    sSPLight.cutOff = 0.3f;
+    sSPLight.cutOff = 0.1f;
+    sSPLight.outerCutOff = 0.33f;
 
     if (GL_FALSE == glfwInit())
         return -1;
@@ -452,6 +454,7 @@ int main(int argc, char* argv[])
                 GLint lightLinCoeffLoc = glGetUniformLocation(shaderCube, "spLight.linCoeff");
                 GLint lightQuadCoeffLoc = glGetUniformLocation(shaderCube, "spLight.quadCoeff");
                 GLint lightCutOffLoc = glGetUniformLocation(shaderCube, "spLight.cutOff");
+                GLint lightOuterCutOffLoc = glGetUniformLocation(shaderCube, "spLight.outerCutOff");
                 glUniform3f(lightPosLoc, sSPLight.position.x, sSPLight.position.y, sSPLight.position.z);
                 glUniform3f(lightDirLoc, sSPLight.direction.x, sSPLight.direction.y, sSPLight.direction.z);
                 glUniform3f(lightAmbLoc, sSPLight.ambient.x, sSPLight.ambient.y, sSPLight.ambient.z);
@@ -461,6 +464,7 @@ int main(int argc, char* argv[])
                 glUniform1f(lightLinCoeffLoc, sSPLight.linCoeff);
                 glUniform1f(lightQuadCoeffLoc, sSPLight.quadCoeff);
                 glUniform1f(lightCutOffLoc, glm::cos(sSPLight.cutOff));
+                glUniform1f(lightOuterCutOffLoc, glm::cos(sSPLight.outerCutOff));
             }
 
 

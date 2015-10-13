@@ -33,6 +33,7 @@ struct SpotLight
     float quadCoeff;
     vec3 direction;
     float cutOff;
+    float outerCutOff;
 };
 
 
@@ -86,13 +87,12 @@ vec4 compPLight()
 
 vec4 compSpotLight()
 {
-    float lightOuterCutOff = spLight.cutOff * 0.95f;
     vec3 lightDir = normalize(spLight.position - FragPos);
     float theta = dot(lightDir, normalize(-spLight.direction));
-    float epsilon = spLight.cutOff - lightOuterCutOff;
-    float intens = clamp((theta - lightOuterCutOff) / epsilon, 0.0f, 1.0f);
+    float epsilon = spLight.cutOff - spLight.outerCutOff;
+    float intens = clamp((theta - spLight.outerCutOff) / epsilon, 0.0f, 1.0f);
     
-    if (theta > lightOuterCutOff)
+    if (theta > spLight.outerCutOff)
     {
         vec3 ambient = spLight.ambient * vec3(texture(material.diffuse, TexCoords));
         
