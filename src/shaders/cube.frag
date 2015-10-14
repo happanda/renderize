@@ -106,7 +106,7 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         float distance = length(light.position - fragPos);
         float attenuation = 1.0f / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
         
-        return vec4((ambient + diffuse * intens + specular * intens) * attenuation, 1.0f);
+        return vec4((ambient + diffuse + specular) * intens * attenuation, 1.0f);
     }
     else
         return vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -117,7 +117,7 @@ void main()
 {
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
-    color = compDirLight(dirLight, normal, viewDir)
-        + compPointLight(pLight, normal, FragPos, viewDir)
-        + compSpotLight(spLight, normal, FragPos, viewDir);
+    color = //compDirLight(dirLight, normal, viewDir)
+        //+ compPointLight(pLight, normal, FragPos, viewDir)
+        compSpotLight(spLight, normal, FragPos, viewDir);
 }
