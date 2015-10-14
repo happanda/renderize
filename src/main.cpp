@@ -122,20 +122,33 @@ int main(int argc, char* argv[])
 
         TwAddVarRW(sATB, "mat.shi", TW_TYPE_FLOAT, &sCube.shininess, " label='Shininess' min=-32 max=512 step=1 ");
         
-        TwAddVarRW(sATB, "dlight.dir", TW_TYPE_DIR3F, glm::value_ptr(sDirLight.direction), " label='Light dir' ");
-        TwAddVarRW(sATB, "dlight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "dlight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "dlight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "dlight.dir", TW_TYPE_DIR3F, glm::value_ptr(sDirLight.direction), " label='DLight dir' ");
+        TwAddVarRW(sATB, "dlight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.ambient), " label='DLight amb' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "dlight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.diffuse), " label='DLight diff' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "dlight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sDirLight.specular), " label='DLight spec' min=-3.0 max=3.0 step=0.05 ");
 
-        TwAddVarRW(sATB, "plight.pos.x", TW_TYPE_FLOAT, &sPLight.position.x, " label='Light pos.x' ");
-        TwAddVarRW(sATB, "plight.pos.y", TW_TYPE_FLOAT, &sPLight.position.y, " label='Light pos.y' ");
-        TwAddVarRW(sATB, "plight.pos.z", TW_TYPE_FLOAT, &sPLight.position.z, " label='Light pos.z' ");
-        TwAddVarRW(sATB, "plight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.ambient), " label='Ambient color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "plight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.diffuse), " label='Diffuse color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "plight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.specular), " label='Specular color' min=-3.0 max=3.0 step=0.05 ");
-        TwAddVarRW(sATB, "plight.const", TW_TYPE_FLOAT, &sPLight.constCoeff, " label='Const coeff' step=0.05 ");
-        TwAddVarRW(sATB, "plight.lin", TW_TYPE_FLOAT, &sPLight.linCoeff, " label='Linear coeff' step=0.05 ");
-        TwAddVarRW(sATB, "plight.quad", TW_TYPE_FLOAT, &sPLight.quadCoeff, " label='Quadratic coeff' step=0.05 ");
+        TwAddVarRW(sATB, "plight.pos.x", TW_TYPE_FLOAT, &sPLight.position.x, " label='PLight pos.x' ");
+        TwAddVarRW(sATB, "plight.pos.y", TW_TYPE_FLOAT, &sPLight.position.y, " label='PLight pos.y' ");
+        TwAddVarRW(sATB, "plight.pos.z", TW_TYPE_FLOAT, &sPLight.position.z, " label='PLight pos.z' ");
+        TwAddVarRW(sATB, "plight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.ambient), " label='PLight amb' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.diffuse), " label='PLight diff' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sPLight.specular), " label='PLight spec' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "plight.const", TW_TYPE_FLOAT, &sPLight.constCoeff, " label='PLight const' step=0.05 ");
+        TwAddVarRW(sATB, "plight.lin", TW_TYPE_FLOAT, &sPLight.linCoeff, " label='PLight lin' step=0.05 ");
+        TwAddVarRW(sATB, "plight.quad", TW_TYPE_FLOAT, &sPLight.quadCoeff, " label='PLight quad' step=0.05 ");
+
+        TwAddVarRW(sATB, "splight.pos.x", TW_TYPE_FLOAT, &sSPLight.position.x, " label='SPLight pos.x' ");
+        TwAddVarRW(sATB, "splight.pos.y", TW_TYPE_FLOAT, &sSPLight.position.y, " label='SPLight pos.y' ");
+        TwAddVarRW(sATB, "splight.pos.z", TW_TYPE_FLOAT, &sSPLight.position.z, " label='SPLight pos.z' ");
+        TwAddVarRW(sATB, "splight.dir", TW_TYPE_DIR3F, glm::value_ptr(sSPLight.direction), " label='SPLight dir' ");
+        TwAddVarRW(sATB, "splight.amb", TW_TYPE_COLOR3F, glm::value_ptr(sSPLight.ambient), " label='SPLight amb' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "splight.dif", TW_TYPE_COLOR3F, glm::value_ptr(sSPLight.diffuse), " label='SPLight diff' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "splight.spe", TW_TYPE_COLOR3F, glm::value_ptr(sSPLight.specular), " label='SPLight spec' min=-3.0 max=3.0 step=0.05 ");
+        TwAddVarRW(sATB, "splight.const", TW_TYPE_FLOAT, &sSPLight.constCoeff, " label='SPLight const' step=0.05 ");
+        TwAddVarRW(sATB, "splight.lin", TW_TYPE_FLOAT, &sSPLight.linCoeff, " label='SPLight lin' step=0.05 ");
+        TwAddVarRW(sATB, "splight.quad", TW_TYPE_FLOAT, &sSPLight.quadCoeff, " label='SPLight quad' step=0.05 ");
+        TwAddVarRW(sATB, "splight.cutoff", TW_TYPE_FLOAT, &sSPLight.cutOff, " label='SPLight cutoff' step=0.05 ");
+        TwAddVarRW(sATB, "splight.outercutoff", TW_TYPE_FLOAT, &sSPLight.outerCutOff, " label='SPLight outerCutOff' step=0.05 ");
     }
     else
         std::cerr << TwGetLastError() << std::endl;
