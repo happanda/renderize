@@ -374,113 +374,68 @@ int main(int argc, char* argv[])
 
         {
             shaderLamp.use();
-            {
-                shaderLamp["pLight.position"] = sPLight.position;
-
-                GLint lightPosLoc = glGetUniformLocation(shaderLamp, "pLight.position");
-                GLint lightAmbLoc = glGetUniformLocation(shaderLamp, "pLight.ambient");
-                GLint lightDifLoc = glGetUniformLocation(shaderLamp, "pLight.diffuse");
-                GLint lightSpeLoc = glGetUniformLocation(shaderLamp, "pLight.specular");
-                GLint lightConstCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.constCoeff");
-                GLint lightLinCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.linCoeff");
-                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderLamp, "pLight.quadCoeff");
-                glUniform3fv(lightPosLoc, 1, glm::value_ptr(sPLight.position));
-                glUniform3fv(lightAmbLoc, 1, glm::value_ptr(sPLight.ambient));
-                glUniform3fv(lightDifLoc, 1, glm::value_ptr(sPLight.diffuse));
-                glUniform3fv(lightSpeLoc, 1, glm::value_ptr(sPLight.specular));
-                glUniform1f(lightConstCoeffLoc, sPLight.constCoeff);
-                glUniform1f(lightLinCoeffLoc, sPLight.linCoeff);
-                glUniform1f(lightQuadCoeffLoc, sPLight.quadCoeff);
-            }
+            
+            shaderLamp["pLight.position"] = sPLight.position;
+            shaderLamp["pLight.ambient"] = sPLight.ambient;
+            shaderLamp["pLight.diffuse"] = sPLight.diffuse;
+            shaderLamp["pLight.specular"] = sPLight.specular;
+            shaderLamp["pLight.constCoeff"] = sPLight.constCoeff;
+            shaderLamp["pLight.linCoeff"] = sPLight.linCoeff;
+            shaderLamp["pLight.quadCoeff"] = sPLight.quadCoeff;
 
             glm::mat4 model;
             //model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
             model = glm::translate(model, sPLight.position);
             model = glm::scale(model, glm::vec3(0.2f));
             glBindVertexArray(lightVAO);
-            GLint modelLocation = glGetUniformLocation(shaderLamp, "model");
-            GLint viewLocation = glGetUniformLocation(shaderLamp, "view");
-            GLint projectionLocation = glGetUniformLocation(shaderLamp, "projection");
-            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+            shaderLamp["model"] = model;
+            shaderLamp["view"] = view;
+            shaderLamp["projection"] = projection;
+
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
 
         {
             shaderCube.use();
-            GLint modelLocation = glGetUniformLocation(shaderCube, "model");
-            GLint viewLocation = glGetUniformLocation(shaderCube, "view");
-            GLint projectionLocation = glGetUniformLocation(shaderCube, "projection");
-            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+            shaderCube["view"] = view;
+            shaderCube["projection"] = projection;
 
-            GLint viewerPosLoc = glGetUniformLocation(shaderCube, "viewerPos");
-            glUniform3f(viewerPosLoc, sCamera.pos().x, sCamera.pos().y, sCamera.pos().z);
+            shaderCube["viewerPos"] = sCamera.pos();
 
-            GLint matDifLoc = glGetUniformLocation(shaderCube, "material.diffuse");
-            glUniform1i(matDifLoc, 0);
+            shaderCube["material.diffuse"] = 0;
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textures[0]);
-            GLint matSpecLoc = glGetUniformLocation(shaderCube, "material.specular");
-            glUniform1i(matSpecLoc, 1);
+            shaderCube["material.specular"] = 1;
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, textures[1]);
+            shaderCube["material.shininess"] = sCube.shininess;
 
-            GLint matShiLoc = glGetUniformLocation(shaderCube, "material.shininess");
-            glUniform1f(matShiLoc, sCube.shininess);
-
-            {
-                GLint lightDirsLoc = glGetUniformLocation(shaderCube, "dirLight.direction");
-                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "dirLight.ambient");
-                GLint lightDifLoc = glGetUniformLocation(shaderCube, "dirLight.diffuse");
-                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "dirLight.specular");
-                glUniform3fv(lightDirsLoc, 1, glm::value_ptr(sDirLight.direction));
-                glUniform3fv(lightAmbLoc, 1, glm::value_ptr(sDirLight.ambient));
-                glUniform3fv(lightDifLoc, 1, glm::value_ptr(sDirLight.diffuse));
-                glUniform3fv(lightSpeLoc, 1, glm::value_ptr(sDirLight.specular));
-            }
-            {
-                GLint lightPosLoc = glGetUniformLocation(shaderCube, "pLight.position");
-                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "pLight.ambient");
-                GLint lightDifLoc = glGetUniformLocation(shaderCube, "pLight.diffuse");
-                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "pLight.specular");
-                GLint lightConstCoeffLoc = glGetUniformLocation(shaderCube, "pLight.constCoeff");
-                GLint lightLinCoeffLoc = glGetUniformLocation(shaderCube, "pLight.linCoeff");
-                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderCube, "pLight.quadCoeff");
-                glUniform3fv(lightPosLoc, 1, glm::value_ptr(sPLight.position));
-                glUniform3fv(lightAmbLoc, 1, glm::value_ptr(sPLight.ambient));
-                glUniform3fv(lightDifLoc, 1, glm::value_ptr(sPLight.diffuse));
-                glUniform3fv(lightSpeLoc, 1, glm::value_ptr(sPLight.specular));
-                glUniform1f(lightConstCoeffLoc, sPLight.constCoeff);
-                glUniform1f(lightLinCoeffLoc, sPLight.linCoeff);
-                glUniform1f(lightQuadCoeffLoc, sPLight.quadCoeff);
-            }
-            {
-                sSPLight.position = sCamera.pos();
-                sSPLight.direction = sCamera.front();
-                GLint lightPosLoc = glGetUniformLocation(shaderCube, "spLight.position");
-                GLint lightDirLoc = glGetUniformLocation(shaderCube, "spLight.direction");
-                GLint lightAmbLoc = glGetUniformLocation(shaderCube, "spLight.ambient");
-                GLint lightDifLoc = glGetUniformLocation(shaderCube, "spLight.diffuse");
-                GLint lightSpeLoc = glGetUniformLocation(shaderCube, "spLight.specular");
-                GLint lightConstCoeffLoc = glGetUniformLocation(shaderCube, "spLight.constCoeff");
-                GLint lightLinCoeffLoc = glGetUniformLocation(shaderCube, "spLight.linCoeff");
-                GLint lightQuadCoeffLoc = glGetUniformLocation(shaderCube, "spLight.quadCoeff");
-                GLint lightCutOffLoc = glGetUniformLocation(shaderCube, "spLight.cutOff");
-                GLint lightOuterCutOffLoc = glGetUniformLocation(shaderCube, "spLight.outerCutOff");
-                glUniform3fv(lightPosLoc, 1, glm::value_ptr(sSPLight.position));
-                glUniform3fv(lightDirLoc, 1, glm::value_ptr(sSPLight.direction));
-                glUniform3fv(lightAmbLoc, 1, glm::value_ptr(sSPLight.ambient));
-                glUniform3fv(lightDifLoc, 1, glm::value_ptr(sSPLight.diffuse));
-                glUniform3fv(lightSpeLoc, 1, glm::value_ptr(sSPLight.specular));
-                glUniform1f(lightConstCoeffLoc, sSPLight.constCoeff);
-                glUniform1f(lightLinCoeffLoc, sSPLight.linCoeff);
-                glUniform1f(lightQuadCoeffLoc, sSPLight.quadCoeff);
-                glUniform1f(lightCutOffLoc, glm::cos(sSPLight.cutOff));
-                glUniform1f(lightOuterCutOffLoc, glm::cos(sSPLight.outerCutOff));
-            }
+            shaderCube["dirLight.direction"] = sDirLight.direction;
+            shaderCube["dirLight.ambient"] = sDirLight.ambient;
+            shaderCube["dirLight.diffuse"] = sDirLight.diffuse;
+            shaderCube["dirLight.specular"] = sDirLight.specular;
+            
+            shaderCube["pLight.position"] = sPLight.position;
+            shaderCube["pLight.ambient"] = sPLight.ambient;
+            shaderCube["pLight.diffuse"] = sPLight.diffuse;
+            shaderCube["pLight.specular"] = sPLight.specular;
+            shaderCube["pLight.constCoeff"] = sPLight.constCoeff;
+            shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
+            shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
+            
+            sSPLight.position = sCamera.pos();
+            sSPLight.direction = sCamera.front();
+            shaderCube["spLight.position"] = sSPLight.position;
+            shaderCube["spLight.direction"] = sSPLight.direction;
+            shaderCube["spLight.ambient"] = sSPLight.ambient;
+            shaderCube["spLight.diffuse"] = sSPLight.diffuse;
+            shaderCube["spLight.specular"] = sSPLight.specular;
+            shaderCube["spLight.constCoeff"] = sSPLight.constCoeff;
+            shaderCube["spLight.linCoeff"] = sSPLight.linCoeff;
+            shaderCube["spLight.quadCoeff"] = sSPLight.quadCoeff;
+            shaderCube["spLight.cutOff"] = sSPLight.cutOff;
+            shaderCube["spLight.outerCutOff"] = sSPLight.outerCutOff;
 
 
             glBindVertexArray(VAO);
@@ -490,7 +445,7 @@ int main(int argc, char* argv[])
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
                 model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
-                glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+                shaderCube["model"] = model;
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
         }
