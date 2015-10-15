@@ -9,6 +9,8 @@ ${SourcePath}/shaders/program.h
 ${SourcePath}/shaders/program.cpp
 ${SourcePath}/shaders/shader.h
 ${SourcePath}/shaders/shader.cpp
+${SourcePath}/shaders/uniform.h
+${SourcePath}/shaders/uniform.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE

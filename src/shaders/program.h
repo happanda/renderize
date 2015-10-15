@@ -1,5 +1,6 @@
 #pragma once
 #include "shader.h"
+#include "uniform.h"
 
 
 struct program
@@ -17,6 +18,9 @@ struct program
     GLstring lastError() const;
 
     operator GLenum() const;
+
+    uniform operator[](std::string const& uniName) const;
+    uniform operator[](char const* uniName) const;
 
 private:
     GLenum mProg;

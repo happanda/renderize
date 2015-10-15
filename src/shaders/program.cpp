@@ -57,3 +57,13 @@ program::operator GLenum() const
 {
     return mProg;
 }
+
+uniform program::operator[](std::string const& uniName) const
+{
+    return uniform(*this, uniName);
+}
+
+uniform program::operator[](char const* uniName) const
+{
+    return uniform(*this, uniName);
+}
