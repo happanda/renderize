@@ -1,0 +1,12 @@
+auto
+bin
+build
+config
+doc
+src
+Makefile
+glew.pc.in
+TODO.txt
+*.exp
+lib/Debug/Win32/glew32d.lib
+lib/Release/Win32/glew32.lib
