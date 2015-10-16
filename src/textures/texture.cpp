@@ -19,7 +19,7 @@ bool texture::load(std::string const& path, bool genMipMap)
 
     int texWidth = 0,
         texHeight = 0;
-    auto image = SOIL_load_image("../tex/crate.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
+    auto image = SOIL_load_image(path.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
     if (!image)
     {
         glDeleteTextures(1, &mTex);

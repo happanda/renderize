@@ -66,8 +66,8 @@ point_light sPLight
 {
     { -1.0f, -1.0f, 0.0f },
     { 0.1f, 0.1f, 0.1f },
-    { 0.3f, 0.3f, 0.3f },
-    { 0.5f, 0.5f, 0.5f },
+    { 0.3f, 0.02f, 0.02f },
+    { 0.5f, 0.1f, 0.1f },
     1.0f, 0.09f, 0.05f
 };
 spot_light sSPLight;
@@ -85,9 +85,9 @@ void moveCamera(float dt);
 
 int main(int argc, char* argv[])
 {
-    sSPLight.ambient = sPLight.ambient;
-    sSPLight.diffuse = sPLight.diffuse;
-    sSPLight.specular = sPLight.specular;
+    sSPLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+    sSPLight.diffuse = glm::vec3(0.3f, 0.3f, 0.3f);
+    sSPLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
     sSPLight.constCoeff = sPLight.constCoeff;
     sSPLight.linCoeff = sPLight.linCoeff;
     sSPLight.quadCoeff = sPLight.quadCoeff;
@@ -388,11 +388,10 @@ int main(int argc, char* argv[])
             shaderCube["viewerPos"] = sCamera.pos();
 
             shaderCube["material.diffuse"] = 0;
-            shaderCube["material.specular"] = 1;
-            shaderCube["material.shininess"] = sCube.shininess;
-
             crateTex.active(GL_TEXTURE0);
+            shaderCube["material.specular"] = 1;
             crateSpecTex.active(GL_TEXTURE1);
+            shaderCube["material.shininess"] = sCube.shininess;
 
             shaderCube["dirLight.direction"] = sDirLight.direction;
             shaderCube["dirLight.ambient"] = sDirLight.ambient;
