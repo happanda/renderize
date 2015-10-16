@@ -13,6 +13,11 @@ ${SourcePath}/shaders/uniform.h
 ${SourcePath}/shaders/uniform.cpp
 )
 
+set(SOURCE_FILES_TEXTURES
+${SourcePath}/textures/texture.h
+${SourcePath}/textures/texture.cpp
+)
+
 set(SOURCE_FILES_SHADERS_SOURCE
 ${SourcePath}/shaders/cube.vert
 ${SourcePath}/shaders/cube.frag
@@ -34,6 +39,7 @@ ${SourcePath}/main.cpp
 source_group(""  FILES  ${SourcePath}/main.cpp)
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
+source_group(textures  FILES  ${SOURCE_FILES_TEXTURES})
 source_group(shaders_src  FILES  ${SOURCE_FILES_SHADERS_SOURCE})
 set_source_files_properties(${SOURCE_FILES_SHADERS_SOURCE} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -42,6 +48,7 @@ set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_SHADERS}
+${SOURCE_FILES_TEXTURES}
 ${SOURCE_FILES_SHADERS_SOURCE}
 #${SOURCE_FILES_GLFW}
 )

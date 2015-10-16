@@ -15,7 +15,7 @@
 
 #include "camera/camera.h"
 #include "shaders/program.h"
-#include "SOIL.h"
+#include "textures/texture.h"
 
 
 size_t sWinWidth = 400;
@@ -229,34 +229,18 @@ int main(int argc, char* argv[])
     }
 
     // Texture loading
-    GLuint textures[2];
-    glGenTextures(2, textures);
+    texture crateTex, crateSpecTex;
+    crateTex.load("../tex/crate.png", true);
+    crateTex.setFilter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    crateTex.setFilter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    crateTex.setWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    crateTex.setWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    int texWidth{ 0 }, texHeight{ 0 };
-    auto image = SOIL_load_image("../tex/crate.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    SOIL_free_image_data(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-
-    glBindTexture(GL_TEXTURE_2D, textures[1]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    image = SOIL_load_image("../tex/crate_specular.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    SOIL_free_image_data(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    crateSpecTex.load("../tex/crate_specular.png", true);
+    crateSpecTex.setFilter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    crateSpecTex.setFilter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    crateSpecTex.setWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    crateSpecTex.setWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 
     // Geometry to draw
@@ -404,12 +388,11 @@ int main(int argc, char* argv[])
             shaderCube["viewerPos"] = sCamera.pos();
 
             shaderCube["material.diffuse"] = 0;
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textures[0]);
             shaderCube["material.specular"] = 1;
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, textures[1]);
             shaderCube["material.shininess"] = sCube.shininess;
+
+            crateTex.active(GL_TEXTURE0);
+            crateSpecTex.active(GL_TEXTURE1);
 
             shaderCube["dirLight.direction"] = sDirLight.direction;
             shaderCube["dirLight.ambient"] = sDirLight.ambient;
