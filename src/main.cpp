@@ -18,8 +18,8 @@
 #include "SOIL.h"
 
 
-size_t sWinWidth = 300;
-size_t sWinHeight = 300;
+size_t sWinWidth = 400;
+size_t sWinHeight = 400;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
         moveCamera(dt);
 
         // Rendering
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
