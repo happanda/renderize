@@ -25,7 +25,8 @@ ${SourcePath}/shaders/lamp.frag
 )
 
 set(SOURCE_FILES
-${SOURCE_FILES_SHADERS}
+${SourcePath}/cubes.h
+${SourcePath}/cubes.cpp
 ${SourcePath}/main.cpp
 )
 
@@ -36,7 +37,7 @@ ${SourcePath}/main.cpp
 
 # set appropriate source groups
 #source_group(glfw  FILES  ${SOURCE_FILES_GLFW})
-source_group(""  FILES  ${SourcePath}/main.cpp)
+source_group(""  FILES  ${SOURCE_FILES})
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
 source_group(textures  FILES  ${SOURCE_FILES_TEXTURES})
