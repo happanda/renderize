@@ -18,8 +18,8 @@
 #include "textures/texture.h"
 
 
-size_t sWinWidth = 400;
-size_t sWinHeight = 400;
+size_t sWinWidth = 1280;
+size_t sWinHeight = 800;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
@@ -57,18 +57,18 @@ struct spot_light : public point_light
 
 material sCube{ 128.0f };
 dir_light sDirLight{
-    { -1.0f, -1.0f, -0.3f },
-    { 0.1f, 0.1f, 0.1f },
-    { 0.2f, 0.2f, 0.2f },
-    { 0.2f, 0.2f, 0.2f },
+    { 1.0f, 1.0f, -0.3f },
+    { 0.01f, 0.01f, 0.01f },
+    { 0.01f, 0.01f, 0.01f },
+    { 0.01f, 0.01f, 0.01f },
 };
 point_light sPLight
 {
     { -1.0f, -1.0f, 0.0f },
     { 0.1f, 0.1f, 0.1f },
-    { 0.8f, 0.8f, 0.8f },
-    { 0.8f, 0.8f, 0.8f },
-    1.0f, 0.09f, 0.032f
+    { 0.3f, 0.3f, 0.3f },
+    { 0.5f, 0.5f, 0.5f },
+    1.0f, 0.09f, 0.05f
 };
 spot_light sSPLight;
 
@@ -417,8 +417,8 @@ int main(int argc, char* argv[])
             shaderCube["spLight.constCoeff"] = sSPLight.constCoeff;
             shaderCube["spLight.linCoeff"] = sSPLight.linCoeff;
             shaderCube["spLight.quadCoeff"] = sSPLight.quadCoeff;
-            shaderCube["spLight.cutOff"] = sSPLight.cutOff;
-            shaderCube["spLight.outerCutOff"] = sSPLight.outerCutOff;
+            shaderCube["spLight.cutOff"] = glm::cos(sSPLight.cutOff);
+            shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
 
 
             glBindVertexArray(VAO);
@@ -427,7 +427,7 @@ int main(int argc, char* argv[])
                 glm::mat4 model;
                 model = glm::translate(model, cubePositions[i]);
                 GLfloat angle = 20.0f * i;
-                model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
                 shaderCube["model"] = model;
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
