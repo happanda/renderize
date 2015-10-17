@@ -22,12 +22,16 @@ set(SOURCE_FILES_SHADERS_SOURCE
 ${SourcePath}/shaders/cube.vert
 ${SourcePath}/shaders/cube.frag
 ${SourcePath}/shaders/lamp.frag
+${SourcePath}/shaders/simple.vert
+${SourcePath}/shaders/visual.frag
 )
 
 set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
 ${SourcePath}/main.cpp
+${SourcePath}/visual.h
+${SourcePath}/visual.cpp
 )
 
 #set(SOURCE_FILES_GLFW

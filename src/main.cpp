@@ -1,8 +1,10 @@
 #include <iostream>
 #include "cubes.h"
+#include "visual.h"
 
 
 int main(int argc, char* argv[])
 {
-    return runCubes();
+    return runVisual();
+    //return runCubes();
 }
