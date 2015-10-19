@@ -58,6 +58,11 @@ set(ATBPath ${ExtPath}/AntTweakBar)
 include_directories(${ATBPath}/include)
 target_link_libraries(Renderize ${ATBPath}/lib/AntTweakBar.lib)
 
+### ASSIMP ###
+#set(AssimpPath ${ExtPath}/assimp-3.1.1)
+#include_directories(${AssimpPath}/include)
+#target_link_libraries(Renderize ${AssimpPath}/lib/assimp.lib)
+
 
 
 ### Copying stuff ###

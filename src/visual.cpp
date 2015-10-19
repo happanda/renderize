@@ -153,6 +153,7 @@ int runVisual()
         //moveCamera(dt);
 
         prog.use();
+        prog["sourcePos"] = glm::vec2(sWinWidth / 2.0f, sWinHeight / 2.0f);
         prog["dt"] = dt;
         prog["curTime"] = curTime;
         prog["randColor"] = glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen));
