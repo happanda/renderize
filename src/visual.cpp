@@ -1,6 +1,7 @@
 #include "visual.h"
 #include <ctime>
 #include <iostream>
+#include <list>
 #include <random>
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,6 +25,8 @@ static size_t sWinHeight = 800;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
+static float sYaw = 0.0f;
+static float sPitch = 0.0f;
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 
 
@@ -134,7 +137,17 @@ int runVisual()
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
     std::uniform_real_distribution<float>  uniDist;
+    std::exponential_distribution<float>  expDist;
 
+    float const DropSpeed = 0.01f;
+    float const Zzero = 1.0f;
+    size_t const DropsCount{ 100 };
+    std::vector<glm::vec3> drops;
+    for (size_t i = 0; i < DropsCount; ++i)
+    {
+        drops.push_back(glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen)));
+    }
+    
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -150,15 +163,36 @@ int runVisual()
             continue;
         lastTime = curTime;
         
+        for (size_t i = drops.size(); i < DropsCount; ++i)
+        {
+            
+        }
+
+        for (auto dr = std::begin(drops); dr != std::end(drops); ++dr)
+        {
+            dr->x -= DropSpeed * (Zzero / (Zzero + dr->z));
+            if (dr->x < 0.00f)
+                *dr = glm::vec3(1.0f, uniDist(randGen), uniDist(randGen));
+        }
+
         //moveCamera(dt);
+        //glm::mat4 view;
+        //view = sCamera.view();
+        //glm::mat4 projection;
+        //projection = sCamera.projection();
 
         prog.use();
+        //prog["view"] = view;
+        //prog["projection"] = projection;
+        prog["sWinWidth"] = sWinWidth;
+        prog["sWinHeight"] = sWinHeight;
         prog["dt"] = dt;
         prog["curTime"] = curTime;
         prog["randColor"] = glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen));
+        glUniform3fv(glGetUniformLocation(prog, "drops"), DropsCount, (GLfloat*)(drops.data()));
 
         // Rendering
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -214,6 +248,9 @@ void mouseCallback(GLFWwindow* window, double x, double y)
     GLfloat const sensitivity = 0.08f;
     xDiff *= sensitivity;
     yDiff *= sensitivity;
+
+    sYaw += xDiff;
+    sPitch = glm::clamp(sPitch - yDiff, -89.0f, 89.0f);
 }
 
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
@@ -255,5 +292,5 @@ void moveCamera(float dt)
     if (sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     sCamera.pos(camPos);
-    //sCamera.front(sPitch, sYaw);
+    sCamera.front(sPitch, sYaw);
 }
