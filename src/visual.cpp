@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include <AntTweakBar.h>
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -28,7 +30,9 @@ static camera sCamera(sWinWidth, sWinHeight);
 static float sYaw = 0.0f;
 static float sPitch = 0.0f;
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
+static float sStep = 1.0f;
 
+static TwBar* sATB{ nullptr };
 
 static void glfwErrorReporting(int errCode, char const* msg);
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
@@ -59,6 +63,17 @@ int runVisual()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+
+    if (TwInit(TW_OPENGL_CORE, NULL))
+    {
+        TwWindowSize(sWinWidth, sWinHeight);
+        sATB = TwNewBar("Tweak");
+        TwAddVarRW(sATB, "step", TW_TYPE_FLOAT, &sStep, " label='Step' step=0.1 ");
+    }
+    else
+        std::cerr << TwGetLastError() << std::endl;
+
 
         // Initialize Glew
     glewExperimental = GL_TRUE;
@@ -125,7 +140,7 @@ int runVisual()
         std::cerr << fragShader.lastError() << std::endl;
         return -1;
     }
-
+    
     prog.attach(vertexShader);
     prog.attach(fragShader);
     if (!prog.link())
@@ -184,6 +199,7 @@ int runVisual()
         prog.use();
         //prog["view"] = view;
         //prog["projection"] = projection;
+        prog["step"] = sStep;
         prog["sWinWidth"] = sWinWidth;
         prog["sWinHeight"] = sWinHeight;
         prog["dt"] = dt;
@@ -200,8 +216,13 @@ int runVisual()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        TwDraw();
+
         glfwSwapBuffers(window);
     }
+
+    TwDeleteBar(sATB);
+    sATB = nullptr;
 
     glfwTerminate();
     return 0;
@@ -214,6 +235,8 @@ void glfwErrorReporting(int errCode, char const* msg)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
 {
+    if (TwEventKeyGLFW(key, action))
+        return;
     if (action == GLFW_PRESS)
         sKeys[key] = true;
     if (action == GLFW_RELEASE)
@@ -238,6 +261,7 @@ void mouseCallback(GLFWwindow* window, double x, double y)
     {
         lastX = xFloat;
         lastY = yFloat;
+        TwEventMousePosGLFW(static_cast<int>(x), static_cast<int>(y));
         return;
     }
     
@@ -255,15 +279,19 @@ void mouseCallback(GLFWwindow* window, double x, double y)
 
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
 {
+    if (TwEventMouseWheelGLFW(static_cast<int>(yDiff)))
+        return;
     sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
 {
+    TwEventMouseButtonGLFW(button, action);
 }
 
 void charCallback(GLFWwindow* window, unsigned int symb)
 {
+    TwEventCharGLFW(symb, GLFW_PRESS);
 }
 
 void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
@@ -271,6 +299,7 @@ void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
     sWinWidth = sizeX;
     sWinHeight = sizeY;
     glViewport(0, 0, sWinWidth, sWinHeight);
+    TwWindowSize(sWinWidth, sWinHeight);
 }
 
 void moveCamera(float dt)
