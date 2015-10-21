@@ -1,4 +1,5 @@
 #include "visual.h"
+#include <array>
 #include <ctime>
 #include <iostream>
 #include <list>
@@ -154,13 +155,15 @@ int runVisual()
     std::uniform_real_distribution<float>  uniDist;
     std::exponential_distribution<float>  expDist;
 
-    float const DropSpeed = 0.01f;
-    float const Zzero = 1.0f;
-    size_t const DropsCount{ 100 };
-    std::vector<glm::vec3> drops;
-    for (size_t i = 0; i < DropsCount; ++i)
+    int const GridX{ 5 };
+    int const GridY{ 5 };
+    int const GridSize{ GridX * GridY };
+    std::array<glm::vec2, GridSize> grid;
+    for (size_t i = 0; i < GridSize; ++i)
     {
-        drops.push_back(glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen)));
+        int const x = i % GridX;
+        int const y = i / GridX;
+        grid[i] = glm::normalize(glm::vec2(x, y));
     }
     
 
@@ -178,17 +181,6 @@ int runVisual()
             continue;
         lastTime = curTime;
         
-        for (size_t i = drops.size(); i < DropsCount; ++i)
-        {
-            
-        }
-
-        for (auto dr = std::begin(drops); dr != std::end(drops); ++dr)
-        {
-            dr->x -= DropSpeed * (Zzero / (Zzero + dr->z));
-            if (dr->x < 0.00f)
-                *dr = glm::vec3(1.0f, uniDist(randGen), uniDist(randGen));
-        }
 
         //moveCamera(dt);
         //glm::mat4 view;
@@ -204,11 +196,10 @@ int runVisual()
         prog["sWinHeight"] = sWinHeight;
         prog["dt"] = dt;
         prog["curTime"] = curTime;
-        prog["randColor"] = glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen));
-        glUniform3fv(glGetUniformLocation(prog, "drops"), DropsCount, (GLfloat*)(drops.data()));
+        glUniform2fv(glGetUniformLocation(prog, "grid"), GridSize, (GLfloat*)(grid.data()));
 
         // Rendering
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 

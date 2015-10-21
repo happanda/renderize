@@ -5,16 +5,15 @@ out vec4 color;
 const float PI = 3.1415926535f;
 const float PI2 = PI / 2.0f;
 
-const uint DropsCount = 100;
-const float tail = -15.0f;
+const int GridX = 5;
+const int GridY = 5;
+const int GridSize = GridX * GridY;
 
-uniform float step;
 uniform uint sWinWidth;
 uniform uint sWinHeight;
 uniform float dt;
 uniform float curTime;
-uniform vec3 randColor;
-uniform vec3 drops[DropsCount];
+uniform vec2 grid[GridSize];
 
 vec2 polar(vec2 dPoint)
 {
@@ -61,6 +60,37 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec2 getGrid(int i, int j)
+{
+    return grid[j * GridX + i];
+}
+
+float perlin(vec2 pos, float gridX, float gridY)
+{
+    int i = int(floor(pos.x / gridX));
+    int j = int(floor(pos.y / gridY));
+    
+    vec2 gridPos = vec2(gridX * i, gridY * j);
+    vec2 dPos = (pos - gridPos) / vec2(gridX, gridY);
+    
+    float d1 = dot(dPos, getGrid(i, j));
+    float d2 = dot(dPos, getGrid(i + 1, j));
+    float d3 = dot(dPos, getGrid(i, j + 1));
+    float d4 = dot(dPos, getGrid(i + 1, j + 1));
+    
+    if (i % 2 == 0)
+    {
+        dPos.x = 1.0f - dPos.x;
+    }
+    if (j % 2 == 0)
+    {
+        dPos.y = 1.0f - dPos.y;
+    }
+    float D1 = mix(d1, d2, dPos.x);
+    float D2 = mix(d3, d4, dPos.x);
+    return mix(D1, D2, dPos.y); // dPos.x * dPos.y;
+}
+
 void main()
 {
     float periodOn = 1.0f;
@@ -70,6 +100,9 @@ void main()
     vec2 scrCenter = screen / 2.0f;
     float maxRadius = length(scrCenter - screen);
     
+    float gridX = float(sWinWidth) / GridX;
+    float gridY = float(sWinHeight) / GridY;
+    
     vec2 dP = gl_FragCoord.xy - scrCenter;
     vec2 pP = polar(dP);
     
@@ -78,20 +111,10 @@ void main()
     float B = 0.0f;
     float H, S, V;
     
-    float st = subTime(curTime, periodOn, periodOff);
-    float rad = maxRadius * (1.0f - cos(PI2 * st / (periodOn + periodOff)));
-    float phi = (curTime - st) / (2.0f * PI) * 2.0f * PI;
+    R = H = perlin(gl_FragCoord.xy, gridX, gridY);
+    S = 0.99f;
+    V = 0.99f;
     
-    float phidiff = abs(pP.y - phi) / (2.0f * PI);
-    float phidiff2 = float(int(phidiff));
-    //if (blink(curTime, periodOn, periodOff))
-    {
-        if (abs(pP.x - rad) < 1.1f && abs(phidiff - phidiff2) < 0.001f)
-            R = 1.0f;
-    }
-    S = 0.7f;
-    V = 0.7f;
-    
-    color = vec4(vec3(R, R, R), 1.0f);
-    //color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
+    //color = vec4(vec3(R, R, R), 1.0f);
+    color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
 }
