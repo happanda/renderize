@@ -216,7 +216,7 @@ int runVisual()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
-        TwDraw();
+        //TwDraw();
 
         glfwSwapBuffers(window);
     }

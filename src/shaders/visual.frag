@@ -63,7 +63,7 @@ vec3 hsv2rgb(vec3 c)
 
 void main()
 {
-    float periodOn = abs(tan(gl_FragCoord.x / sWinWidth * PI * step) * tan(gl_FragCoord.y / sWinHeight * PI * step));
+    float periodOn = 1.0f;
     float periodOff = periodOn;
     
     vec2 screen = vec2(sWinWidth, sWinHeight);
@@ -79,11 +79,19 @@ void main()
     float H, S, V;
     
     float st = subTime(curTime, periodOn, periodOff);
-    if (blink(curTime, periodOn, periodOff))
-        H = sin(curTime) * (st / (periodOn + periodOff));
-    //H = gl_FragCoord.x / sWinWidth;
+    float rad = maxRadius * (1.0f - cos(PI2 * st / (periodOn + periodOff)));
+    float phi = (curTime - st) / (2.0f * PI) * 2.0f * PI;
+    
+    float phidiff = abs(pP.y - phi) / (2.0f * PI);
+    float phidiff2 = float(int(phidiff));
+    //if (blink(curTime, periodOn, periodOff))
+    {
+        if (abs(pP.x - rad) < 1.1f && abs(phidiff - phidiff2) < 0.001f)
+            R = 1.0f;
+    }
     S = 0.7f;
     V = 0.7f;
     
-    color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
+    color = vec4(vec3(R, R, R), 1.0f);
+    //color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
 }
