@@ -17,14 +17,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "camera/camera.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
 
 
-static size_t sWinWidth = 400;
-static size_t sWinHeight = 400;
+static size_t sWinWidth = 800;
+static size_t sWinHeight = 800;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
@@ -155,15 +156,19 @@ int runVisual()
     std::uniform_real_distribution<float>  uniDist;
     std::exponential_distribution<float>  expDist;
 
-    int const GridX{ 5 };
-    int const GridY{ 5 };
+    int const GridX{ 7 };
+    int const GridY{ 7 };
     int const GridSize{ GridX * GridY };
     std::array<glm::vec2, GridSize> grid;
+    std::array<float, GridSize> speed;
     for (size_t i = 0; i < GridSize; ++i)
     {
         int const x = i % GridX;
         int const y = i / GridX;
-        grid[i] = glm::normalize(glm::vec2(x, y));
+        grid[i] = glm::normalize(glm::vec2(
+            2.0f * 3.14f * (uniDist(randGen) - 0.5f),
+            2.0f * 3.14f * (uniDist(randGen) - 0.5f)));
+        speed[i] = (uniDist(randGen) - 0.5f) / 10.0f;
     }
     
 
@@ -181,6 +186,14 @@ int runVisual()
             continue;
         lastTime = curTime;
         
+        for (size_t i = 0; i < GridSize; ++i)
+        {
+            int const x = i % GridX;
+            int const y = i / GridX;
+            grid[i] = glm::normalize(glm::rotate(grid[i], speed[i]));
+            if (uniDist(randGen) < 0.005f)
+                speed[i] = (uniDist(randGen) - 0.5f) / 10.0f;
+        }
 
         //moveCamera(dt);
         //glm::mat4 view;

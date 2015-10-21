@@ -5,8 +5,8 @@ out vec4 color;
 const float PI = 3.1415926535f;
 const float PI2 = PI / 2.0f;
 
-const int GridX = 5;
-const int GridY = 5;
+const int GridX = 7;
+const int GridY = 7;
 const int GridSize = GridX * GridY;
 
 uniform uint sWinWidth;
@@ -65,30 +65,39 @@ vec2 getGrid(int i, int j)
     return grid[j * GridX + i];
 }
 
+float sinrp(float val0, float val1, float t)
+{
+    float val = t * t * t * (t * (t * 6 - 15) + 10);
+    return (1 - val) * val0 + val * val1;
+}
+
 float perlin(vec2 pos, float gridX, float gridY)
 {
-    int i = int(floor(pos.x / gridX));
-    int j = int(floor(pos.y / gridY));
+    int x = int(floor(pos.x / gridX));
+    int y = int(floor(pos.y / gridY));
     
-    vec2 gridPos = vec2(gridX * i, gridY * j);
-    vec2 dPos = (pos - gridPos) / vec2(gridX, gridY);
-    
-    float d1 = dot(dPos, getGrid(i, j));
-    float d2 = dot(dPos, getGrid(i + 1, j));
-    float d3 = dot(dPos, getGrid(i, j + 1));
-    float d4 = dot(dPos, getGrid(i + 1, j + 1));
-    
-    if (i % 2 == 0)
+    vec2 gridPos[4];
+    gridPos[0] = vec2(gridX * x      , gridY * y      );
+    gridPos[1] = vec2(gridX * (x + 1), gridY * y      );
+    gridPos[2] = vec2(gridX * x      , gridY * (y + 1));
+    gridPos[3] = vec2(gridX * (x + 1), gridY * (y + 1));
+
+    vec2 cellSize = vec2(gridX, gridY);
+    vec2 dPos[4];
+    for (int i = 0; i < 4; ++i)
     {
-        dPos.x = 1.0f - dPos.x;
-    }
-    if (j % 2 == 0)
-    {
-        dPos.y = 1.0f - dPos.y;
-    }
-    float D1 = mix(d1, d2, dPos.x);
-    float D2 = mix(d3, d4, dPos.x);
-    return mix(D1, D2, dPos.y); // dPos.x * dPos.y;
+        dPos[i] = (pos - gridPos[i]) / cellSize;
+    };
+    
+    float dots[4];
+    dots[0] = dot(dPos[0], getGrid(x      , y      ));
+    dots[1] = dot(dPos[1], getGrid((x + 1), y      ));
+    dots[2] = dot(dPos[2], getGrid(x      , (y + 1)));
+    dots[3] = dot(dPos[3], getGrid((x + 1), (y + 1)));
+
+    float D1 = sinrp(dots[0], dots[1], dPos[0].x);
+    float D2 = sinrp(dots[2], dots[3], dPos[0].x);
+    return sinrp(D1, D2, dPos[0].y);//dPos[0].x * dPos[0].y;//
 }
 
 void main()
@@ -100,8 +109,8 @@ void main()
     vec2 scrCenter = screen / 2.0f;
     float maxRadius = length(scrCenter - screen);
     
-    float gridX = float(sWinWidth) / GridX;
-    float gridY = float(sWinHeight) / GridY;
+    float gridX = float(sWinWidth) / (GridX - 1);
+    float gridY = float(sWinHeight) / (GridY - 1);
     
     vec2 dP = gl_FragCoord.xy - scrCenter;
     vec2 pP = polar(dP);
@@ -111,10 +120,13 @@ void main()
     float B = 0.0f;
     float H, S, V;
     
-    R = H = perlin(gl_FragCoord.xy, gridX, gridY);
-    S = 0.99f;
+    float val = perlin(gl_FragCoord.xy, gridX, gridY);
+    val = (val + 1.0f) / 2.0f;
+    R = H = val;
+    
+    S = 0.9f;
     V = 0.99f;
     
-    //color = vec4(vec3(R, R, R), 1.0f);
+    color = vec4(vec3(R, R, R), 1.0f);
     color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
 }
