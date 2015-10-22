@@ -126,7 +126,12 @@ void main()
     
     S = 0.9f;
     V = 0.99f;
-    
+    float middleVal = (cos(curTime * 2.0f) + 2.0f) / 5.0f;
+    float eps = (sin(curTime * 2.0f) + 2.0f) / 5.0f;
+    if (abs(H - middleVal) > 0.01f)
+    {
+        S = V = 0.01f / abs(H - middleVal);
+    }
     color = vec4(vec3(R, R, R), 1.0f);
     color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
 }

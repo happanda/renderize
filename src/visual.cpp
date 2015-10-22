@@ -24,8 +24,8 @@
 #include "shaders/shader.h"
 
 
-static size_t sWinWidth = 800;
-static size_t sWinHeight = 800;
+static size_t sWinWidth = 400;
+static size_t sWinHeight = 400;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
