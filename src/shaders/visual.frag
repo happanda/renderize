@@ -122,16 +122,19 @@ void main()
     
     float val = perlin(gl_FragCoord.xy, gridX, gridY);
     val = (val + 1.0f) / 2.0f;
-    R = H = val;
+    R = val;
+    float zPart;
+    H = val * 3.0f + modf(curTime, zPart);
     
-    S = 0.9f;
-    V = 0.99f;
-    float middleVal = (cos(curTime * 2.0f) + 2.0f) / 5.0f;
-    float eps = (sin(curTime * 2.0f) + 2.0f) / 5.0f;
-    if (abs(H - middleVal) > 0.01f)
+    S = 0.85f;
+    V = 0.85f;
+    float middleVal = (cos(curTime * 2.0f) + 1.0f) / 2.0f;
+    float theta = abs(modf(H, zPart) - middleVal);// / 2.0f - int(abs(H - middleVal) / 2.0f);
+    if (theta > 0.01f)
     {
-        S = V = 0.01f / abs(H - middleVal);
+        S = V = 0.01f / theta;
     }
+    R = middleVal;
     color = vec4(vec3(R, R, R), 1.0f);
     color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
 }
