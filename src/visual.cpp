@@ -156,22 +156,6 @@ int runVisual()
     std::uniform_real_distribution<float>  uniDist;
     std::exponential_distribution<float>  expDist;
 
-    int const GridX{ 17 };
-    int const GridY{ 17 };
-    int const GridSize{ GridX * GridY };
-    std::array<glm::vec2, GridSize> grid;
-    std::array<float, GridSize> speed;
-    for (size_t i = 0; i < GridSize; ++i)
-    {
-        int const x = i % GridX;
-        int const y = i / GridX;
-        grid[i] = glm::normalize(glm::vec2(
-            2.0f * 3.14f * (uniDist(randGen) - 0.5f),
-            2.0f * 3.14f * (uniDist(randGen) - 0.5f)));
-        speed[i] = (uniDist(randGen) - 0.5f) / 10.0f;
-    }
-    
-
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
     float const dT{ 0.0125f };
@@ -186,15 +170,6 @@ int runVisual()
             continue;
         lastTime = curTime;
         
-        for (size_t i = 0; i < GridSize; ++i)
-        {
-            int const x = i % GridX;
-            int const y = i / GridX;
-            grid[i] = glm::normalize(glm::rotate(grid[i], speed[i]));
-            if (uniDist(randGen) < 0.005f)
-                speed[i] = (uniDist(randGen) - 0.5f) / 10.0f;
-        }
-
         //moveCamera(dt);
         //glm::mat4 view;
         //view = sCamera.view();
@@ -209,7 +184,6 @@ int runVisual()
         prog["sWinHeight"] = sWinHeight;
         prog["dt"] = dt;
         prog["curTime"] = curTime;
-        glUniform2fv(glGetUniformLocation(prog, "grid"), GridSize, (GLfloat*)(grid.data()));
 
         // Rendering
         glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
