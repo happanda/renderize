@@ -5,8 +5,8 @@ out vec4 color;
 const float PI = 3.1415926535f;
 const float PI2 = PI / 2.0f;
 
-const int GridX = 7;
-const int GridY = 7;
+const int GridX = 17;
+const int GridY = 17;
 const int GridSize = GridX * GridY;
 
 uniform uint sWinWidth;
@@ -124,7 +124,7 @@ void main()
     val = (val + 1.0f) / 2.0f;
     R = val;
     float zPart;
-    H = val * 3.0f + modf(curTime, zPart);
+    H = modf(val * 3.0f + curTime, zPart);
     
     S = 0.85f;
     V = 0.85f;

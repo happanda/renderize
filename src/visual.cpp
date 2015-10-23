@@ -24,8 +24,8 @@
 #include "shaders/shader.h"
 
 
-static size_t sWinWidth = 400;
-static size_t sWinHeight = 400;
+static size_t sWinWidth = 1920;
+static size_t sWinHeight = 1080;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
@@ -156,8 +156,8 @@ int runVisual()
     std::uniform_real_distribution<float>  uniDist;
     std::exponential_distribution<float>  expDist;
 
-    int const GridX{ 7 };
-    int const GridY{ 7 };
+    int const GridX{ 17 };
+    int const GridY{ 17 };
     int const GridSize{ GridX * GridY };
     std::array<glm::vec2, GridSize> grid;
     std::array<float, GridSize> speed;
