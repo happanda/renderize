@@ -2,25 +2,24 @@
 
 out vec4 color;
 
-const float PI = 3.1415926535f;
-const float PI2 = PI / 2.0f;
+uniform vec3 iResolution;
+uniform float iGlobalTime;
 
-const int GridX = 30;
-const int GridY = 30;
-const int GridSize = GridX * GridY;
+
+const float PI = 3.1415926535;
+const float PI2 = PI / 2.0;
+
+const float GridX = 20.0;
+const float GridY = 20.0;
 
 float
-R = 0.0f,
-G = 0.0f,
-B = 0.0f,
-H = 0.0f,
-S = 0.0f,
-V = 0.0f;
+R = 0.0,
+G = 0.0,
+B = 0.0,
+H = 0.0,
+S = 0.0,
+V = 0.0;
 
-uniform uint sWinWidth;
-uniform uint sWinHeight;
-uniform float dt;
-uniform float curTime;
 
 
 /*******************************************************************/
@@ -121,25 +120,25 @@ vec3 hsv2rgb(vec3 c)
 
 vec2 noise2vec(float noise, vec2 pos)
 {
-    return normalize(decart(vec2(1.0f, (noise + curTime * cos(pos.x) * sin(pos.y)) * PI * 2.0f)));
+    return normalize(decart(vec2(1.0, (noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * PI * 2.0)));
 }
 
 float poly6rp(float val0, float val1, float t)
 {
-    float val = t * t * t * (t * (t * 6 - 15) + 10);
-    return (1 - val) * val0 + val * val1;
+    float val = t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+    return (1.0 - val) * val0 + val * val1;
 }
 
 float perlin(vec2 pos, float gridX, float gridY)
 {
-    int x = int(floor(pos.x / gridX));
-    int y = int(floor(pos.y / gridY));
+    float x = floor(pos.x / gridX);
+    float y = floor(pos.y / gridY);
     
     vec2 gridPos[4];
     gridPos[0] = vec2(gridX * x      , gridY * y      );
-    gridPos[1] = vec2(gridX * (x + 1), gridY * y      );
-    gridPos[2] = vec2(gridX * x      , gridY * (y + 1));
-    gridPos[3] = vec2(gridX * (x + 1), gridY * (y + 1));
+    gridPos[1] = vec2(gridX * (x + 1.0), gridY * y      );
+    gridPos[2] = vec2(gridX * x      , gridY * (y + 1.0));
+    gridPos[3] = vec2(gridX * (x + 1.0), gridY * (y + 1.0));
 
     vec2 cellSize = vec2(gridX, gridY);
     vec2 dPos[4];
@@ -161,24 +160,24 @@ float perlin(vec2 pos, float gridX, float gridY)
 
 void main()
 {
-    vec2 screen = vec2(sWinWidth, sWinHeight);
-    vec2 scrCenter = screen / 2.0f;
+    vec2 screen = iResolution.xy;
+    vec2 scrCenter = screen / 2.0;
     
-    float gridX = float(sWinWidth) / (GridX - 1);
-    float gridY = float(sWinHeight) / (GridY - 1);
+    float gridX = iResolution.x / (GridX - 1.0);
+    float gridY = iResolution.y / (GridY - 1.0);
     
     float val = perlin(gl_FragCoord.xy, gridX, gridY);
-    val = (val + 1.0f) / 2.0f;
-    float zPart;
-    H = modf(val * 3.0f + curTime, zPart);
+    val = (val + 1.0) / 2.0;
+    H = mod(val * 3.0 + iGlobalTime, 1.0);
     
-    S = 0.85f;
-    V = 0.85f;
-    float middleVal = (cos(curTime * 2.0f) + 1.0f) / 2.0f;
-    float theta = abs(modf(H, zPart) - middleVal);// / 2.0f - int(abs(H - middleVal) / 2.0f);
-    if (theta > 0.01f)
+    S = 0.85;
+    V = 0.85;
+    float middleVal = (cos(iGlobalTime * 2.0) + 1.0) / 2.0;
+    float theta = abs(mod(H, 1.0) - middleVal);
+    float eps = 0.01 + (sin(iGlobalTime / 2) / 512.0);
+    if (theta > eps)
     {
-        S = V = 0.01f / theta;
+        S = V = eps / theta;
     }
-    color = vec4(hsv2rgb(vec3(H, S, V)), 1.0f);
+    color = vec4(hsv2rgb(vec3(H, S, V)), 1.0);
 }

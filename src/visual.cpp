@@ -179,11 +179,8 @@ int runVisual()
         prog.use();
         //prog["view"] = view;
         //prog["projection"] = projection;
-        prog["step"] = sStep;
-        prog["sWinWidth"] = sWinWidth;
-        prog["sWinHeight"] = sWinHeight;
-        prog["dt"] = dt;
-        prog["curTime"] = curTime;
+        prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0f);
+        prog["iGlobalTime"] = curTime;
 
         // Rendering
         glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
