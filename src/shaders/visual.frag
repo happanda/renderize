@@ -82,7 +82,7 @@ float snoise(vec2 v)
 
 
 
-#define hsv2rgb(H, S, V)  V * mix(vec3(1.), clamp(abs(fract(H + vec3(3, 2, 1) / 3) * 6. - 3.) - 1., 0., 1.), S)
+#define hsv2rgb(H, S, V)  V * mix(vec3(1.), clamp(abs(fract(H + vec3(3., 2., 1.) / 3.) * 6. - 3.) - 1., 0., 1.), S)
 
 #define CS(p) vec2(cos(p), sin(p))
 
@@ -90,7 +90,7 @@ float snoise(vec2 v)
 
 #define poly6rp(val0, val1, t) mix(val0, val1, t * t * t * (t * (t * 6. - 15.) + 10.))
 
-float perlin(vec2 pos, float gridStep)
+float perlin(vec2 pos, vec2 gridStep)
 {
     vec2 pLL = floor(pos / gridStep);
     vec2 gp, dpos, dpos0, eps=vec2(1, 0);
@@ -118,7 +118,7 @@ void main()
 
     float middleVal = (cos(iGlobalTime * 2.) + 1.) / 2.;
     float theta = abs(mod(H, 1.) - middleVal);
-    float eps = 0.05 + (sin(iGlobalTime / 2) / 512.);
+    float eps = 0.05 + (sin(iGlobalTime / 2.) / 512.);
     S = V = (theta > eps) ? (eps / theta) : 0.85;
     color = vec4(hsv2rgb(H, S, V), 1.);
 }
