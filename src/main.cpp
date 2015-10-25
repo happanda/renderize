@@ -5,6 +5,6 @@
 
 int main(int argc, char* argv[])
 {
-    return runVisual();
-    //return runCubes();
+    //return runVisual();
+    return runCubes();
 }

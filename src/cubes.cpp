@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "camera/camera.h"
 #include "shaders/program.h"
@@ -24,7 +25,9 @@ size_t sWinHeight = 800;
 TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
+bool sUseCam1{ true };
 camera sCamera(sWinWidth, sWinHeight);
+camera sCamera2(sWinWidth, sWinHeight);
 float sYaw = 0.0f;
 float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -352,9 +355,9 @@ int runCubes()
 
 
         glm::mat4 view;
-        view = sCamera.view();
+        view = sUseCam1 ? sCamera.view() : sCamera2.view();
         glm::mat4 projection;
-        projection = sCamera.projection();
+        projection = sUseCam1 ? sCamera.projection() : sCamera2.projection();
 
         {
             shaderLamp.use();
@@ -385,7 +388,7 @@ int runCubes()
             shaderCube["view"] = view;
             shaderCube["projection"] = projection;
 
-            shaderCube["viewerPos"] = sCamera.pos();
+            shaderCube["viewerPos"] = sUseCam1 ? sCamera.pos() : sCamera2.pos();
 
             shaderCube["material.diffuse"] = 0;
             crateTex.active(GL_TEXTURE0);
@@ -406,8 +409,8 @@ int runCubes()
             shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
             shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
             
-            sSPLight.position = sCamera.pos();
-            sSPLight.direction = sCamera.front();
+            sSPLight.position = sUseCam1 ? sCamera.pos() : sCamera2.pos();
+            sSPLight.direction = sUseCam1 ? sCamera.front() : sCamera2.front();
             shaderCube["spLight.position"] = sSPLight.position;
             shaderCube["spLight.direction"] = sSPLight.direction;
             shaderCube["spLight.ambient"] = sSPLight.ambient;
@@ -469,6 +472,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
         sMouseVisible = !sMouseVisible;
         glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
+    else if ((key == GLFW_KEY_C && action == GLFW_PRESS))
+        sUseCam1 = !sUseCam1;
 }
 
 void mouseCallback(GLFWwindow* window, double x, double y)
@@ -502,6 +507,7 @@ void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
     if (TwEventMouseWheelGLFW(static_cast<int>(yDiff)))
         return;
     sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
+    sCamera2.fov(sCamera.fov());
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
@@ -542,4 +548,9 @@ void moveCamera(float dt)
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     sCamera.pos(camPos);
     sCamera.front(sPitch, sYaw);
+    float const CamDist = 5.0f;
+    float const CamAngle = 0.03f;
+    glm::vec3 const minCf = glm::rotate(-sCamera.front() * CamDist, CamAngle, sCamera.up());
+    sCamera2.front(-minCf);
+    sCamera2.pos(sCamera.pos() + sCamera.front() * CamDist + minCf);
 }
