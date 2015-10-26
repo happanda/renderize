@@ -1,10 +1,14 @@
 #include "visual.h"
+#include <array>
 #include <ctime>
 #include <iostream>
+#include <list>
 #include <random>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+
+#include <AntTweakBar.h>
 
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -13,19 +17,24 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "camera/camera.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
 
 
-static size_t sWinWidth = 800;
-static size_t sWinHeight = 800;
+static size_t sWinWidth = 1920;
+static size_t sWinHeight = 1080;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
+static float sYaw = 0.0f;
+static float sPitch = 0.0f;
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
+static float sStep = 1.0f;
 
+static TwBar* sATB{ nullptr };
 
 static void glfwErrorReporting(int errCode, char const* msg);
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers);
@@ -56,6 +65,17 @@ int runVisual()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+
+    if (TwInit(TW_OPENGL_CORE, NULL))
+    {
+        TwWindowSize(sWinWidth, sWinHeight);
+        sATB = TwNewBar("Tweak");
+        TwAddVarRW(sATB, "step", TW_TYPE_FLOAT, &sStep, " label='Step' step=0.1 ");
+    }
+    else
+        std::cerr << TwGetLastError() << std::endl;
+
 
         // Initialize Glew
     glewExperimental = GL_TRUE;
@@ -122,7 +142,7 @@ int runVisual()
         std::cerr << fragShader.lastError() << std::endl;
         return -1;
     }
-
+    
     prog.attach(vertexShader);
     prog.attach(fragShader);
     if (!prog.link())
@@ -134,7 +154,7 @@ int runVisual()
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
     std::uniform_real_distribution<float>  uniDist;
-
+    std::exponential_distribution<float>  expDist;
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -151,15 +171,19 @@ int runVisual()
         lastTime = curTime;
         
         //moveCamera(dt);
+        //glm::mat4 view;
+        //view = sCamera.view();
+        //glm::mat4 projection;
+        //projection = sCamera.projection();
 
         prog.use();
-        prog["sourcePos"] = glm::vec2(sWinWidth / 2.0f, sWinHeight / 2.0f);
-        prog["dt"] = dt;
-        prog["curTime"] = curTime;
-        prog["randColor"] = glm::vec3(uniDist(randGen), uniDist(randGen), uniDist(randGen));
+        //prog["view"] = view;
+        //prog["projection"] = projection;
+        prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0f);
+        prog["iGlobalTime"] = curTime;
 
         // Rendering
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -167,8 +191,13 @@ int runVisual()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
+        //TwDraw();
+
         glfwSwapBuffers(window);
     }
+
+    TwDeleteBar(sATB);
+    sATB = nullptr;
 
     glfwTerminate();
     return 0;
@@ -181,6 +210,8 @@ void glfwErrorReporting(int errCode, char const* msg)
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
 {
+    if (TwEventKeyGLFW(key, action))
+        return;
     if (action == GLFW_PRESS)
         sKeys[key] = true;
     if (action == GLFW_RELEASE)
@@ -205,6 +236,7 @@ void mouseCallback(GLFWwindow* window, double x, double y)
     {
         lastX = xFloat;
         lastY = yFloat;
+        TwEventMousePosGLFW(static_cast<int>(x), static_cast<int>(y));
         return;
     }
     
@@ -215,19 +247,26 @@ void mouseCallback(GLFWwindow* window, double x, double y)
     GLfloat const sensitivity = 0.08f;
     xDiff *= sensitivity;
     yDiff *= sensitivity;
+
+    sYaw += xDiff;
+    sPitch = glm::clamp(sPitch - yDiff, -89.0f, 89.0f);
 }
 
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
 {
+    if (TwEventMouseWheelGLFW(static_cast<int>(yDiff)))
+        return;
     sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
 {
+    TwEventMouseButtonGLFW(button, action);
 }
 
 void charCallback(GLFWwindow* window, unsigned int symb)
 {
+    TwEventCharGLFW(symb, GLFW_PRESS);
 }
 
 void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
@@ -235,6 +274,7 @@ void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
     sWinWidth = sizeX;
     sWinHeight = sizeY;
     glViewport(0, 0, sWinWidth, sWinHeight);
+    TwWindowSize(sWinWidth, sWinHeight);
 }
 
 void moveCamera(float dt)
@@ -256,5 +296,5 @@ void moveCamera(float dt)
     if (sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     sCamera.pos(camPos);
-    //sCamera.front(sPitch, sYaw);
+    sCamera.front(sPitch, sYaw);
 }

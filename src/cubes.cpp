@@ -22,7 +22,7 @@
 
 size_t sWinWidth = 1280;
 size_t sWinHeight = 800;
-TwBar* sATB{ nullptr };
+static TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
 bool sUseCam1{ true };
