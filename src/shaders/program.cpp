@@ -33,7 +33,7 @@ bool program::link()
     return success == GL_TRUE;
 }
 
-void program::use()
+void program::use() const
 {
     glUseProgram(mProg);
 }

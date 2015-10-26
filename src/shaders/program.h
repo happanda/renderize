@@ -11,7 +11,7 @@ struct program
     bool create();
     void attach(shader const& sh);
     bool link();
-    void use();
+    void use() const;
 
     GLenum get() const;
 
