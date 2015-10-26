@@ -19,11 +19,11 @@ ${SourcePath}/textures/texture.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
-${SourcePath}/shaders/cube.vert
-${SourcePath}/shaders/cube.frag
-${SourcePath}/shaders/lamp.frag
-${SourcePath}/shaders/simple.vert
-${SourcePath}/shaders/visual.frag
+${SourcePath}/shaders_src/cube.vert
+${SourcePath}/shaders_src/cube.frag
+${SourcePath}/shaders_src/lamp.frag
+${SourcePath}/shaders_src/simple.vert
+${SourcePath}/shaders_src/visual.frag
 )
 
 set(SOURCE_FILES
