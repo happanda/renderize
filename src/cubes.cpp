@@ -17,6 +17,7 @@
 
 #include "camera/camera.h"
 #include "shaders/program.h"
+#include "textures/render_target.h"
 #include "textures/texture.h"
 #include "util/checked_call.h"
 
@@ -63,9 +64,9 @@ struct spot_light : public point_light
 material sCube{ 128.0f };
 dir_light sDirLight{
     { 1.0f, 1.0f, -0.3f },
-    { 0.01f, 0.01f, 0.01f },
-    { 0.01f, 0.01f, 0.01f },
-    { 0.01f, 0.01f, 0.01f },
+    { 0.1f, 0.1f, 0.1f },
+    { 0.8f, 0.8f, 0.8f },
+    { 0.4f, 0.4f, 0.4f },
 };
 point_light sPLight
 {
@@ -90,7 +91,7 @@ void moveCamera(float dt);
 int runCubes()
 {
     sSPLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-    sSPLight.diffuse = glm::vec3(0.3f, 0.3f, 0.3f);
+    sSPLight.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
     sSPLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
     sSPLight.constCoeff = sPLight.constCoeff;
     sSPLight.linCoeff = sPLight.linCoeff;
@@ -194,6 +195,21 @@ int runCubes()
         CHECK(shaderLamp.link(), shaderLamp.lastError(), return -1;);
     }
 
+    program simpleProg;
+    CHECK(simpleProg.create(), simpleProg.lastError(), return -1;);
+    {
+        // Shaders
+        shader vertexShader;
+        CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
+        shader fragCube;
+        CHECK(fragCube.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER), fragCube.lastError(), return -1;);
+        
+        // Shader program
+        simpleProg.attach(vertexShader);
+        simpleProg.attach(fragCube);
+        CHECK(simpleProg.link(), simpleProg.lastError(), return -1;);
+    }
+
     // Texture loading
     texture crateTex, crateSpecTex;
     CHECK(crateTex.load("../tex/crate.png", true), "Error loading crate texture", );
@@ -291,6 +307,35 @@ int runCubes()
     glBindVertexArray(0);
 
 
+
+    glm::vec3 quad[] = {
+        glm::vec3(-1.0f, -1.0f, 0.0f),
+        glm::vec3(-1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(-1.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, -1.0f, 0.0f)
+    };
+    GLuint quadVBO;
+    glGenBuffers(1, &quadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+
+    GLuint quadVAO;
+    glGenVertexArrays(1, &quadVAO);
+    glBindVertexArray(quadVAO);
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(0));
+        glEnableVertexAttribArray(0);
+    }
+
+
+
+    render_target renderTex[2];
+    CHECK(renderTex[0].create(sWinWidth, sWinHeight), "Error creating render target 0", return -1;);
+    CHECK(renderTex[1].create(sWinWidth, sWinHeight), "Error creating render target 1", return -1;);
+
     float lastTime = static_cast<float>(glfwGetTime());
     float dt = 0.0f;
     // Game Loop
@@ -304,20 +349,25 @@ int runCubes()
 
         moveCamera(dt);
 
+
+            // TO TEXTURE
+        renderTex[0].bind();
+        glViewport(0, 0, sWinWidth, sWinHeight);
+
         // Rendering
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         glm::mat4 view;
-        view = sUseCam1 ? sCamera.view() : sCamera2.view();
+        view = sCamera.view();
         glm::mat4 projection;
-        projection = sUseCam1 ? sCamera.projection() : sCamera2.projection();
+        projection = sCamera.projection();
 
         shaderCube.use();
         shaderCube["view"] = view;
         shaderCube["projection"] = projection;
-        shaderCube["viewerPos"] = sUseCam1 ? sCamera.pos() : sCamera2.pos();
+        shaderCube["viewerPos"] = sCamera.pos();
 
         shaderCube["material.diffuse"] = 0;
         crateTex.active(GL_TEXTURE0);
@@ -338,8 +388,8 @@ int runCubes()
         shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
         shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
             
-        sSPLight.position = sUseCam1 ? sCamera.pos() : sCamera2.pos();
-        sSPLight.direction = sUseCam1 ? sCamera.front() : sCamera2.front();
+        sSPLight.position = sCamera.pos();
+        sSPLight.direction = sCamera.front();
         shaderCube["spLight.position"] = sSPLight.position;
         shaderCube["spLight.direction"] = sSPLight.direction;
         shaderCube["spLight.ambient"] = sSPLight.ambient;
@@ -351,13 +401,107 @@ int runCubes()
         shaderCube["spLight.cutOff"] = glm::cos(sSPLight.cutOff);
         shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
 
-
         glBindVertexArray(VAO);
-        shaderCube["model"] = glm::mat4x4();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < 10; ++i)
+        {
+            glm::mat4 model;
+            model = glm::translate(model, cubePositions[i]);
+            GLfloat angle = 20.0f * i;
+            //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+            shaderCube["model"] = model;
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         glBindVertexArray(0);
 
-        //TwDraw();
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+
+
+
+        renderTex[1].bind();
+        glViewport(0, 0, sWinWidth, sWinHeight);
+        // Rendering
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        view = sCamera2.view();
+        projection = sCamera2.projection();
+
+        shaderCube.use();
+        shaderCube["view"] = view;
+        shaderCube["projection"] = projection;
+        shaderCube["viewerPos"] = sCamera2.pos();
+
+        shaderCube["material.diffuse"] = 0;
+        crateTex.active(GL_TEXTURE0);
+        shaderCube["material.specular"] = 1;
+        crateSpecTex.active(GL_TEXTURE1);
+        shaderCube["material.shininess"] = sCube.shininess;
+
+        shaderCube["dirLight.direction"] = sDirLight.direction;
+        shaderCube["dirLight.ambient"] = sDirLight.ambient;
+        shaderCube["dirLight.diffuse"] = sDirLight.diffuse;
+        shaderCube["dirLight.specular"] = sDirLight.specular;
+
+        shaderCube["pLight.position"] = sPLight.position;
+        shaderCube["pLight.ambient"] = sPLight.ambient;
+        shaderCube["pLight.diffuse"] = sPLight.diffuse;
+        shaderCube["pLight.specular"] = sPLight.specular;
+        shaderCube["pLight.constCoeff"] = sPLight.constCoeff;
+        shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
+        shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
+
+        sSPLight.position = sCamera2.pos();
+        sSPLight.direction = sCamera2.front();
+        shaderCube["spLight.position"] = sSPLight.position;
+        shaderCube["spLight.direction"] = sSPLight.direction;
+        shaderCube["spLight.ambient"] = sSPLight.ambient;
+        shaderCube["spLight.diffuse"] = sSPLight.diffuse;
+        shaderCube["spLight.specular"] = sSPLight.specular;
+        shaderCube["spLight.constCoeff"] = sSPLight.constCoeff;
+        shaderCube["spLight.linCoeff"] = sSPLight.linCoeff;
+        shaderCube["spLight.quadCoeff"] = sSPLight.quadCoeff;
+        shaderCube["spLight.cutOff"] = glm::cos(sSPLight.cutOff);
+        shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
+
+        shaderCube["model"] = glm::mat4x4();
+
+        glBindVertexArray(VAO);
+        for (int i = 0; i < 10; ++i)
+        {
+            glm::mat4 model;
+            model = glm::translate(model, cubePositions[i]);
+            GLfloat angle = 20.0f * i;
+            //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
+            shaderCube["model"] = model;
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        glBindVertexArray(0);
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+
+
+
+            // TO SCREEN
+        renderTex[0].unbind();
+        glViewport(0, 0, sWinWidth, sWinHeight);
+        glClearColor(0.1f, 0.1f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        simpleProg.use();
+        renderTex[0].activeTex(GL_TEXTURE0);
+        renderTex[1].activeTex(GL_TEXTURE1);
+        simpleProg["renderTex0"] = 0;
+        simpleProg["renderTex1"] = 1;
+        simpleProg["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
+
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        glDisableVertexAttribArray(0);
 
         glfwSwapBuffers(window);
     }
@@ -469,7 +613,7 @@ void moveCamera(float dt)
     sCamera.pos(camPos);
     sCamera.front(sPitch, sYaw);
     float const CamDist = 5.0f;
-    float const CamAngle = 0.03f;
+    float const CamAngle = 0.01f;
     glm::vec3 const minCf = glm::rotate(-sCamera.front() * CamDist, CamAngle, sCamera.up());
     sCamera2.front(-minCf);
     sCamera2.pos(sCamera.pos() + sCamera.front() * CamDist + minCf);

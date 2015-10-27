@@ -14,6 +14,8 @@ ${SourcePath}/shaders/uniform.cpp
 )
 
 set(SOURCE_FILES_TEXTURES
+${SourcePath}/textures/render_target.h
+${SourcePath}/textures/render_target.cpp
 ${SourcePath}/textures/texture.h
 ${SourcePath}/textures/texture.cpp
 )
@@ -23,6 +25,7 @@ ${SourcePath}/shaders_src/cube.vert
 ${SourcePath}/shaders_src/cube.frag
 ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/simple.vert
+${SourcePath}/shaders_src/simple.frag
 ${SourcePath}/shaders_src/visual.frag
 )
 
