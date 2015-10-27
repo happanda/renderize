@@ -30,6 +30,9 @@ bool sMouseVisible{ false };
 bool sUseCam1{ true };
 camera sCamera(sWinWidth, sWinHeight);
 camera sCamera2(sWinWidth, sWinHeight);
+float sCamDist{ 5.0f };
+float sCamAngle{ 0.01f };
+
 float sYaw = 0.0f;
 float sPitch = 0.0f;
 std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -130,6 +133,10 @@ int runCubes()
         TwWindowSize(sWinWidth, sWinHeight);
         sATB = TwNewBar("Tweak");
 
+        TwAddVarRW(sATB, "dist", TW_TYPE_FLOAT, &sCamDist, " label='Dist' step=0.1 precision=2");
+        TwAddVarRW(sATB, "angle", TW_TYPE_FLOAT, &sCamAngle, " label='Angle' step=0.005 precision=3");
+
+        /*
         TwAddVarRW(sATB, "mat.shi", TW_TYPE_FLOAT, &sCube.shininess, " label='Shininess' min=-32 max=512 step=1 ");
         
         TwAddVarRW(sATB, "dlight.dir", TW_TYPE_DIR3F, glm::value_ptr(sDirLight.direction), " label='DLight dir' ");
@@ -158,7 +165,7 @@ int runCubes()
         TwAddVarRW(sATB, "splight.lin", TW_TYPE_FLOAT, &sSPLight.linCoeff, " label='SPLight lin' step=0.05 ");
         TwAddVarRW(sATB, "splight.quad", TW_TYPE_FLOAT, &sSPLight.quadCoeff, " label='SPLight quad' step=0.05 ");
         TwAddVarRW(sATB, "splight.cutoff", TW_TYPE_FLOAT, &sSPLight.cutOff, " label='SPLight cutoff' step=0.05 ");
-        TwAddVarRW(sATB, "splight.outercutoff", TW_TYPE_FLOAT, &sSPLight.outerCutOff, " label='SPLight outerCutOff' step=0.05 ");
+        TwAddVarRW(sATB, "splight.outercutoff", TW_TYPE_FLOAT, &sSPLight.outerCutOff, " label='SPLight outerCutOff' step=0.05 ");*/
     }
     else
         std::cerr << TwGetLastError() << std::endl;
@@ -503,6 +510,8 @@ int runCubes()
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);
 
+        //TwDraw();
+
         glfwSwapBuffers(window);
     }
 
@@ -594,8 +603,8 @@ void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
 
 void moveCamera(float dt)
 {
-    if (sMouseVisible)
-        return;
+    //if (sMouseVisible)
+    //    return;
     GLfloat cameraSpeed = 5.0f * dt;
     auto camPos = sCamera.pos();
     if (sKeys[GLFW_KEY_W])
@@ -612,9 +621,7 @@ void moveCamera(float dt)
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     sCamera.pos(camPos);
     sCamera.front(sPitch, sYaw);
-    float const CamDist = 5.0f;
-    float const CamAngle = 0.01f;
-    glm::vec3 const minCf = glm::rotate(-sCamera.front() * CamDist, CamAngle, sCamera.up());
+    glm::vec3 const minCf = glm::rotate(-sCamera.front() * sCamDist, sCamAngle, sCamera.up());
     sCamera2.front(-minCf);
-    sCamera2.pos(sCamera.pos() + sCamera.front() * CamDist + minCf);
+    sCamera2.pos(sCamera.pos() + sCamera.front() * sCamDist + minCf);
 }
