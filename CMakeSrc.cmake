@@ -26,6 +26,10 @@ ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/visual.frag
 )
 
+set(SOURCE_FILES_UTIL
+${SourcePath}/util/checked_call.h
+)
+
 set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
@@ -46,11 +50,13 @@ source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
 source_group(textures  FILES  ${SOURCE_FILES_TEXTURES})
 source_group(shaders_src  FILES  ${SOURCE_FILES_SHADERS_SOURCE})
+source_group(util  FILES  ${SOURCE_FILES_UTIL})
 set_source_files_properties(${SOURCE_FILES_SHADERS_SOURCE} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 
 set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
+${SOURCE_FILES_UTIL}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_SHADERS}
 ${SOURCE_FILES_TEXTURES}

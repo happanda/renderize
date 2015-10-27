@@ -18,6 +18,7 @@
 #include "camera/camera.h"
 #include "shaders/program.h"
 #include "textures/texture.h"
+#include "util/checked_call.h"
 
 
 size_t sWinWidth = 1280;
@@ -105,16 +106,21 @@ int runCubes()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
+    // Initialize some GLFW callbacks
     glfwSetErrorCallback(glfwErrorReporting);
 
         // Create a window
     GLFWwindow* window = glfwCreateWindow(sWinWidth, sWinHeight, "Renderize", nullptr, nullptr);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
+    CHECK(window, "Error creating window", { glfwTerminate(); return -1; });
     glfwMakeContextCurrent(window);
+
+    glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetCharCallback(window, charCallback);
+    glfwSetWindowSizeCallback(window, windowSizeCallback);
 
 
         // AntTweakBar
@@ -158,92 +164,40 @@ int runCubes()
 
 
         // Initialize Glew
-
     glewExperimental = GL_TRUE;
     GLenum glewCode = glewInit();
-    if (GLEW_OK != glewCode)
-    {
-        std::cerr << "Failed to initialize GLEW: " << glewGetErrorString(glewCode) << std::endl;
-        return -1;
-    }
+    CHECK(GLEW_OK == glewCode, "Failed to initialize GLEW: ",
+        std::cerr << glewGetErrorString(glewCode) << std::endl; return -1;);
 
-    glViewport(0, 0, sWinWidth, sWinHeight);
     glEnable(GL_DEPTH_TEST);
-
-    // Initialize some GLFW callbacks
-    glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetCursorPosCallback(window, mouseCallback);
-    glfwSetScrollCallback(window, scrollCallback);
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
-    glfwSetCharCallback(window, charCallback);
-    glfwSetWindowSizeCallback(window, windowSizeCallback);
 
 
     program shaderCube;
     program shaderLamp;
-    if (!shaderCube.create())
-    {
-        std::cerr << shaderCube.lastError() << std::endl;
-        return -1;
-    }
-    if (!shaderLamp.create())
-    {
-        std::cerr << shaderLamp.lastError() << std::endl;
-        return -1;
-    }
-
+    CHECK(shaderCube.create(), shaderCube.lastError(), return -1;);
+    CHECK(shaderLamp.create(), shaderLamp.lastError(), return -1;);
     {
         // Shaders
         shader vertexShader;
-        if (!vertexShader.compile(readAllText("shaders/cube.vert"), GL_VERTEX_SHADER))
-        {
-            std::cerr << vertexShader.lastError() << std::endl;
-            return -1;
-        }
+        CHECK(vertexShader.compile(readAllText("shaders/cube.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
         shader fragCube;
-        if (!fragCube.compile(readAllText("shaders/cube.frag"), GL_FRAGMENT_SHADER))
-        {
-            std::cerr << fragCube.lastError() << std::endl;
-            return -1;
-        }
+        CHECK(fragCube.compile(readAllText("shaders/cube.frag"), GL_FRAGMENT_SHADER), fragCube.lastError(), return -1;);
         shader fragLamp;
-        if (!fragLamp.compile(readAllText("shaders/lamp.frag"), GL_FRAGMENT_SHADER))
-        {
-            std::cerr << fragLamp.lastError() << std::endl;
-            return -1;
-        }
+        CHECK(fragLamp.compile(readAllText("shaders/lamp.frag"), GL_FRAGMENT_SHADER), fragLamp.lastError(), return -1;);
 
         // Shader program
         shaderCube.attach(vertexShader);
         shaderCube.attach(fragCube);
-        if (!shaderCube.link())
-        {
-            std::cerr << shaderCube.lastError() << std::endl;
-            return -1;
-        }
+        CHECK(shaderCube.link(), shaderCube.lastError(), return -1;);
         shaderLamp.attach(vertexShader);
         shaderLamp.attach(fragLamp);
-        if (!shaderLamp.link())
-        {
-            std::cerr << shaderLamp.lastError() << std::endl;
-            return -1;
-        }
+        CHECK(shaderLamp.link(), shaderLamp.lastError(), return -1;);
     }
 
     // Texture loading
     texture crateTex, crateSpecTex;
-    crateTex.load("../tex/crate.png", true);
-    crateTex.setFilter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    crateTex.setFilter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    crateTex.setWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
-    crateTex.setWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    crateSpecTex.load("../tex/crate_specular.png", true);
-    crateSpecTex.setFilter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    crateSpecTex.setFilter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    crateSpecTex.setWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
-    crateSpecTex.setWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    CHECK(crateTex.load("../tex/crate.png", true), "Error loading crate texture", );
+    CHECK(crateSpecTex.load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
 
 
     // Geometry to draw
@@ -324,6 +278,7 @@ int runCubes()
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
         glEnableVertexAttribArray(2);
     }
+    glBindVertexArray(0);
 
     GLuint lightVAO;
     glGenVertexArrays(1, &lightVAO);
@@ -359,85 +314,50 @@ int runCubes()
         glm::mat4 projection;
         projection = sUseCam1 ? sCamera.projection() : sCamera2.projection();
 
-        {
-            shaderLamp.use();
+        shaderCube.use();
+        shaderCube["view"] = view;
+        shaderCube["projection"] = projection;
+        shaderCube["viewerPos"] = sUseCam1 ? sCamera.pos() : sCamera2.pos();
+
+        shaderCube["material.diffuse"] = 0;
+        crateTex.active(GL_TEXTURE0);
+        shaderCube["material.specular"] = 1;
+        crateSpecTex.active(GL_TEXTURE1);
+        shaderCube["material.shininess"] = sCube.shininess;
+
+        shaderCube["dirLight.direction"] = sDirLight.direction;
+        shaderCube["dirLight.ambient"] = sDirLight.ambient;
+        shaderCube["dirLight.diffuse"] = sDirLight.diffuse;
+        shaderCube["dirLight.specular"] = sDirLight.specular;
             
-            shaderLamp["pLight.position"] = sPLight.position;
-            shaderLamp["pLight.ambient"] = sPLight.ambient;
-            shaderLamp["pLight.diffuse"] = sPLight.diffuse;
-            shaderLamp["pLight.specular"] = sPLight.specular;
-            shaderLamp["pLight.constCoeff"] = sPLight.constCoeff;
-            shaderLamp["pLight.linCoeff"] = sPLight.linCoeff;
-            shaderLamp["pLight.quadCoeff"] = sPLight.quadCoeff;
-
-            glm::mat4 model;
-            //model = glm::rotate(model, curTime, glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::translate(model, sPLight.position);
-            model = glm::scale(model, glm::vec3(0.2f));
-            glBindVertexArray(lightVAO);
-            shaderLamp["model"] = model;
-            shaderLamp["view"] = view;
-            shaderLamp["projection"] = projection;
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-
-        {
-            shaderCube.use();
-            shaderCube["view"] = view;
-            shaderCube["projection"] = projection;
-
-            shaderCube["viewerPos"] = sUseCam1 ? sCamera.pos() : sCamera2.pos();
-
-            shaderCube["material.diffuse"] = 0;
-            crateTex.active(GL_TEXTURE0);
-            shaderCube["material.specular"] = 1;
-            crateSpecTex.active(GL_TEXTURE1);
-            shaderCube["material.shininess"] = sCube.shininess;
-
-            shaderCube["dirLight.direction"] = sDirLight.direction;
-            shaderCube["dirLight.ambient"] = sDirLight.ambient;
-            shaderCube["dirLight.diffuse"] = sDirLight.diffuse;
-            shaderCube["dirLight.specular"] = sDirLight.specular;
+        shaderCube["pLight.position"] = sPLight.position;
+        shaderCube["pLight.ambient"] = sPLight.ambient;
+        shaderCube["pLight.diffuse"] = sPLight.diffuse;
+        shaderCube["pLight.specular"] = sPLight.specular;
+        shaderCube["pLight.constCoeff"] = sPLight.constCoeff;
+        shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
+        shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
             
-            shaderCube["pLight.position"] = sPLight.position;
-            shaderCube["pLight.ambient"] = sPLight.ambient;
-            shaderCube["pLight.diffuse"] = sPLight.diffuse;
-            shaderCube["pLight.specular"] = sPLight.specular;
-            shaderCube["pLight.constCoeff"] = sPLight.constCoeff;
-            shaderCube["pLight.linCoeff"] = sPLight.linCoeff;
-            shaderCube["pLight.quadCoeff"] = sPLight.quadCoeff;
-            
-            sSPLight.position = sUseCam1 ? sCamera.pos() : sCamera2.pos();
-            sSPLight.direction = sUseCam1 ? sCamera.front() : sCamera2.front();
-            shaderCube["spLight.position"] = sSPLight.position;
-            shaderCube["spLight.direction"] = sSPLight.direction;
-            shaderCube["spLight.ambient"] = sSPLight.ambient;
-            shaderCube["spLight.diffuse"] = sSPLight.diffuse;
-            shaderCube["spLight.specular"] = sSPLight.specular;
-            shaderCube["spLight.constCoeff"] = sSPLight.constCoeff;
-            shaderCube["spLight.linCoeff"] = sSPLight.linCoeff;
-            shaderCube["spLight.quadCoeff"] = sSPLight.quadCoeff;
-            shaderCube["spLight.cutOff"] = glm::cos(sSPLight.cutOff);
-            shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
+        sSPLight.position = sUseCam1 ? sCamera.pos() : sCamera2.pos();
+        sSPLight.direction = sUseCam1 ? sCamera.front() : sCamera2.front();
+        shaderCube["spLight.position"] = sSPLight.position;
+        shaderCube["spLight.direction"] = sSPLight.direction;
+        shaderCube["spLight.ambient"] = sSPLight.ambient;
+        shaderCube["spLight.diffuse"] = sSPLight.diffuse;
+        shaderCube["spLight.specular"] = sSPLight.specular;
+        shaderCube["spLight.constCoeff"] = sSPLight.constCoeff;
+        shaderCube["spLight.linCoeff"] = sSPLight.linCoeff;
+        shaderCube["spLight.quadCoeff"] = sSPLight.quadCoeff;
+        shaderCube["spLight.cutOff"] = glm::cos(sSPLight.cutOff);
+        shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
 
 
-            glBindVertexArray(VAO);
-            for (int i = 0; i < 10; ++i)
-            {
-                glm::mat4 model;
-                model = glm::translate(model, cubePositions[i]);
-                GLfloat angle = 20.0f * i;
-                //model = glm::rotate(model, glm::radians(angle) + curTime, glm::vec3(1.0f, 0.1f * i, 0.5f));
-                shaderCube["model"] = model;
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-            }
-        }
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(VAO);
+        shaderCube["model"] = glm::mat4x4();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
-        TwDraw();
+        //TwDraw();
 
         glfwSwapBuffers(window);
     }
