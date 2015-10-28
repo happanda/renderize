@@ -22,6 +22,7 @@
 #include "camera/camera.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
+#include "util/checked_call.h"
 
 
 static size_t sWinWidth = 1920;
@@ -47,8 +48,7 @@ static void moveCamera(float dt);
 
 int runVisual()
 {
-    if (GL_FALSE == glfwInit())
-        return -1;
+    CHECK(GL_FALSE != glfwInit(), "GLFW init failed", return -1;);
         // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -59,11 +59,7 @@ int runVisual()
 
         // Create a window
     GLFWwindow* window = glfwCreateWindow(sWinWidth, sWinHeight, "Renderize", nullptr, nullptr);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
+    CHECK(window, "Error creating window", { glfwTerminate(); return -1; });
     glfwMakeContextCurrent(window);
 
 
@@ -80,11 +76,8 @@ int runVisual()
         // Initialize Glew
     glewExperimental = GL_TRUE;
     GLenum glewCode = glewInit();
-    if (GLEW_OK != glewCode)
-    {
-        std::cerr << "Failed to initialize GLEW: " << glewGetErrorString(glewCode) << std::endl;
-        return -1;
-    }
+    CHECK(GLEW_OK == glewCode, "Failed to initialize GLEW: ",
+        std::cerr << glewGetErrorString(glewCode) << std::endl; return -1;);
 
     glViewport(0, 0, sWinWidth, sWinHeight);
     glEnable(GL_DEPTH_TEST);
@@ -123,33 +116,16 @@ int runVisual()
 
 
     program prog;
-    if (!prog.create())
-    {
-        std::cerr << prog.lastError() << std::endl;
-        return -1;
-    }
+    CHECK(prog.create(), prog.lastError(), return -1;);
 
         // Shaders
-    shader vertexShader;
-    if (!vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER))
-    {
-        std::cerr << vertexShader.lastError() << std::endl;
-        return -1;
-    }
-    shader fragShader;
-    if (!fragShader.compile(readAllText("shaders/visual.frag"), GL_FRAGMENT_SHADER))
-    {
-        std::cerr << fragShader.lastError() << std::endl;
-        return -1;
-    }
-    
+    shader vertexShader, fragShader;
+    CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
+    CHECK(vertexShader.compile(readAllText("shaders/visual.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
+
     prog.attach(vertexShader);
     prog.attach(fragShader);
-    if (!prog.link())
-    {
-        std::cerr << prog.lastError() << std::endl;
-        return -1;
-    }
+    CHECK(prog.link(), prog.lastError(), return -1;);
 
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));

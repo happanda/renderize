@@ -102,8 +102,7 @@ int runCubes()
     sSPLight.cutOff = 0.05f;
     sSPLight.outerCutOff = 0.2f;
 
-    if (GL_FALSE == glfwInit())
-        return -1;
+    CHECK(GL_FALSE == glfwInit(), "GLFW init failed", return -1;);
         // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
