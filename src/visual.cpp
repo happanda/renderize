@@ -22,6 +22,7 @@
 #include "camera/camera.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
+#include "textures/texture.h"
 #include "util/checked_call.h"
 
 
@@ -121,11 +122,14 @@ int runVisual()
         // Shaders
     shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-    CHECK(vertexShader.compile(readAllText("shaders/visual.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
+    CHECK(vertexShader.compile(readAllText("shaders/tex_noise.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return -1;);
+
+    texture tex;
+    CHECK(tex.load("../tex/qWG9TKh7Ds4.jpg", true), "Error loading texture", );
 
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
@@ -147,16 +151,12 @@ int runVisual()
         lastTime = curTime;
         
         //moveCamera(dt);
-        //glm::mat4 view;
-        //view = sCamera.view();
-        //glm::mat4 projection;
-        //projection = sCamera.projection();
-
+        
         prog.use();
-        //prog["view"] = view;
-        //prog["projection"] = projection;
-        prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0f);
+        prog["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
         prog["iGlobalTime"] = curTime;
+        prog["tex"] = 0;
+        tex.active(GL_TEXTURE0);
 
         // Rendering
         glClearColor(0.1f, 0.3f, 0.5f, 1.0f);

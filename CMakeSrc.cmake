@@ -26,6 +26,7 @@ ${SourcePath}/shaders_src/cube.frag
 ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
+${SourcePath}/shaders_src/tex_noise.frag
 ${SourcePath}/shaders_src/visual.frag
 )
 
