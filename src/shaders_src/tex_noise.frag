@@ -63,9 +63,12 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+#define coss(arg)  (0.6 + abs(cos(arg) * 0.25))
 
 void main()
 {
+    vec2 UV = vec2(1.0) - gl_FragCoord.xy / iResolution.xy;
+    
     float H = 0.,
           S = 0.,
           V = 0.;
@@ -74,5 +77,5 @@ void main()
     vec2 diff = (3.0 + cos(iGlobalTime) / 10.0) * vec2(cos(val), sin(val));
     vec2 newPos = (gl_FragCoord.xy + diff) / iResolution;
 
-    color = vec4(vec3(texture(tex, newPos)), 1.);
+    color = vec4(vec3(texture(tex, vec2(newPos.x, 1.0 - newPos.y))), 1.);
 }

@@ -26,8 +26,8 @@
 #include "util/checked_call.h"
 
 
-static size_t sWinWidth = 1920;
-static size_t sWinHeight = 1080;
+static size_t sWinWidth = 400;
+static size_t sWinHeight = 400;
 static bool sMouseVisible{ false };
 
 static camera sCamera(sWinWidth, sWinHeight);
@@ -129,7 +129,7 @@ int runVisual()
     CHECK(prog.link(), prog.lastError(), return -1;);
 
     texture tex;
-    CHECK(tex.load("../tex/qWG9TKh7Ds4.jpg", true), "Error loading texture", );
+    CHECK(tex.load("../tex/crate.png", true), "Error loading texture", );
 
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
