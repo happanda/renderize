@@ -80,29 +80,29 @@ void main()
           S = 0.,
           V = 0.;
 
-    vec2 uv = gl_FragCoord.xy / iResolution.xy * 2.0 - 1.0;
+    vec2 uv = (gl_FragCoord.xy - iResolution.xy / 2.0) / (iResolution.xy);
     for (int i = 0; i < NumVerts; ++i)
     {
         float dist = length(vertices[i].xy - uv);
         if (dist < 0.002)
         {
-            R = G = B = 1.0 - dist;
+            R = G = B = pow(cos(dist), 2.0);
         }
     }
     for (int i = 0; i < NumEdges; i += 2)
     {
-        vec2 P = vertices[edges[i]].xy;
-        vec2 Q = vertices[edges[i + 1]].xy;
-
-        if (dot(uv - P, Q - uv) < 0.0)
+        vec3 P = vertices[edges[i]];
+        vec3 Q = vertices[edges[i + 1]];
+        
+        if (dot(uv - P.xy, Q.xy - uv) < 0.0)
             continue;
-
+        
         float a = (Q.y - P.y) / (Q.x - P.x);
         float b = Q.y - a * Q.x;
         float eps = abs(uv.x * a + b - uv.y);
         if (eps <= 0.01)
         {
-            R = G = B = 1.0 - eps;
+            R = G = B = 1.0 - 500.0 * eps;
         }
     }
 

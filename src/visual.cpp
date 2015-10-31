@@ -265,7 +265,7 @@ void moveCamera(float dt)
 {
     if (sMouseVisible)
         return;
-    float const rotAngle = 180.0f * dt;
+    float const rotAngle = 90.0f * dt;
     if (sKeys[GLFW_KEY_W])
         sRotAngles.x += rotAngle;
     if (sKeys[GLFW_KEY_S])
