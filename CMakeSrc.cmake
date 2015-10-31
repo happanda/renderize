@@ -4,6 +4,11 @@ ${SourcePath}/camera/camera.h
 ${SourcePath}/camera/camera.cpp
 )
 
+set(SOURCE_FILES_DATA
+${SourcePath}/data/cube.h
+${SourcePath}/data/cube.cpp
+)
+
 set(SOURCE_FILES_SHADERS
 ${SourcePath}/shaders/program.h
 ${SourcePath}/shaders/program.cpp
@@ -52,6 +57,7 @@ ${SourcePath}/visual.cpp
 #source_group(glfw  FILES  ${SOURCE_FILES_GLFW})
 source_group(""  FILES  ${SOURCE_FILES})
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
+source_group(data FILES ${SOURCE_FILES_DATA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
 source_group(textures  FILES  ${SOURCE_FILES_TEXTURES})
 source_group(shaders_src  FILES  ${SOURCE_FILES_SHADERS_SOURCE})
@@ -63,6 +69,7 @@ set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
 ${SOURCE_FILES_UTIL}
 ${SOURCE_FILES_CAMERA}
+${SOURCE_FILES_DATA}
 ${SOURCE_FILES_SHADERS}
 ${SOURCE_FILES_TEXTURES}
 ${SOURCE_FILES_SHADERS_SOURCE}

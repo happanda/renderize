@@ -20,6 +20,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "camera/camera.h"
+#include "data/cube.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
 #include "textures/texture.h"
@@ -28,8 +29,9 @@
 
 static size_t sWinWidth = 1280;
 static size_t sWinHeight = 800;
+static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
 static bool sMouseVisible{ false };
-glm::vec3 const sCubePos(0.0f, 0.0f, -15.0f);
+glm::vec3 const sCubePos(0.0f, 0.0f, 0.0f);
 glm::vec3 sRotAngles;
 
 static camera sCamera(sWinWidth, sWinHeight);
@@ -106,15 +108,19 @@ int runVisual()
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(sVertices), sVertices.data(), GL_STATIC_DRAW);
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(0));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), static_cast<GLvoid*>(0));
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(2);
     }
 
 
@@ -123,8 +129,8 @@ int runVisual()
 
         // Shaders
     shader vertexShader, fragShader;
-    CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-    CHECK(vertexShader.compile(readAllText("shaders/form.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
+    CHECK(vertexShader.compile(readAllText("shaders/cube.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
+    CHECK(fragShader.compile(readAllText("shaders/form.frag"), GL_FRAGMENT_SHADER), fragShader.lastError(), return -1;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
@@ -152,6 +158,13 @@ int runVisual()
             continue;
         lastTime = curTime;
 
+        //std::array<GLfloat, sNumVertices> verticesCopy = sVertices;
+        //for (size_t i = 0; i < sNumVertices; i += 8)
+        //{
+        //    verticesCopy[i] = std::sin(curTime) * sVertices[i];
+        //}
+        //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        //glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCopy), verticesCopy.data(), GL_STATIC_DRAW);
         moveCamera(dt);
 
         glm::mat4 view;
@@ -159,24 +172,31 @@ int runVisual()
         glm::mat4 projection;
         projection = sCamera.projection();
         glm::mat4 model;
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         model = glm::translate(model, sCubePos);
         model = glm::rotate(model, glm::radians(sRotAngles.x), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(sRotAngles.y), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::rotate(model, glm::radians(sRotAngles.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         prog.use();
+        prog["model"] = model;
+        prog["view"] = view;
+        prog["projection"] = projection;
         prog["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
         prog["iGlobalTime"] = curTime;
-        prog["pvm"] = projection * view * model;
 
         // Rendering
-        glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
 
         //TwDraw();
 
