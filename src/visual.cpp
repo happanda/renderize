@@ -26,9 +26,10 @@
 #include "util/checked_call.h"
 
 
-static size_t sWinWidth = 400;
-static size_t sWinHeight = 400;
+static size_t sWinWidth = 1280;
+static size_t sWinHeight = 800;
 static bool sMouseVisible{ false };
+glm::vec3 const sCubePos(0.0f, 0.0f, -15.0f);
 
 static camera sCamera(sWinWidth, sWinHeight);
 static float sYaw = 0.0f;
@@ -47,8 +48,10 @@ static void charCallback(GLFWwindow* window, unsigned int symb);
 static void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY);
 static void moveCamera(float dt);
 
+
 int runVisual()
 {
+    sCamera.fov(90);
     CHECK(GL_FALSE != glfwInit(), "GLFW init failed", return -1;);
         // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -122,7 +125,7 @@ int runVisual()
         // Shaders
     shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-    CHECK(vertexShader.compile(readAllText("shaders/tex_noise.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
+    CHECK(vertexShader.compile(readAllText("shaders/form.frag"), GL_FRAGMENT_SHADER), vertexShader.lastError(), return -1;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
@@ -149,14 +152,20 @@ int runVisual()
         if (dt < dT)
             continue;
         lastTime = curTime;
-        
-        //moveCamera(dt);
-        
+
+        moveCamera(dt);
+
+        glm::mat4 view;
+        view = sCamera.view();
+        glm::mat4 projection;
+        projection = sCamera.projection();
+        glm::mat4 model;
+        model = glm::translate(model, sCubePos);
+
         prog.use();
         prog["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
         prog["iGlobalTime"] = curTime;
-        prog["tex"] = 0;
-        tex.active(GL_TEXTURE0);
+        prog["pvm"] = projection * view * model;
 
         // Rendering
         glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
@@ -257,20 +266,27 @@ void moveCamera(float dt)
 {
     if (sMouseVisible)
         return;
-    GLfloat cameraSpeed = 5.0f * dt;
+    GLfloat cameraSpeed = 50.0f * dt;
     auto camPos = sCamera.pos();
-    if (sKeys[GLFW_KEY_W])
+    /*if (sKeys[GLFW_KEY_W])
         camPos += cameraSpeed * sCamera.front();
     if (sKeys[GLFW_KEY_S])
-        camPos -= cameraSpeed * sCamera.front();
+        camPos -= cameraSpeed * sCamera.front();*/
     if (sKeys[GLFW_KEY_A])
         camPos -= glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
     if (sKeys[GLFW_KEY_D])
         camPos += glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
-    if (sKeys[GLFW_KEY_SPACE])
-        camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    if (sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
-        camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    sCamera.pos(camPos);
-    sCamera.front(sPitch, sYaw);
+    if (sKeys[GLFW_KEY_W] || sKeys[GLFW_KEY_SPACE])
+        camPos += glm::normalize(sCamera.up()) * cameraSpeed;
+    if (sKeys[GLFW_KEY_S] || sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
+        camPos -= glm::normalize(sCamera.up()) * cameraSpeed;
+    //sCamera.pos(camPos);
+    glm::vec3 const toCube = sCubePos - sCamera.pos();
+    glm::vec3 const wishToCube = toCube / glm::length(toCube) * 10.0f;
+    glm::vec3 const shiftPos = toCube - wishToCube;
+    sCamera.pos(camPos + shiftPos);
+    sCamera.front(sCubePos - sCamera.pos());
+    glm::vec3 const right = glm::normalize(glm::cross(sCamera.up(), sCamera.front()));
+    sCamera.up(glm::normalize(glm::cross(sCamera.front(), right)));
+    //sCamera.front(sPitch, sYaw);
 }

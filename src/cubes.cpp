@@ -102,7 +102,7 @@ int runCubes()
     sSPLight.cutOff = 0.05f;
     sSPLight.outerCutOff = 0.2f;
 
-    CHECK(GL_FALSE == glfwInit(), "GLFW init failed", return -1;);
+    CHECK(GL_TRUE == glfwInit(), "GLFW init failed", return -1;);
         // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -408,7 +408,7 @@ int runCubes()
         shaderCube["spLight.outerCutOff"] = glm::cos(sSPLight.outerCutOff);
 
         glBindVertexArray(VAO);
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 1; ++i)
         {
             glm::mat4 model;
             model = glm::translate(model, cubePositions[i]);
@@ -474,7 +474,7 @@ int runCubes()
         shaderCube["model"] = glm::mat4x4();
 
         glBindVertexArray(VAO);
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 1; ++i)
         {
             glm::mat4 model;
             model = glm::translate(model, cubePositions[i]);
