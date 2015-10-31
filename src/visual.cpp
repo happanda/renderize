@@ -30,10 +30,9 @@ static size_t sWinWidth = 1280;
 static size_t sWinHeight = 800;
 static bool sMouseVisible{ false };
 glm::vec3 const sCubePos(0.0f, 0.0f, -15.0f);
+glm::vec3 sRotAngles;
 
 static camera sCamera(sWinWidth, sWinHeight);
-static float sYaw = 0.0f;
-static float sPitch = 0.0f;
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 static float sStep = 1.0f;
 
@@ -161,6 +160,9 @@ int runVisual()
         projection = sCamera.projection();
         glm::mat4 model;
         model = glm::translate(model, sCubePos);
+        model = glm::rotate(model, glm::radians(sRotAngles.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(sRotAngles.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(sRotAngles.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         prog.use();
         prog["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
@@ -232,9 +234,6 @@ void mouseCallback(GLFWwindow* window, double x, double y)
     GLfloat const sensitivity = 0.08f;
     xDiff *= sensitivity;
     yDiff *= sensitivity;
-
-    sYaw += xDiff;
-    sPitch = glm::clamp(sPitch - yDiff, -89.0f, 89.0f);
 }
 
 void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
@@ -266,27 +265,17 @@ void moveCamera(float dt)
 {
     if (sMouseVisible)
         return;
-    GLfloat cameraSpeed = 50.0f * dt;
-    auto camPos = sCamera.pos();
-    /*if (sKeys[GLFW_KEY_W])
-        camPos += cameraSpeed * sCamera.front();
+    float const rotAngle = 180.0f * dt;
+    if (sKeys[GLFW_KEY_W])
+        sRotAngles.x += rotAngle;
     if (sKeys[GLFW_KEY_S])
-        camPos -= cameraSpeed * sCamera.front();*/
+        sRotAngles.x -= rotAngle;
     if (sKeys[GLFW_KEY_A])
-        camPos -= glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
+        sRotAngles.y -= rotAngle;
     if (sKeys[GLFW_KEY_D])
-        camPos += glm::normalize(glm::cross(sCamera.front(), sCamera.up())) * cameraSpeed;
-    if (sKeys[GLFW_KEY_W] || sKeys[GLFW_KEY_SPACE])
-        camPos += glm::normalize(sCamera.up()) * cameraSpeed;
-    if (sKeys[GLFW_KEY_S] || sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
-        camPos -= glm::normalize(sCamera.up()) * cameraSpeed;
-    //sCamera.pos(camPos);
-    glm::vec3 const toCube = sCubePos - sCamera.pos();
-    glm::vec3 const wishToCube = toCube / glm::length(toCube) * 10.0f;
-    glm::vec3 const shiftPos = toCube - wishToCube;
-    sCamera.pos(camPos + shiftPos);
-    sCamera.front(sCubePos - sCamera.pos());
-    glm::vec3 const right = glm::normalize(glm::cross(sCamera.up(), sCamera.front()));
-    sCamera.up(glm::normalize(glm::cross(sCamera.front(), right)));
-    //sCamera.front(sPitch, sYaw);
+        sRotAngles.y += rotAngle;
+    if (sKeys[GLFW_KEY_SPACE])
+        sRotAngles.z += rotAngle;
+    if (sKeys[GLFW_KEY_LEFT_SHIFT] || sKeys[GLFW_KEY_RIGHT_SHIFT])
+        sRotAngles.z -= rotAngle;
 }
