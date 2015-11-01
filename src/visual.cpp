@@ -21,6 +21,7 @@
 
 #include "camera/camera.h"
 #include "data/cube.h"
+#include "data/point.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
 #include "textures/texture.h"
@@ -52,7 +53,6 @@ static void moveCamera(float dt);
 
 int runVisual()
 {
-    sCamera.fov(90);
     CHECK(GL_FALSE != glfwInit(), "GLFW init failed", return -1;);
         // Provide some hints for the GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -97,6 +97,11 @@ int runVisual()
     glfwSetWindowSizeCallback(window, windowSizeCallback);
 
 
+    std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
+    std::uniform_real_distribution<float>  uniDist;
+    std::exponential_distribution<float>  expDist;
+
+
     glm::vec3 quad[] = {
         glm::vec3(-1.0f, -1.0f, 0.0f),
         glm::vec3(-1.0f, 1.0f, 0.0f),
@@ -105,22 +110,29 @@ int runVisual()
         glm::vec3(1.0f, 1.0f, 0.0f),
         glm::vec3(1.0f, -1.0f, 0.0f)
     };
+
+    auto verts = getCube(0.4f, 7);
+    std::vector<pointCos> pnts;
+    for (auto& vrt : verts)
+    {
+        auto onSphere = glm::normalize(vrt) * 2.0f;
+        pnts.push_back(pointCos(vrt, vrt, onSphere));
+        pnts.back().mFreq = 2.0f;
+        pnts.back().mPhase = 3.14f * uniDist(randGen);
+    }
+
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(sVertices), sVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * verts.size(), verts.data(), GL_DYNAMIC_DRAW);
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), static_cast<GLvoid*>(0));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), static_cast<GLvoid*>(0));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2);
     }
 
 
@@ -140,9 +152,6 @@ int runVisual()
     CHECK(tex.load("../tex/crate.png", true), "Error loading texture", );
 
 
-    std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
-    std::uniform_real_distribution<float>  uniDist;
-    std::exponential_distribution<float>  expDist;
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -158,13 +167,11 @@ int runVisual()
             continue;
         lastTime = curTime;
 
-        //std::array<GLfloat, sNumVertices> verticesCopy = sVertices;
-        //for (size_t i = 0; i < sNumVertices; i += 8)
-        //{
-        //    verticesCopy[i] = std::sin(curTime) * sVertices[i];
-        //}
-        //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        //glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCopy), verticesCopy.data(), GL_STATIC_DRAW);
+        for (auto& pnt : pnts)
+            pnt.update(dt);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(verts[0]), verts.data(), GL_STATIC_DRAW);
         moveCamera(dt);
 
         glm::mat4 view;
@@ -188,15 +195,14 @@ int runVisual()
         // Rendering
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        glPointSize(3);
 
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, verts.size());
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
 
         //TwDraw();
 
@@ -287,9 +293,9 @@ void moveCamera(float dt)
         return;
     float const rotAngle = 90.0f * dt;
     if (sKeys[GLFW_KEY_W])
-        sRotAngles.x += rotAngle;
-    if (sKeys[GLFW_KEY_S])
         sRotAngles.x -= rotAngle;
+    if (sKeys[GLFW_KEY_S])
+        sRotAngles.x += rotAngle;
     if (sKeys[GLFW_KEY_A])
         sRotAngles.y -= rotAngle;
     if (sKeys[GLFW_KEY_D])
