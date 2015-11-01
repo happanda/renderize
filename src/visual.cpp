@@ -28,6 +28,7 @@
 #include "util/checked_call.h"
 
 
+static float const sPI = 3.1415926535f;
 static size_t sWinWidth = 1280;
 static size_t sWinHeight = 800;
 static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
@@ -111,14 +112,18 @@ int runVisual()
         glm::vec3(1.0f, -1.0f, 0.0f)
     };
 
-    auto verts = getCube(0.4f, 7);
+    auto verts = getCube(0.6f, 7);
     std::vector<pointCos> pnts;
     for (auto& vrt : verts)
     {
-        auto onSphere = glm::normalize(vrt) * 2.0f;
+        float const phi = uniDist(randGen) * 2.0f * sPI;
+        float const theta = (uniDist(randGen) - 0.5f) * sPI;
+        float const rad = 2.0f;
+        glm::vec3 onSphere(rad * std::cos(phi) * std::cos(theta), rad * std::sin(phi) * std::cos(theta), rad * std::sin(theta));
+        //auto onSphere = glm::normalize(vrt) * 2.0f;
         pnts.push_back(pointCos(vrt, vrt, onSphere));
-        pnts.back().mFreq = 2.0f;
-        pnts.back().mPhase = 3.14f * uniDist(randGen);
+        pnts.back().mFreq = 3.0f;
+        //pnts.back().mPhase = 3.14f * uniDist(randGen);
     }
 
     GLuint VBO;
@@ -193,7 +198,7 @@ int runVisual()
         prog["iGlobalTime"] = curTime;
 
         // Rendering
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glPointSize(3);

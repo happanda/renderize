@@ -11,6 +11,7 @@ uniform mat4 projection;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
+out vec3 ColFromPos;
 
 void main()
 {
@@ -19,4 +20,5 @@ void main()
     Normal = mat3(model) * normal;
     FragPos = (model * vec4(position, 1.0f)).xyz;
     TexCoords = texCoords;
+    ColFromPos = abs(normalize(position.xyz));
 }

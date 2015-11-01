@@ -1,5 +1,6 @@
 #version 330 core
 
+in vec3 ColFromPos;
 out vec4 color;
 
 uniform vec2 iResolution;
@@ -39,5 +40,5 @@ void main()
           S = 0.,
           V = 0.;
 
-    color = vec4(0.1, 0.8, 0.1, 1.0);
+    color = vec4(ColFromPos, 1.0);
 }
