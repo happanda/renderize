@@ -119,8 +119,8 @@ int runVisual()
         float const phi = uniDist(randGen) * 2.0f * sPI;
         float const theta = (uniDist(randGen) - 0.5f) * sPI;
         float const rad = 2.0f;
-        glm::vec3 onSphere(rad * std::cos(phi) * std::cos(theta), rad * std::sin(phi) * std::cos(theta), rad * std::sin(theta));
-        //auto onSphere = glm::normalize(vrt) * 2.0f;
+        //glm::vec3 onSphere(rad * std::cos(phi) * std::cos(theta), rad * std::sin(phi) * std::cos(theta), rad * std::sin(theta));
+        auto onSphere = glm::normalize(vrt) * 2.0f;
         pnts.push_back(pointCos(vrt, vrt, onSphere));
         pnts.back().mFreq = 3.0f;
         //pnts.back().mPhase = 3.14f * uniDist(randGen);

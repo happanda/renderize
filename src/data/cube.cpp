@@ -61,29 +61,31 @@ std::vector<glm::vec3> getCube(float sideLen, size_t vertsOnSide)
     cube.push_back(glm::vec3( hs,  hs,  hs));
     cube.push_back(glm::vec3( hs,  hs, -hs));
 
-    for (size_t k = 0; k < 4; ++k)
+    glm::vec3 offset;
+    float* axis[3] = { &offset.x, &offset.y, &offset.z };
+    
+    for (size_t it = 0; it < 3; ++it)
     {
+        for (int sign = -1; sign <= 1; sign += 2)
         {
-            glm::vec3 const dir = dx * glm::normalize(cube[(k + 1) % 4] - cube[k]);
-            for (size_t i = 0; i < vertsOnSide; ++i)
+            *axis[0] = sign * hs;
+
+            for (size_t x = 0; x <= vertsOnSide + 1; ++x)
             {
-                cube.push_back(glm::vec3(cube[k]) + dir * static_cast<float>(i + 1));
+                for (size_t y = 0; y <= vertsOnSide + 1; ++y)
+                {
+                    *axis[1] = -hs + x * dx;
+                    *axis[2] = -hs + y * dx;
+
+                    cube.push_back(offset);
+                }
             }
         }
-        {
-            glm::vec3 const dir = dx * glm::normalize(cube[(4 + k + 1) % 4 + 4] - cube[4 + k]);
-            for (size_t i = 0; i < vertsOnSide; ++i)
-            {
-                cube.push_back(glm::vec3(cube[4 + k]) + dir * static_cast<float>(i + 1));
-            }
-        }
-        {
-            glm::vec3 const dir = dx * glm::normalize(cube[4 + k] - cube[k]);
-            for (size_t i = 0; i < vertsOnSide; ++i)
-            {
-                cube.push_back(glm::vec3(cube[k]) + dir * static_cast<float>(i + 1));
-            }
-        }
+
+        auto axis0 = axis[0];
+        axis[0] = axis[1];
+        axis[1] = axis[2];
+        axis[2] = axis0;
     }
 
     return cube;
