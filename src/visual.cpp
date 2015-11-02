@@ -87,6 +87,9 @@ int runVisual()
 
     glViewport(0, 0, sWinWidth, sWinHeight);
     glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    //glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_SRC_COLOR);
 
     // Initialize some GLFW callbacks
     glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -152,11 +155,7 @@ int runVisual()
     prog.attach(vertexShader);
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return -1;);
-
-    texture tex;
-    CHECK(tex.load("../tex/crate.png", true), "Error loading texture", );
-
-
+    
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -191,6 +190,8 @@ int runVisual()
         model = glm::rotate(model, glm::radians(sRotAngles.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         prog.use();
+        prog["zNear"] = sCamera.near();
+        prog["zFar"] = sCamera.far();
         prog["model"] = model;
         prog["view"] = view;
         prog["projection"] = projection;
@@ -198,7 +199,7 @@ int runVisual()
         prog["iGlobalTime"] = curTime;
 
         // Rendering
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glPointSize(3);

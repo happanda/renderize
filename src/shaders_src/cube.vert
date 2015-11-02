@@ -4,6 +4,8 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoords;
 
+uniform float zNear;
+uniform float zFar;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -11,14 +13,16 @@ uniform mat4 projection;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
-out vec3 ColFromPos;
+out vec4 ColFromPos;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(position, 1.0f);
+    vec4 mPos = model * vec4(position, 1.0);
+    vec4 vPos = view * mPos;
+    gl_Position = projection * vPos;
     //Normal = mat3(transpose(inverse(model))) * normal;
     Normal = mat3(model) * normal;
-    FragPos = (model * vec4(position, 1.0f)).xyz;
+    FragPos = (model * vec4(position, 1.0)).xyz;
     TexCoords = texCoords;
-    ColFromPos = abs(normalize(position.xyz));
+    ColFromPos = vec4(abs(normalize(position)), 1.0);
 }
