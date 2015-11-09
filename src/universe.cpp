@@ -148,14 +148,9 @@ int runUniverse()
         glm::mat4 model;
 
         prog.use();
-        prog["zNear"] = sCamera.near();
-        prog["zFar"] = sCamera.far();
-        //prog["model"] = model;
-        //prog["view"] = view;
-        //prog["projection"] = projection;
         prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0);
         prog["iGlobalTime"] = curTime;
-            
+        
         // Rendering
         glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

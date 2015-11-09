@@ -7,19 +7,20 @@ uniform float iGlobalTime;
 
 float aspect = iResolution.y / iResolution.x;
 vec2 center = iResolution.xy / 2.0;
-vec2 frag = gl_FragCoord.xy;
-vec2 cFrag = frag - center;
+vec2 frag;
+vec2 cFrag;
 vec2 uv = frag / iResolution.xy;
 
 float time = iGlobalTime / 2.0;
 float cTime = floor(time);
 float fTime = fract(time);
-const int NumStars = 100;
+const int NumStars = 20;
+const float NumStarsF = float(NumStars);
 float Radius = 4.0;
 
 const float M_PI = 3.1415926535,
-            M_2PI = M_PI * 2,
-            M_PI2 = M_PI / 2.;
+            M_2PI = M_PI * 2.0,
+            M_PI2 = M_PI / 2.0;
 
 #define permute(xvec)  mod(((xvec * 34.0) + 1.0) * xvec, 289.0)
 
@@ -56,28 +57,8 @@ float snoise(vec2 v)
     return 130.0 * dot(m, g);
 }
 
-
-vec3 rgb2hsv(vec3 c)
-{
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
 #define CS(p) vec2(cos(p), sin(p))
 
-//#define noise2vec(noise, pos) CS((noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * M_PI * 2.)
 vec2 decart(vec2 polar)
 {
     return polar.x * CS(polar.y);
@@ -85,21 +66,25 @@ vec2 decart(vec2 polar)
 
 float pressence(vec3 pos, float rad)
 {
-    return (sqrt(-pos.z)) * (rad - clamp(length(pos.xy - cFrag), 0.0, rad));
+    return (sqrt(abs(pos.z))) * (rad - clamp(length(pos.xy - cFrag), 0.0, rad));
 }
 
 void main()
 {
+    frag = gl_FragCoord.xy;
+    cFrag = frag - center;
+    
     float R = 0.0;
     for (int i = 0; i < NumStars; ++i)
     {
-        float locTime = time - (i * 2.0 / NumStars) + i * 600.0;
+        float iFl = float(i);
+        float locTime = time - (iFl * 2.0 / NumStarsF) + iFl * 600.0;
         float locCTime = floor(locTime);
         float locFTime = fract(locTime);
 
         vec2 pPolar;
-        pPolar.x = snoise(vec2(locCTime + i * 1.0 / NumStars, locCTime + i * 1.0 / NumStars));
-        pPolar.y = snoise(vec2(locCTime, locCTime + i * 1.0 / NumStars)) * M_2PI;
+        pPolar.x = snoise(vec2(locCTime + iFl * 1.0 / NumStarsF, locCTime + iFl * 1.0 / NumStarsF));
+        pPolar.y = snoise(vec2(locCTime, locCTime + iFl * 1.0 / NumStarsF)) * M_2PI;
         // move a little bit from zero
         pPolar.x = abs(pPolar.x) * 0.98 + 0.02;
 
@@ -108,8 +93,6 @@ void main()
         mat4 pMat = mat4(0.0);
         float fov = M_PI2;
         float tanFov = tan(fov / 2.0);
-
-        vec2 borders = center;
         float near = -1.0;
         float far = 1.0;
 
