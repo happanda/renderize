@@ -98,28 +98,28 @@ void main()
         float locFTime = fract(locTime);
 
         vec2 pPolar;
-        pPolar.x = snoise(vec2(locCTime + i * 1.0 / NumStars, locCTime + i * 1.0 / NumStars)) * length(center);
+        pPolar.x = snoise(vec2(locCTime + i * 1.0 / NumStars, locCTime + i * 1.0 / NumStars));
         pPolar.y = snoise(vec2(locCTime, locCTime + i * 1.0 / NumStars)) * M_2PI;
 
-        vec3 dPos = vec3(decart(pPolar), locFTime);
+        vec3 dPos = vec3(decart(pPolar), 1.0 - locFTime);
 
-        mat4 pMat;
+        mat4 pMat = mat4(0.0);
         float fov = M_PI2;
         float tanFov = tan(fov / 2.0);
 
         vec2 borders = center;
-        float near = 0.01;
-        float far = 20.0;
+        float near = -1.0;
+        float far = 1.0;
 
         pMat[0][0] = 1.0 / (aspect * tanFov);
         pMat[1][1] = 1.0 / tanFov;
         pMat[2][2] = -(near + far) / (far - near);
         pMat[2][3] = -1.0;
         pMat[3][2] = 2.0 * near * far / (far - near);
-        //pMat[3][3] = 0.0;
 
-        vec3 persPos = vec3(pMat * vec4(dPos, dPos.z));
-        R += pressence(persPos, Radius) / Radius;
+        vec4 persPos = pMat * vec4(dPos, 1.0);
+        persPos.xy = persPos.xy * length(center) / persPos.w;
+        R += pressence(persPos.xyz, Radius) / Radius;
     }
     color = vec4(R, R, R, 1.);
 }
