@@ -11,11 +11,11 @@ vec2 frag = gl_FragCoord.xy;
 vec2 cFrag = frag - center;
 vec2 uv = frag / iResolution.xy;
 
-float time = iGlobalTime / 4.0;
+float time = iGlobalTime / 2.0;
 float cTime = floor(time);
 float fTime = fract(time);
 const int NumStars = 100;
-float Radius = 5.0;
+float Radius = 4.0;
 
 const float M_PI = 3.1415926535,
             M_2PI = M_PI * 2,
@@ -85,7 +85,7 @@ vec2 decart(vec2 polar)
 
 float pressence(vec3 pos, float rad)
 {
-    return pos.z * pos.z * (rad - clamp(length(pos.xy - cFrag), 0.0, rad));
+    return (sqrt(-pos.z)) * (rad - clamp(length(pos.xy - cFrag), 0.0, rad));
 }
 
 void main()
@@ -100,6 +100,8 @@ void main()
         vec2 pPolar;
         pPolar.x = snoise(vec2(locCTime + i * 1.0 / NumStars, locCTime + i * 1.0 / NumStars));
         pPolar.y = snoise(vec2(locCTime, locCTime + i * 1.0 / NumStars)) * M_2PI;
+        // move a little bit from zero
+        pPolar.x = abs(pPolar.x) * 0.98 + 0.02;
 
         vec3 dPos = vec3(decart(pPolar), 1.0 - locFTime);
 
@@ -119,7 +121,8 @@ void main()
 
         vec4 persPos = pMat * vec4(dPos, 1.0);
         persPos.xy = persPos.xy * length(center) / persPos.w;
-        R += pressence(persPos.xyz, Radius) / Radius;
+        float thisRadi = Radius * (locFTime * 0.7 + 0.3);
+        R += pressence(persPos.xyz, thisRadi) / thisRadi;
     }
     color = vec4(R, R, R, 1.);
 }
