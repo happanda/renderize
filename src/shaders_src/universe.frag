@@ -110,9 +110,9 @@ void main()
         // move a little bit from zero
         pPolar.x = abs(pPolar.x) * 0.9 + 0.02;
 
-        vec3 dPos = vec3(decart(pPolar), 1.0 - locFTime);
+        vec4 dPos = vec4(decart(pPolar), 1.0 - locFTime, 1.0);
 
-        vec4 persPos = pMat * vec4(dPos, 1.0);
+        vec4 persPos = pMat * dPos;
         persPos.xy = persPos.xy * centLen / persPos.w;
         float thisRadi = Radius * (locFTime * 0.7 + 0.3);
         R += pressence(persPos.xyz, thisRadi) / thisRadi;
