@@ -5,16 +5,17 @@ out vec4 color;
 uniform vec3 iResolution;
 uniform float iGlobalTime;
 
+float aspect = iResolution.y / iResolution.x;
 vec2 center = iResolution.xy / 2.0;
 vec2 frag = gl_FragCoord.xy;
 vec2 cFrag = frag - center;
 vec2 uv = frag / iResolution.xy;
 
-float time = iGlobalTime;
+float time = iGlobalTime / 4.0;
 float cTime = floor(time);
 float fTime = fract(time);
-const int NumStars = 20;
-float Radius = 50.0 * iGlobalTime;
+const int NumStars = 100;
+float Radius = 5.0;
 
 const float M_PI = 3.1415926535,
             M_2PI = M_PI * 2,
@@ -76,20 +77,49 @@ vec3 hsv2rgb(vec3 c)
 
 #define CS(p) vec2(cos(p), sin(p))
 
-#define noise2vec(noise, pos) CS((noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * M_PI * 2.)
-
-float pressence(vec2 pos, float rad)
+//#define noise2vec(noise, pos) CS((noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * M_PI * 2.)
+vec2 decart(vec2 polar)
 {
-    return rad - clamp(length(pos - cFrag), 0.0, rad);
+    return polar.x * CS(polar.y);
+}
+
+float pressence(vec3 pos, float rad)
+{
+    return pos.z * pos.z * (rad - clamp(length(pos.xy - cFrag), 0.0, rad));
 }
 
 void main()
 {
     float R = 0.0;
-    //for (int i = 0; i < NumStars; ++i)
+    for (int i = 0; i < NumStars; ++i)
     {
-        vec2 randPos = noise2vec(snoise(vec2(cTime, cTime)), frag) * 200;
-        R += pressence(randPos, Radius) / Radius;
+        float locTime = time - (i * 2.0 / NumStars) + i * 600.0;
+        float locCTime = floor(locTime);
+        float locFTime = fract(locTime);
+
+        vec2 pPolar;
+        pPolar.x = snoise(vec2(locCTime + i * 1.0 / NumStars, locCTime + i * 1.0 / NumStars)) * length(center);
+        pPolar.y = snoise(vec2(locCTime, locCTime + i * 1.0 / NumStars)) * M_2PI;
+
+        vec3 dPos = vec3(decart(pPolar), locFTime);
+
+        mat4 pMat;
+        float fov = M_PI2;
+        float tanFov = tan(fov / 2.0);
+
+        vec2 borders = center;
+        float near = 0.01;
+        float far = 20.0;
+
+        pMat[0][0] = 1.0 / (aspect * tanFov);
+        pMat[1][1] = 1.0 / tanFov;
+        pMat[2][2] = -(near + far) / (far - near);
+        pMat[2][3] = -1.0;
+        pMat[3][2] = 2.0 * near * far / (far - near);
+        //pMat[3][3] = 0.0;
+
+        vec3 persPos = vec3(pMat * vec4(dPos, dPos.z));
+        R += pressence(persPos, Radius) / Radius;
     }
     color = vec4(R, R, R, 1.);
 }

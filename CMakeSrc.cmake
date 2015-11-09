@@ -35,6 +35,7 @@ ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
 ${SourcePath}/shaders_src/tex_noise.frag
+${SourcePath}/shaders_src/universe.frag
 ${SourcePath}/shaders_src/visual.frag
 )
 
@@ -46,6 +47,8 @@ set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
 ${SourcePath}/main.cpp
+${SourcePath}/universe.h
+${SourcePath}/universe.cpp
 ${SourcePath}/visual.h
 ${SourcePath}/visual.cpp
 )

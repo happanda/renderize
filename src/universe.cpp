@@ -155,7 +155,7 @@ int runUniverse()
         //prog["projection"] = projection;
         prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0);
         prog["iGlobalTime"] = curTime;
-
+            
         // Rendering
         glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -165,8 +165,6 @@ int runUniverse()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);
-
-        //TwDraw();
 
         glfwSwapBuffers(window);
     }
