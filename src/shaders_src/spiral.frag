@@ -24,6 +24,11 @@ const float M_PI = 3.1415926535,
             M_2PI = M_PI * 2.0,
             M_PI2 = M_PI / 2.0;
 
+float snoise(vec2 v)
+{
+    return fract(sin(dot(v.xy, vec2(12.9898,78.233))) * 43758.5453);
+}
+
 #define CS(p) vec2(cos(p), sin(p))
 
 vec2 decart(vec2 polar)

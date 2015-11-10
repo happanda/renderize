@@ -16,8 +16,8 @@ float cTime = floor(time);
 float fTime = fract(time);
 const int NumStars = 50;
 const float NumStarsF = float(NumStars);
-float Radius = 4.0;
-float Intensity = 2.0;
+float Radius = 3.0;
+float Intensity = 0.8;
 
 const float M_PI = 3.1415926535,
             M_2PI = M_PI * 2.0,
