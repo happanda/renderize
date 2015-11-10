@@ -64,10 +64,8 @@ void main()
     float B = 50.0;
     
     float check = ((fragPolar.x - A) / B - fragPolar.y - time) / M_PI;
-    float pressence = fract(check);
-    if (pressence > iValue)
-        pressence = 1.0;
-    pressence = 1.0 - pressence;
+    float pressence = transit(0.0, 1.0, 0.0, iValue, fract(check));
+    pressence = 1.0 - clamp(pressence, 0.0, 1.0);
     H = fragPolar.y / M_PI;
     S = V = pressence;
     color = vec4(hsv2rgb(vec3(H, S, V)), 1.);

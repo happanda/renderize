@@ -31,7 +31,7 @@ static size_t sWinWidth = 800;
 static size_t sWinHeight = 800;
 static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
 static bool sMouseVisible{ false };
-static float sValue{ 0.01f };
+static float sValue{ 100.0f };
 
 static camera sCamera(sWinWidth, sWinHeight);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -245,7 +245,7 @@ void moveCamera(float dt)
 void checkKeys(float dt)
 {
     if (sKeys[GLFW_KEY_UP])
-        sValue += 0.01;
+        sValue += 1.0f;
     else if (sKeys[GLFW_KEY_DOWN])
-        sValue -= 0.01;
+        sValue -= 1.0f;
 }
