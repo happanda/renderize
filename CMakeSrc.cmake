@@ -9,6 +9,8 @@ ${SourcePath}/data/cube.h
 ${SourcePath}/data/cube.cpp
 ${SourcePath}/data/point.h
 ${SourcePath}/data/point.cpp
+${SourcePath}/data/triangle.h
+${SourcePath}/data/triangle.cpp
 )
 
 set(SOURCE_FILES_SHADERS

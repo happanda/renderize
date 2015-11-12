@@ -24,5 +24,7 @@ void main()
     Normal = mat3(model) * normal;
     FragPos = (model * vec4(position, 1.0)).xyz;
     TexCoords = texCoords;
-    ColFromPos = vec4(abs(normalize(position)), 1.0);
+    ColFromPos = vec4(abs(normalize(1.0 - position)), 1.0);
+    //if (ColFromPos.xyz == vec3(0.0, 0.0, 0.0))
+        //ColFromPos.xyz = 1.0 - ColFromPos.xyz;
 }

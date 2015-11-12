@@ -22,6 +22,7 @@
 #include "camera/camera.h"
 #include "data/cube.h"
 #include "data/point.h"
+#include "data/triangle.h"
 #include "shaders/program.h"
 #include "shaders/shader.h"
 #include "textures/texture.h"
@@ -156,6 +157,12 @@ int runVisual()
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return -1;);
     
+    
+    verts.clear();
+    verts.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
+    verts.push_back(glm::vec3(-1.0f, 1.0f, 0.0f));
+    verts.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
+    verts = fill(verts.data(), 0.2f);
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -171,8 +178,8 @@ int runVisual()
             continue;
         lastTime = curTime;
 
-        for (auto& pnt : pnts)
-            pnt.update(dt);
+        //for (auto& pnt : pnts)
+        //    pnt.update(dt);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(verts[0]), verts.data(), GL_STATIC_DRAW);
