@@ -1,5 +1,7 @@
+#include <iostream>
 #include <glm/gtx/norm.hpp>
 #include "triangle.h"
+#include "cycle.h"
 
 
 using namespace glm;
@@ -43,10 +45,15 @@ std::vector<vec3> fill(vec3 const* triangle, float minDist)
         float const step = static_cast<float>(i) / numCA;
         points.push_back(C + CA * step);
     }
-    //points.push_back(C + CA * 0.5f);
 
     float const perimeter = lenAB + lenBC + lenCA;
     vec3 const inCenter = (lenAB * C + lenBC * A + lenCA * B) / perimeter;
+
+    cycle2(std::cbegin(points), std::cend(points), [](vec3 const& p0, vec3 const& p1)
+    {
+        std::cout << p0.x << " " << p1.x << std::endl;
+    });
+
     points.push_back(inCenter);
 
     return points;

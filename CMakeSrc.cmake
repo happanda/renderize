@@ -7,6 +7,7 @@ ${SourcePath}/camera/camera.cpp
 set(SOURCE_FILES_DATA
 ${SourcePath}/data/cube.h
 ${SourcePath}/data/cube.cpp
+${SourcePath}/data/cycle.h
 ${SourcePath}/data/point.h
 ${SourcePath}/data/point.cpp
 ${SourcePath}/data/triangle.h
