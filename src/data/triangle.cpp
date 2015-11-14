@@ -12,48 +12,31 @@ std::vector<vec3> fill(vec3 const* triangle, float minDist)
 {
     std::vector<vec3> points;
 
-    vec3 const& A = triangle[0];
-    vec3 const& B = triangle[1];
-    vec3 const& C = triangle[2];
-    points.push_back(A);
-    points.push_back(B);
-    points.push_back(C);
-
-    vec3 const AB = B - A;
-    vec3 const BC = C - B;
-    vec3 const CA = A - C;
-    float const lenAB = length(AB);
-    float const lenBC = length(BC);
-    float const lenCA = length(CA);
-
-    int const numAB = static_cast<int>(lenAB / minDist);
-    int const numBC = static_cast<int>(lenBC / minDist);
-    int const numCA = static_cast<int>(lenCA / minDist);
-    
-    for (int i = 1; i < numAB; ++i)
+    int idx = 0;
+    vec3 edges[3];
+    float lens[3];
+    int nums[3];
+    cycle2(triangle, triangle + 3, [&](vec3 const& p0, vec3 const& p1)
     {
-        float const step = static_cast<float>(i) / numAB;
-        points.push_back(A + AB * step);
-    }
-    for (int i = 1; i < numBC; ++i)
-    {
-        float const step = static_cast<float>(i) / numBC;
-        points.push_back(B + BC * step);
-    }
-    for (int i = 1; i < numCA; ++i)
-    {
-        float const step = static_cast<float>(i) / numCA;
-        points.push_back(C + CA * step);
-    }
-
-    float const perimeter = lenAB + lenBC + lenCA;
-    vec3 const inCenter = (lenAB * C + lenBC * A + lenCA * B) / perimeter;
-
-    cycle2(std::cbegin(points), std::cend(points), [](vec3 const& p0, vec3 const& p1)
-    {
-        std::cout << p0.x << " " << p1.x << std::endl;
+        edges[idx] = p1 - p0;
+        lens[idx] = length(edges[idx]);
+        nums[idx] = static_cast<int>(lens[idx] / minDist);
+        ++idx;
     });
 
+    points.insert(points.cend(), triangle, triangle + 3);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 1; j < nums[i]; ++j)
+        {
+            float const step = static_cast<float>(j) / nums[i];
+            points.push_back(triangle[i] + edges[i] * step);
+        }
+    }
+
+    float const perimeter = lens[0] + lens[1] + lens[2];
+    vec3 const inCenter = (lens[0] * triangle[2] + lens[1] * triangle[0] + lens[2] * triangle[1]) / perimeter;
     points.push_back(inCenter);
 
     return points;
