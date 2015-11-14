@@ -12,11 +12,11 @@ vec2 center = iResolution.xy / 2.0;
 vec2 frag;
 vec2 cFrag;
 
-float timeFactor = 4.0;
+float timeFactor = 2.0;
 float time = iGlobalTime / timeFactor;
 float cTime = floor(time);
 float fTime = fract(time);
-const int NumStars = 100;
+const int NumStars = 500;
 const float NumStarsF = float(NumStars);
 float Radius = 3.0;
 float Intensity = 0.8;
@@ -85,7 +85,7 @@ void main()
         pPolar.x = snoise(vec2(locCTime, 1.0));
         pPolar.y = snoise(vec2(locCTime, 2.0)) * M_2PI;
         // move a little bit from zero
-        pPolar.x = transit(0.0, 1.0, 0.1, 0.99, abs(pPolar.x));
+        pPolar.x = transit(0.0, 1.0, 0.02, 0.99, abs(pPolar.x));
 
         vec4 dPos = vec4(decart(pPolar), 1.0 - locFTime, 1.0);
 
