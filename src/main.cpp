@@ -8,7 +8,7 @@
 int main(int argc, char* argv[])
 {
     //return runSpiral();
-    return runUniverse();
+    //return runUniverse();
     return runVisual();
     //return runCubes();
 }

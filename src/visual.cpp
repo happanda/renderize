@@ -117,17 +117,29 @@ int runVisual()
     };
 
     auto verts = getCube(0.6f, 7);
-    std::vector<pointCos> pnts;
-    for (auto& vrt : verts)
+    //std::vector<pointCos> pnts;
+    //for (auto& vrt : verts)
+    //{
+    //    float const phi = uniDist(randGen) * 2.0f * sPI;
+    //    float const theta = (uniDist(randGen) - 0.5f) * sPI;
+    //    float const rad = 2.0f;
+    //    //glm::vec3 onSphere(rad * std::cos(phi) * std::cos(theta), rad * std::sin(phi) * std::cos(theta), rad * std::sin(theta));
+    //    auto onSphere = glm::normalize(vrt) * 2.0f;
+    //    pnts.push_back(pointCos(vrt, vrt, onSphere));
+    //    pnts.back().mFreq = 3.0f;
+    //    //pnts.back().mPhase = 3.14f * uniDist(randGen);
+    //}
+    verts.clear();
+    verts.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
+    verts.push_back(glm::vec3(-1.0f, 1.0f, 0.0f));
+    verts.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
+    verts = fill(verts.data(), 0.2f);
+
+    std::vector<pointCycle<std::vector<glm::vec3>::const_iterator>> pnts;
+    for (auto it = verts.begin(); it != verts.end(); ++it)
     {
-        float const phi = uniDist(randGen) * 2.0f * sPI;
-        float const theta = (uniDist(randGen) - 0.5f) * sPI;
-        float const rad = 2.0f;
-        //glm::vec3 onSphere(rad * std::cos(phi) * std::cos(theta), rad * std::sin(phi) * std::cos(theta), rad * std::sin(theta));
-        auto onSphere = glm::normalize(vrt) * 2.0f;
-        pnts.push_back(pointCos(vrt, vrt, onSphere));
-        pnts.back().mFreq = 3.0f;
-        //pnts.back().mPhase = 3.14f * uniDist(randGen);
+        pnts.emplace_back(*it, verts.begin(), verts.end(), it);
+        pnts.back().mFreq = 0.5f;
     }
 
     GLuint VBO;
@@ -157,12 +169,6 @@ int runVisual()
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return -1;);
     
-    
-    verts.clear();
-    verts.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
-    verts.push_back(glm::vec3(-1.0f, 1.0f, 0.0f));
-    verts.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
-    verts = fill(verts.data(), 0.2f);
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -178,8 +184,8 @@ int runVisual()
             continue;
         lastTime = curTime;
 
-        //for (auto& pnt : pnts)
-        //    pnt.update(dt);
+        for (auto& pnt : pnts)
+            pnt.update(dt);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(verts[0]), verts.data(), GL_STATIC_DRAW);
