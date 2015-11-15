@@ -7,13 +7,21 @@ uniform float iGlobalTime;
 
 vec4 fragCoord;
 
-float aspect = iResolution.y / iResolution.x;
-vec2 center = iResolution.xy / 2.0;
-vec2 frag;
-vec2 cFrag;
+float transit(float min0, float max0, float min1, float max1, float val)
+{
+    return (val - min0) / (max0 - min0) * (max1 - min1) + min1;
+}
+
+#define CS(p) vec2(cos(p), sin(p))
 
 float timeFactor = 2.0;
 float time = iGlobalTime / timeFactor;
+float aspect = iResolution.y / iResolution.x;
+vec2 center = iResolution.xy / 2.0 + CS(iGlobalTime) * iResolution.xy / 10.0;
+vec2 frag;
+vec2 cFrag;
+
+
 float cTime = floor(time);
 float fTime = fract(time);
 const int NumStars = 500;
@@ -30,7 +38,6 @@ float snoise(vec2 v)
     return fract(sin(dot(v.xy, vec2(12.9898,78.233))) * 43758.5453);
 }
 
-#define CS(p) vec2(cos(p), sin(p))
 
 vec2 decart(vec2 polar)
 {
@@ -41,11 +48,6 @@ vec2 polar(vec2 dec)
 {
     return vec2(length(dec), abs(dec.x) > 0.00001 ? atan(dec.y / dec.x)
         : (dec.y >= 0.0 ? M_PI2 : -M_PI2));
-}
-
-float transit(float min0, float max0, float min1, float max1, float val)
-{
-    return (val - min0) / (max0 - min0) * (max1 - min1) + min1;
 }
 
 float pressence(vec3 pos, float rad)
