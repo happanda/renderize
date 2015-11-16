@@ -7,7 +7,7 @@ do{                                     \
     {                                   \
         std::cerr << msg << std::endl;  \
         do {                            \
-            action                      \
+            action;                     \
         } while(false);                 \
     }                                   \
 } while(false);

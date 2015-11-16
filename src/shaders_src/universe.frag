@@ -24,7 +24,7 @@ vec2 cFrag;
 
 float cTime = floor(time);
 float fTime = fract(time);
-const int NumStars = 500;
+const int NumStars = 100;
 const float NumStarsF = float(NumStars);
 float Radius = 3.0;
 float Intensity = 0.8;

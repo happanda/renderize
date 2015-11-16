@@ -1,4 +1,9 @@
 # C++ source files
+set(SOURCE_FILES_APP
+${SourcePath}/app/app.h
+${SourcePath}/app/app.cpp
+)
+
 set(SOURCE_FILES_CAMERA
 ${SourcePath}/camera/camera.h
 ${SourcePath}/camera/camera.cpp
@@ -35,6 +40,7 @@ ${SourcePath}/shaders_src/cube.vert
 ${SourcePath}/shaders_src/cube.frag
 ${SourcePath}/shaders_src/form.frag
 ${SourcePath}/shaders_src/lamp.frag
+${SourcePath}/shaders_src/landscape.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
 ${SourcePath}/shaders_src/spiral.frag
@@ -50,6 +56,8 @@ ${SourcePath}/util/checked_call.h
 set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
+${SourcePath}/landscape.h
+${SourcePath}/landscape.cpp
 ${SourcePath}/main.cpp
 ${SourcePath}/spiral.h
 ${SourcePath}/spiral.cpp
@@ -67,6 +75,7 @@ ${SourcePath}/visual.cpp
 # set appropriate source groups
 #source_group(glfw  FILES  ${SOURCE_FILES_GLFW})
 source_group(""  FILES  ${SOURCE_FILES})
+source_group(app FILES ${SOURCE_FILES_APP})
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(data FILES ${SOURCE_FILES_DATA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
@@ -79,6 +88,7 @@ set_source_files_properties(${SOURCE_FILES_SHADERS_SOURCE} PROPERTIES HEADER_FIL
 set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
 ${SOURCE_FILES_UTIL}
+#${SOURCE_FILES_APP}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_DATA}
 ${SOURCE_FILES_SHADERS}
