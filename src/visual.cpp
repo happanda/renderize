@@ -116,7 +116,7 @@ int runVisual()
         glm::vec3(1.0f, -1.0f, 0.0f)
     };
 
-    auto verts = getCube(0.6f, 7);
+    //auto verts = getCube(0.6f, 7);
     //std::vector<pointCos> pnts;
     //for (auto& vrt : verts)
     //{
@@ -129,11 +129,11 @@ int runVisual()
     //    pnts.back().mFreq = 3.0f;
     //    //pnts.back().mPhase = 3.14f * uniDist(randGen);
     //}
-    verts.clear();
-    verts.push_back(glm::vec3(-1.0f, -1.0f, 0.0f));
-    verts.push_back(glm::vec3(-1.0f, 1.0f, 0.0f));
-    verts.push_back(glm::vec3(1.0f, 1.0f, 0.0f));
-    verts = fill(verts.data(), 0.2f);
+    std::vector<glm::vec3> verts;
+    glm::vec3 triangle[] = { glm::vec3(-1.0f, -1.0f, 0.0f),
+        glm::vec3(-1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f) };
+    verts = fill(triangle, 0.2f);
 
     std::vector<pointCycle<std::vector<glm::vec3>::const_iterator>> pnts;
     for (auto it = verts.begin(); it != verts.end(); ++it)

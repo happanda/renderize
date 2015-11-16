@@ -62,16 +62,20 @@ void main()
           S = 0.85,
           V = 0.85;
     frag = gl_FragCoord.xy;
-    cFrag = frag - center;
-    vec2 fragPolar = polar(cFrag);
     
-    float A = 0.0;
-    float B = 50.0;
-    
-    float check = ((fragPolar.x - A) / B - fragPolar.y - time) / M_PI;
-    float pressence = transit(0.0, 1.0, 0.0, iValue, fract(check));
-    pressence = 1.0 - clamp(pressence, 0.0, 1.0);
-    H = fragPolar.y / M_PI;
-    S = V = pressence;
-    color = vec4(hsv2rgb(vec3(H, S, V)), 1.);
+    float SpiralCount = 10.0;
+    for (float i = 0.0; i < SpiralCount; i += 1.0)
+    {
+        cFrag = frag - center * i / SpiralCount;
+        vec2 fragPolar = polar(cFrag);
+        float A = 0.0;
+        float B = 10.0;
+        
+        float check = ((fragPolar.x - A) / B - fragPolar.y - time) / M_PI2;
+        float pressence = transit(0.0, 1.0, 0.0, iValue, fract(check));
+        pressence = 1.0 - clamp(pressence, 0.0, 1.0);
+        H = fragPolar.y / M_PI;
+        S = V = pressence / (i / SpiralCount + 1.0);
+        color += vec4(hsv2rgb(vec3(H, S, V)), 1.);
+    }
 }

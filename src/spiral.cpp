@@ -184,12 +184,19 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modi
     if (action == GLFW_RELEASE)
         sKeys[key] = false;
 
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    else if ((key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT) && action == GLFW_PRESS)
+    if (action == GLFW_PRESS)
     {
-        sMouseVisible = !sMouseVisible;
-        glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        if (key == GLFW_KEY_ESCAPE)
+            glfwSetWindowShouldClose(window, GL_TRUE);
+        else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT)
+        {
+            sMouseVisible = !sMouseVisible;
+            glfwSetInputMode(window, GLFW_CURSOR, sMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        }
+        else if (key == GLFW_KEY_UP)
+            sValue += 1.0f;
+        else if (key == GLFW_KEY_DOWN)
+            sValue -= 1.0f;
     }
 }
 
@@ -244,8 +251,4 @@ void moveCamera(float dt)
 
 void checkKeys(float dt)
 {
-    if (sKeys[GLFW_KEY_UP])
-        sValue += 1.0f;
-    else if (sKeys[GLFW_KEY_DOWN])
-        sValue -= 1.0f;
 }
