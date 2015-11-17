@@ -17,7 +17,7 @@ vec2 cFrag;
 
 float cTime = floor(time);
 float fTime = fract(time);
-const int NumPnts = 10;
+const int NumPnts = 13;
 const float NumPntsF = float(NumPnts);
 float Radius = 6.0;
 float Intensity = 0.8;
@@ -75,6 +75,9 @@ void main()
     
     float centLen = length(center);
     float R = 0.0;
+    float xWidth = 16.0;
+    float xWidth2 = xWidth / 2.0;
+    
     for (int i = 0; i < NumPnts; ++i)
     {
         float iFl = float(i);
@@ -87,14 +90,13 @@ void main()
         {
             float jFl = float(j);
             
-            
-            float xc = jFl / NumPntsF * 6.0 - 3.0;
-            float yc = 1.1 - sin(jFl / NumPntsF * M_PI + iFl / NumPntsF * M_2PI);
-            float zc = (1.0 - locFTime) * 10.0;
+            float xc = jFl / NumPntsF * xWidth - xWidth2;
+            float yc = 1.5 - sin(4.0 * jFl / NumPntsF * M_PI + iFl / NumPntsF * M_2PI);
+            float zc = (1.0 - locFTime) * 20.0;
             vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
             persPos.xy = persPos.xy * centLen / persPos.w;
-            float transVal = transit(0.0, 1.0, 0.3, 1.0, 0.5);
+            float transVal = transit(0.0, 1.0, 0.5, 1.0, locFTime);
             float intens = Intensity * transVal;
             R += pressence(persPos.xyz, Radius * transVal) * intens;
         }
