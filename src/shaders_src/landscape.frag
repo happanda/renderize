@@ -78,14 +78,20 @@ void main()
     for (int i = 0; i < NumPnts; ++i)
     {
         float iFl = float(i);
+        
+        float locTime = time + iFl / NumPntsF;
+        float locCTime = floor(locTime);
+        float locFTime = locTime - locCTime;
+        
         for (int j = 0; j < NumPnts; ++j)
         {
             float jFl = float(j);
             
-            float xc = iFl / NumPntsF * 2.0 - 1.0;
-            float zc = jFl / NumPntsF + 1.0;
-            vec4 dPos = vec4(xc, sin(jFl * M_PI / NumPntsF), zc - sin(time) * 2.0, 1.0);
-            //vec4 dPos = vec4(cos(iFl / NumPntsF * M_2PI), sin(iFl / NumPntsF * M_2PI), jFl / NumPntsF * 2.0  - sin(time) * 20.0, 1.0);
+            
+            float xc = jFl / NumPntsF * 6.0 - 3.0;
+            float yc = 1.1 - sin(jFl / NumPntsF * M_PI + iFl / NumPntsF * M_2PI);
+            float zc = (1.0 - locFTime) * 10.0;
+            vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
             persPos.xy = persPos.xy * centLen / persPos.w;
             float transVal = transit(0.0, 1.0, 0.3, 1.0, 0.5);
