@@ -27,8 +27,8 @@
 
 
 static float const sPI = 3.1415926535f;
-static size_t sWinWidth = 400;
-static size_t sWinHeight = 400;
+static size_t sWinWidth = 800;
+static size_t sWinHeight = 800;
 static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
 static bool sMouseVisible{ false };
 

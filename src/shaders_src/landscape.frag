@@ -33,22 +33,6 @@ float transit(float min0, float max0, float min1, float max1, float val)
     return (val - min0) / (max0 - min0) * (max1 - min1) + min1;
 }
 
-float snoise(vec2 v)
-{
-    return fract(sin(dot(v.xy, vec2(12.9898,78.233))) * 43758.5453);
-}
-
-vec2 decart(vec2 polar)
-{
-    return polar.x * CS(polar.y);
-}
-
-vec2 polar(vec2 dec)
-{
-    return vec2(length(dec), abs(dec.x) > 0.00001 ? atan(dec.y / dec.x)
-        : (dec.y >= 0.0 ? M_PI2 : -M_PI2));
-}
-
 float pressence(vec3 pos, float rad)
 {
     vec2 dif = pos.xy - cFrag;
@@ -77,6 +61,7 @@ void main()
     float R = 0.0;
     float xWidth = 16.0;
     float xWidth2 = xWidth / 2.0;
+    float zWidth = 20.0;
     
     for (int i = 0; i < NumPnts; ++i)
     {
@@ -90,13 +75,14 @@ void main()
         {
             float jFl = float(j);
             
-            float xc = jFl / NumPntsF * xWidth - xWidth2;
-            float yc = 1.5 - sin(4.0 * jFl / NumPntsF * M_PI + iFl / NumPntsF * M_2PI);
-            float zc = (1.0 - locFTime) * 20.0;
+            float xc = jFl / NumPntsF * xWidth - xWidth2 + sin(iGlobalTime) * xWidth / NumPntsF;
+            float zc = (1.0 - iFl / NumPntsF) * zWidth;//(1.0 - locFTime) * 20.0;
+            float yc = 2.5 - sin(xc * zc);//4.0 * iFl / NumPntsF * M_PI) * (sin(iGlobalTime) + 1.0) / 2.0;// + iFl / NumPntsF * M_2PI);
+
             vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
             persPos.xy = persPos.xy * centLen / persPos.w;
-            float transVal = transit(0.0, 1.0, 0.5, 1.0, locFTime);
+            float transVal = transit(0.0, zWidth, 0.3, 1.0, zWidth - zc);
             float intens = Intensity * transVal;
             R += pressence(persPos.xyz, Radius * transVal) * intens;
         }
