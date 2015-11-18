@@ -31,6 +31,9 @@ static size_t sWinWidth = 800;
 static size_t sWinHeight = 800;
 static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
 static bool sMouseVisible{ false };
+static size_t const NumPnts{ 16 };
+static size_t const NumPntsSq{ (NumPnts + 1) * (NumPnts + 1)};
+static std::vector<float> Land(NumPntsSq, 0.0f);
 
 static camera sCamera(sWinWidth, sWinHeight);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -44,6 +47,81 @@ static void charCallback(GLFWwindow* window, unsigned int symb);
 static void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY);
 static void moveCamera(float dt);
 
+float snoise(glm::vec2 v)
+{
+    float val = std::sin(glm::dot(v, glm::vec2(12.9898f, 78.233f))) * 43758.5453f;
+    return val - std::floor(val);
+}
+
+float transit(float val, float min0, float max0, float min1, float max1)
+{
+    return (val - min0) / (max0 - min0) * (max1 - min1) + min1;
+}
+
+int idx(int x, int y)
+{
+    return y * (NumPnts + 1) + x;
+}
+#define lval(x, y) Land[idx(x, y)]
+#define lset(x, y, v) Land[idx(x, y)] = v
+
+void land()
+{
+    float H = 0.8;
+    lset(0, 0, 0.0);
+    lset(0, NumPnts, 0.0);
+    lset(NumPnts, 0, 0.0);
+    lset(NumPnts, NumPnts, 0.0);
+    for (int y = 0; y <= NumPnts; ++y)
+    {
+        for (int x = 0; x <= NumPnts; ++x)
+        {
+            lset(x, y, 0);
+        }
+    }
+
+    for (int step = NumPnts; step > 1; step /= 2)
+    {
+        float hardness = 1 / pow(2.0, H / step * NumPnts);
+        int halfStep = step / 2;
+        for (int y = halfStep; y < NumPnts; y += step)
+        {
+            for (int x = halfStep; x < NumPnts; x += step)
+            {
+                float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
+                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0
+                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
+        }
+        for (int y = 0; y < NumPnts; y += step)
+        {
+            for (int x = halfStep; x < NumPnts; x += step)
+            {
+                int ym = y - halfStep;
+                if (ym < 0)
+                    ym += NumPnts;
+                float value = (lval(x - halfStep, y) + lval(x, ym)
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
+                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
+        }
+        for (int y = halfStep; y < NumPnts; y += step)
+        {
+            for (int x = 0; x < NumPnts; x += step)
+            {
+                int xm = x - halfStep;
+                if (xm < 0)
+                    xm += NumPnts;
+                float value = (lval(xm, y) + lval(x, y - halfStep)
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
+                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
+        }
+    }
+}
 
 int runLandscape()
 {
@@ -147,9 +225,12 @@ int runLandscape()
         projection = sCamera.projection();
         glm::mat4 model;
 
+        land();
+
         prog.use();
         prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0);
         prog["iGlobalTime"] = curTime;
+        glUniform1fv(glGetUniformLocation(prog, "Land"), NumPntsSq, Land.data());
         
         // Rendering
         glClearColor(0.0f, 0.0f, 0.2f, 0.0f);

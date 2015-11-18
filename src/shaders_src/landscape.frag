@@ -19,9 +19,9 @@ float cTime = floor(time);
 float fTime = fract(time);
 const int NumPnts = 16;
 const float NumPntsF = float(NumPnts);
-float Heights[NumPnts + 1];
+float Heights[1];
 const int NumPntsSq = (NumPnts + 1) * (NumPnts + 1);
-float Land[NumPntsSq];
+uniform float Land[NumPntsSq];
 float Radius = 2.0;
 float Intensity = 0.8;
 
@@ -49,25 +49,25 @@ float pressence(vec3 pos, float rad)
 
 void mapHeights(float line)
 {
-    float H = 0.7;
-    Heights[0] = 0;//snoise(vec2(line, 0.0));
-    Heights[NumPnts] = 0;//snoise(vec2(line, NumPnts));
-    for (int step = NumPnts; step > 1; step /= 2)
-    {
-        float hardness = 1 / pow(2.0, H / float(step) * NumPntsF);
-        int halfStep = step / 2;
-        for (int k = halfStep; k < NumPnts; k += step)
-        {
-            Heights[k] = (Heights[k - halfStep] + Heights[k + halfStep]) / 2.0
-                + transit(snoise(vec2(line, k)), -1.0, 1.0, -hardness, hardness);
-        }
-    }
+    //float H = 0.7;
+    //Heights[0] = 0;//snoise(vec2(line, 0.0));
+    //Heights[NumPnts] = 0;//snoise(vec2(line, NumPnts));
+    //for (int step = NumPnts; step > 1; step /= 2)
+    //{
+    //    float hardness = 1 / pow(2.0, H / float(step) * NumPntsF);
+    //    int halfStep = step / 2;
+    //    for (int k = halfStep; k < NumPnts; k += step)
+    //    {
+    //        Heights[k] = (Heights[k - halfStep] + Heights[k + halfStep]) / 2.0
+    //            + transit(snoise(vec2(line, k)), -1.0, 1.0, -hardness, hardness);
+    //    }
+    //}
 }
 
 #define idx(x, y) (y * (NumPnts + 1) + x)
 #define lval(x, y) Land[idx(x, y)]
 #define lset(x, y, v) Land[idx(x, y)] = v
-
+/*
 void land()
 {
     float H = 0.3;
@@ -125,6 +125,7 @@ void land()
         }
     }
 }
+*/
 
 void main()
 {
@@ -146,7 +147,7 @@ void main()
     
     float centLen = length(center);
     float R = 0.0;
-    float xWidth = 8.0;
+    float xWidth = 4.0;
     float xWidth2 = xWidth / 2.0;
     float zWidth = 16.0;
     
@@ -195,7 +196,7 @@ void main()
         }
     }
     */
-    land();
+    //land();
     for (int i = 0; i < NumPnts; ++i)
     {
         float iFl = float(i);
