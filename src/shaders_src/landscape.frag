@@ -20,7 +20,9 @@ float fTime = fract(time);
 const int NumPnts = 16;
 const float NumPntsF = float(NumPnts);
 float Heights[NumPnts + 1];
-float Radius = 6.0;
+const int NumPntsSq = (NumPnts + 1) * (NumPnts + 1);
+float Land[NumPntsSq];
+float Radius = 2.0;
 float Intensity = 0.8;
 
 const float M_PI = 3.1415926535,
@@ -58,6 +60,60 @@ void mapHeights(float line)
         {
             Heights[k] = (Heights[k - halfStep] + Heights[k + halfStep]) / 2.0
                 + transit(snoise(vec2(line, k)), -1.0, 1.0, -hardness, hardness);
+        }
+    }
+}
+
+#define idx(x, y) (y * (NumPnts + 1) + x)
+#define lval(x, y) Land[idx(x, y)]
+#define lset(x, y, v) Land[idx(x, y)] = v
+
+void land()
+{
+    float H = 0.6;
+    lset(0, 0, 0.0);
+    lset(0, NumPnts, 0.0);
+    lset(NumPnts, 0, 0.0);
+    lset(NumPnts, NumPnts, 0.0);
+    for (int step = NumPnts; step > 1; step /= 2)
+    {
+        float hardness = 1 / pow(2.0, H / float(step) * NumPntsF);
+        int halfStep = step / 2;
+        for (int y = halfStep; y < NumPnts; y += step)
+        {
+            for (int x = halfStep; x < NumPnts; x += step)
+            {
+                float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
+                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0;
+                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
+        }
+        for (int y = 0; y < NumPnts; y += step)
+        {
+            for (int x = halfStep; x < NumPnts; x += step)
+            {
+                int ym = y - halfStep;
+                if (ym < 0)
+                    ym += step;
+                float value = (lval(x - halfStep, y) + lval(x, ym)
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
+                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
+        }
+        for (int y = halfStep; y < NumPnts; y += step)
+        {
+            for (int x = 0; x < NumPnts; x += step)
+            {
+                int xm = x - halfStep;
+                if (xm < 0)
+                    xm += step;
+                float value = (lval(xm, y) + lval(x, y - halfStep)
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
+                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                lset(x, y, value);
+            }
         }
     }
 }
@@ -104,7 +160,7 @@ void main()
         R += pressence(screenPos, Radius);
     }
     */
-
+    /*
     for (int i = 0; i < NumPnts; ++i)
     {
         float iFl = float(i);
@@ -130,43 +186,11 @@ void main()
             R += pressence(persPos.xyz, Radius * transVal) * intens;
         }
     }
-    fragColor = vec4(R, R, R, 1.);
-}
-
-/*
-#define idx(x, y) y * NumPnts + x
-#define lval(x, y) Land[idx(x, y)]
-#define lset(x, y, v) Land[idx(x, y)] = v
-
-void land()
-{
-    float H = 0.5;
-    lset(0, 0, 0.0);//snoise(vec2(line, 0.0));
-    lset(0, NumPnts, 0.0);//snoise(vec2(line, NumPnts));
-    lset(NumPnts, 0, 0.0);//snoise(vec2(line, NumPnts));
-    lset(NumPnts, NumPnts, 0.0);//snoise(vec2(line, NumPnts));
-    for (int step = NumPnts; step > 1; step /= 2)
-    {
-        float hardness = 1 / pow(2.0, H / float(step) * NumPntsF);
-        int halfStep = step / 2;
-        for (int y = halfStep; y < NumPnts; y += step)
-        {
-            for (int x = halfStep; x < NumPnts; x += step)
-            {
-                float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
-                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0;
-                    //+ transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
-                lset(x, y, value);
-            }
-        }
-    }
-}
-
-
+    */
+    land();
     for (int i = 0; i < NumPnts; ++i)
     {
         float iFl = float(i);
-        
         float locTime = time + iFl / NumPntsF;
         float locCTime = floor(locTime);
         float locFTime = locTime - locCTime;
@@ -176,7 +200,7 @@ void land()
             float jFl = float(j);
             
             float xc = jFl / NumPntsF * xWidth - xWidth2;
-            float zc = (1.0 - iFl / NumPntsF) * zWidth;//(1.0 - locFTime) * zWidth;//
+            float zc = (1.0 - locFTime) * zWidth;//(1.0 - iFl / NumPntsF) * zWidth;//
             float yc = 2.0 - lval(i, j);
 
             vec4 dPos = vec4(xc, yc, zc, 1.0);
@@ -187,4 +211,5 @@ void land()
             R += pressence(persPos.xyz, Radius * transVal) * intens;
         }
     }
-    */
+    fragColor = vec4(R, R, R, 1.);
+}
