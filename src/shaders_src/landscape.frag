@@ -70,11 +70,19 @@ void mapHeights(float line)
 
 void land()
 {
-    float H = 0.6;
+    float H = 0.3;
     lset(0, 0, 0.0);
     lset(0, NumPnts, 0.0);
     lset(NumPnts, 0, 0.0);
     lset(NumPnts, NumPnts, 0.0);
+    for (int y = 0; y <= NumPnts; ++y)
+    {
+        for (int x = 0; x <= NumPnts; ++x)
+        {
+            lset(x, y, 0);
+        }
+    }
+
     for (int step = NumPnts; step > 1; step /= 2)
     {
         float hardness = 1 / pow(2.0, H / float(step) * NumPntsF);
@@ -84,8 +92,8 @@ void land()
             for (int x = halfStep; x < NumPnts; x += step)
             {
                 float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
-                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0;
-                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0
+                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -95,10 +103,10 @@ void land()
             {
                 int ym = y - halfStep;
                 if (ym < 0)
-                    ym += step;
+                    ym += NumPnts;
                 float value = (lval(x - halfStep, y) + lval(x, ym)
                     + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -108,10 +116,10 @@ void land()
             {
                 int xm = x - halfStep;
                 if (xm < 0)
-                    xm += step;
+                    xm += NumPnts;
                 float value = (lval(xm, y) + lval(x, y - halfStep)
                     + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(vec2(x, y)), -1.0, 1.0, -hardness, hardness);
+                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -125,7 +133,7 @@ void main()
     cFrag = frag - center;
     
     mat4 pMat = mat4(0.0);
-    float fov = M_PI2 / 2.0;
+    float fov = M_PI2;
     float tanFov = tan(fov / 2.0);
     const float near = 0.0;
     const float far = 10.0;
@@ -138,7 +146,7 @@ void main()
     
     float centLen = length(center);
     float R = 0.0;
-    float xWidth = 4.0;
+    float xWidth = 8.0;
     float xWidth2 = xWidth / 2.0;
     float zWidth = 16.0;
     
@@ -199,9 +207,9 @@ void main()
         {
             float jFl = float(j);
             
-            float xc = jFl / NumPntsF * xWidth - xWidth2;
+            float xc = jFl / NumPntsF * xWidth - xWidth2 + 0.51;
             float zc = (1.0 - locFTime) * zWidth;//(1.0 - iFl / NumPntsF) * zWidth;//
-            float yc = 2.0 - lval(i, j);
+            float yc = 1.5 - lval(i, j);
 
             vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
