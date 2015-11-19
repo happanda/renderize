@@ -75,3 +75,38 @@ bool app::shouldClose() const
 {
     return glfwWindowShouldClose(mWindow) != 0;
 }
+
+void app::resize(int width, int height)
+{
+    mWinSize = glm::ivec2(width, height);
+    glViewport(0, 0, mWinSize.x, mWinSize.y);
+}
+
+void app::mouse(glm::vec2 const& pos)
+{
+}
+
+void app::scroll(int xDiff, int yDiff)
+{
+}
+
+void app::touchDown(int button)
+{
+}
+
+void app::touchUp(int button)
+{
+}
+
+void app::keyDown(int key)
+{
+}
+
+void app::keyUp(int key)
+{
+}
+
+bool app::isPressed(int key)
+{
+}
+

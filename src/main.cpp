@@ -8,9 +8,9 @@
 
 int main(int argc, char* argv[])
 {
-    return runLandscape();
+    //return runLandscape();
     //return runSpiral();
     //return runUniverse();
-    //return runVisual();
+    return runVisual();
     //return runCubes();
 }
