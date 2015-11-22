@@ -67,11 +67,11 @@ int idx(int x, int y)
 
 void land()
 {
-    float H = 0.8;
-    lset(0, 0, 0.0);
-    lset(0, NumPnts, 0.0);
-    lset(NumPnts, 0, 0.0);
-    lset(NumPnts, NumPnts, 0.0);
+    float H = 0.8f;
+    lset(0, 0, 0.0f);
+    lset(0, NumPnts, 0.0f);
+    lset(NumPnts, 0, 0.0f);
+    lset(NumPnts, NumPnts, 0.0f);
     for (int y = 0; y <= NumPnts; ++y)
     {
         for (int x = 0; x <= NumPnts; ++x)
@@ -82,15 +82,15 @@ void land()
 
     for (int step = NumPnts; step > 1; step /= 2)
     {
-        float hardness = 1 / pow(2.0, H / step * NumPnts);
+        float hardness = 1.0f / pow(2.0f, H / step * NumPnts);
         int halfStep = step / 2;
         for (int y = halfStep; y < NumPnts; y += step)
         {
             for (int x = halfStep; x < NumPnts; x += step)
             {
                 float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
-                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0
-                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0f
+                    + transit(snoise(glm::vec2(x, y)), 0.0f, 1.0f, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -102,8 +102,8 @@ void land()
                 if (ym < 0)
                     ym += NumPnts;
                 float value = (lval(x - halfStep, y) + lval(x, ym)
-                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0f
+                    + transit(snoise(glm::vec2(x, y)), 0.0f, 1.0f, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -115,8 +115,8 @@ void land()
                 if (xm < 0)
                     xm += NumPnts;
                 float value = (lval(xm, y) + lval(x, y - halfStep)
-                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(glm::vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0f
+                    + transit(snoise(glm::vec2(x, y)), 0.0f, 1.0f, -hardness, hardness);
                 lset(x, y, value);
             }
         }

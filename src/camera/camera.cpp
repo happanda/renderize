@@ -4,9 +4,30 @@
 #include "camera.h"
 
 
+camera::camera(float width, float height)
+    : mSize(width, height)
+    , mNear(0.1f)
+    , mFar(7.0f)
+    , mFov(45.0f)
+    , mPos(0.0f, 0.0f, 5.0f)
+    , mFront(0.0f, 0.0f, -1.0f)
+    , mUp(0.0f, 1.0f, 0.0f)
+{
+}
+
+camera::camera(int width, int height)
+    : mSize(static_cast<float>(width), static_cast<float>(height))
+    , mNear(0.1f)
+    , mFar(7.0f)
+    , mFov(45.0f)
+    , mPos(0.0f, 0.0f, 5.0f)
+    , mFront(0.0f, 0.0f, -1.0f)
+    , mUp(0.0f, 1.0f, 0.0f)
+{
+}
+
 camera::camera(size_t width, size_t height)
-    : mWidth(width)
-    , mHeight(height)
+    : mSize(static_cast<float>(width), static_cast<float>(height))
     , mNear(0.1f)
     , mFar(7.0f)
     , mFov(45.0f)
@@ -50,7 +71,7 @@ void camera::fov(float val)
 
 glm::mat4 camera::projection() const
 {
-    return glm::perspective(glm::radians(mFov), static_cast<GLfloat>(mWidth) / static_cast<GLfloat>(mHeight), mNear, mFar);
+    return glm::perspective(glm::radians(mFov), static_cast<GLfloat>(mSize.x) / static_cast<GLfloat>(mSize.y), mNear, mFar);
 }
 
 glm::vec3 const& camera::pos() const

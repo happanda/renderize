@@ -5,6 +5,8 @@
 
 struct camera
 {
+    camera(float width, float height);
+    camera(int width, int height);
     camera(size_t width, size_t height);
 
     float near() const;
@@ -29,8 +31,7 @@ struct camera
     glm::mat4 view() const;
 
 private:
-    size_t mWidth;
-    size_t mHeight;
+    glm::vec2 mSize;
     float mNear;
     float mFar;
     float mFov;

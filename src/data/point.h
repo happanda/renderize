@@ -5,6 +5,7 @@
 struct point
 {
     point(glm::vec3& pos);
+    point& operator=(point const& other) = default;
     virtual ~point();
 
     void update(float dt);
@@ -20,6 +21,7 @@ struct pointCos
     : public point
 {
     pointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& finishPos);
+    pointCos& operator=(pointCos const& other) = default;
 
     float mPhase;
     float mFreq;
@@ -31,6 +33,31 @@ private:
     glm::vec3  mFinish;
     glm::vec3  mDir;
     float  mDirLen;
+};
+
+
+struct pointFromTo
+    : public point
+{
+    pointFromTo(glm::vec3& pos, glm::vec3 const& finishPos);
+    pointFromTo& operator=(pointFromTo const& other) = default;
+
+    float mMoveTime;
+    float mForceCoeff;
+    float mMass;
+    float mFrict;
+
+    float dist() const;
+
+    glm::vec3  mFinish;
+
+private:
+    void updateImpl(float dt) override;
+
+    glm::vec3  mDir;
+    glm::vec3  mSpeed;
+    float  mDirLen;
+    glm::vec3  mForce;
 };
 
 

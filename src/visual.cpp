@@ -30,14 +30,15 @@
 
 
 static float const sPI = 3.1415926535f;
-static size_t sWinWidth = 1280;
-static size_t sWinHeight = 800;
-static float sScreenRatio = static_cast<float>(sWinWidth) / static_cast<float>(sWinHeight);
+static glm::ivec2 sWinSizeI(1280, 800);
+static glm::vec2 sWinSize(static_cast<float>(sWinSizeI.x), static_cast<float>(sWinSizeI.y));
+static float sScreenRatio = sWinSize.x / sWinSize.y;
 static bool sMouseVisible{ false };
 glm::vec3 const sCubePos(0.0f, 0.0f, 0.0f);
 glm::vec3 sRotAngles;
+static size_t const sNumPoints{ 32 };
 
-static camera sCamera(sWinWidth, sWinHeight);
+static camera sCamera(sWinSize.x, sWinSize.y);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
 static float sStep = 1.0f;
 
@@ -65,14 +66,14 @@ int runVisual()
     glfwSetErrorCallback(glfwErrorReporting);
 
         // Create a window
-    GLFWwindow* window = glfwCreateWindow(sWinWidth, sWinHeight, "Renderize", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(sWinSizeI.x, sWinSizeI.y, "Renderize", nullptr, nullptr);
     CHECK(window, "Error creating window", { glfwTerminate(); return -1; });
     glfwMakeContextCurrent(window);
 
 
     if (TwInit(TW_OPENGL_CORE, NULL))
     {
-        TwWindowSize(sWinWidth, sWinHeight);
+        TwWindowSize(sWinSizeI.x, sWinSizeI.y);
         sATB = TwNewBar("Tweak");
         TwAddVarRW(sATB, "step", TW_TYPE_FLOAT, &sStep, " label='Step' step=0.1 ");
     }
@@ -86,7 +87,7 @@ int runVisual()
     CHECK(GLEW_OK == glewCode, "Failed to initialize GLEW: ",
         std::cerr << glewGetErrorString(glewCode) << std::endl; return -1;);
 
-    glViewport(0, 0, sWinWidth, sWinHeight);
+    glViewport(0, 0, sWinSizeI.x, sWinSizeI.y);
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
@@ -103,7 +104,7 @@ int runVisual()
 
 
     std::mt19937 randGen(static_cast<std::mt19937::result_type>(std::time(nullptr)));
-    std::uniform_real_distribution<float>  uniDist;
+    std::uniform_real_distribution<float>  uniDist(-1.0f, 1.0f);
     std::exponential_distribution<float>  expDist;
 
 
@@ -129,18 +130,26 @@ int runVisual()
     //    pnts.back().mFreq = 3.0f;
     //    //pnts.back().mPhase = 3.14f * uniDist(randGen);
     //}
-    std::vector<glm::vec3> verts;
-    glm::vec3 triangle[] = { glm::vec3(-1.0f, -1.0f, 0.0f),
-        glm::vec3(-1.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 0.0f) };
-    verts = fill(triangle, 0.2f);
+    //std::vector<glm::vec3> verts;
+    //glm::vec3 triangle[] = { glm::vec3(-1.0f, -1.0f, 0.0f),
+    //    glm::vec3(-1.0f, 1.0f, 0.0f),
+    //    glm::vec3(1.0f, 1.0f, 0.0f) };
+    //verts = fill(triangle, 0.2f);
 
-    std::vector<pointCycle<std::vector<glm::vec3>::const_iterator>> pnts;
-    for (auto it = verts.begin(); it != verts.end(); ++it)
+    std::vector<glm::vec3> verts;
+    std::generate_n(std::back_inserter(verts), sNumPoints, [&uniDist, &randGen]()
     {
-        pnts.emplace_back(*it, verts.begin(), verts.end(), it);
-        pnts.back().mFreq = 0.5f;
+        return glm::vec3(uniDist(randGen), uniDist(randGen), 2.1f);
+    });
+
+
+    std::vector<pointFromTo>  motors;
+    for (size_t i = 0; i < verts.size(); ++i)
+    {
+        motors.push_back(pointFromTo(verts[i], verts[i]));
     }
+    motors[0].mFinish = verts[1];
+    int movingI = 0;
 
     GLuint VBO;
     glGenBuffers(1, &VBO);
@@ -184,8 +193,16 @@ int runVisual()
             continue;
         lastTime = curTime;
 
-        for (auto& pnt : pnts)
-            pnt.update(dt);
+        for (size_t i = 0; i < sNumPoints; ++i)
+        {
+            motors[i].update(dt);
+        }
+        if (motors[movingI].dist() < 0.01f)
+        {
+            int nextI = (movingI + 1) % sNumPoints;
+            motors[nextI].mFinish = verts[(nextI + 1) % sNumPoints];
+            movingI = (movingI + 1) % sNumPoints;
+        }
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(verts[0]), verts.data(), GL_STATIC_DRAW);
@@ -208,7 +225,7 @@ int runVisual()
         prog["model"] = model;
         prog["view"] = view;
         prog["projection"] = projection;
-        prog["iResolution"] = glm::vec2(sWinWidth, sWinHeight);
+        prog["iResolution"] = sWinSize;
         prog["iGlobalTime"] = curTime;
 
         // Rendering
@@ -300,10 +317,10 @@ void charCallback(GLFWwindow* window, unsigned int symb)
 
 void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
 {
-    sWinWidth = sizeX;
-    sWinHeight = sizeY;
-    glViewport(0, 0, sWinWidth, sWinHeight);
-    TwWindowSize(sWinWidth, sWinHeight);
+    sWinSizeI = glm::ivec2(sizeX, sizeY);
+    sWinSize = glm::vec2(static_cast<float>(sizeX), static_cast<float>(sizeY));
+    glViewport(0, 0, sWinSizeI.x, sWinSizeI.y);
+    TwWindowSize(sWinSizeI.x, sWinSizeI.y);
 }
 
 void moveCamera(float dt)
