@@ -139,7 +139,7 @@ int runVisual()
     std::vector<glm::vec3> verts;
     std::generate_n(std::back_inserter(verts), sNumPoints, [&uniDist, &randGen]()
     {
-        return glm::vec3(uniDist(randGen), uniDist(randGen), 2.1f);
+        return glm::vec3(uniDist(randGen), uniDist(randGen), 0.1f);
     });
 
 
