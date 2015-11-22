@@ -50,12 +50,12 @@ struct pointFromTo
     float dist() const;
 
     glm::vec3  mFinish;
+    glm::vec3  mSpeed;
 
 private:
     void updateImpl(float dt) override;
 
     glm::vec3  mDir;
-    glm::vec3  mSpeed;
     float  mDirLen;
     glm::vec3  mForce;
 };

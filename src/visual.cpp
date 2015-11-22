@@ -36,7 +36,7 @@ static float sScreenRatio = sWinSize.x / sWinSize.y;
 static bool sMouseVisible{ false };
 glm::vec3 const sCubePos(0.0f, 0.0f, 0.0f);
 glm::vec3 sRotAngles;
-static size_t const sNumPoints{ 32 };
+static size_t const sNumPoints{ 128 };
 
 static camera sCamera(sWinSize.x, sWinSize.y);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -197,10 +197,11 @@ int runVisual()
         {
             motors[i].update(dt);
         }
-        if (motors[movingI].dist() < 0.01f)
+        if (motors[movingI].dist() < 0.1f)
         {
             int nextI = (movingI + 1) % sNumPoints;
             motors[nextI].mFinish = verts[(nextI + 1) % sNumPoints];
+            motors[nextI].mSpeed = motors[movingI].mSpeed;
             movingI = (movingI + 1) % sNumPoints;
         }
 
