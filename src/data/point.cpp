@@ -42,9 +42,9 @@ void pointCos::updateImpl(float)
 pointFromTo::pointFromTo(glm::vec3& pos, glm::vec3 const& finishPos)
     : point(pos)
     , mMoveTime(2.0f)
-    , mForceCoeff(2.0f)
+    , mForceCoeff(2.4f)
     , mMass(1.0f)
-    , mFrict(0.5f)
+    , mFrict(0.8f)
     , mFinish(finishPos)
     , mDir(mFinish - mPnt)
     , mDirLen(glm::length(mDir))
@@ -73,9 +73,13 @@ void pointFromTo::updateImpl(float dt)
         glm::vec3 const accel = mForce / mMass;
         mSpeed += accel * dt;
 
-        glm::vec3 const speedDir = dot(mSpeed, dirN) * dirN;
-        glm::vec3 const speedNorm = mSpeed - speedDir;
-        mSpeed = speedNorm * 0.95f + speedDir;
+        float const mSpLen = length(mSpeed);
+        float const sMaxSpeed(2.0f);
+        if (mSpLen > sMaxSpeed)
+            mSpeed *= sMaxSpeed / mSpLen;
+        //glm::vec3 const speedDir = dot(mSpeed, dirN) * dirN;
+        //glm::vec3 const speedNorm = mSpeed - speedDir;
+        //mSpeed = speedNorm + speedDir;
     }
     mPnt = mPnt + mSpeed * dt;
 }
