@@ -31,13 +31,13 @@
 
 
 static float const sPI = 3.1415926535f;
-static glm::ivec2 sWinSizeI(400, 400);
+static glm::ivec2 sWinSizeI(1280, 800);
 static glm::vec2 sWinSize(static_cast<float>(sWinSizeI.x), static_cast<float>(sWinSizeI.y));
 static float sScreenRatio = sWinSize.x / sWinSize.y;
 static bool sMouseVisible{ false };
 glm::vec3 const sCubePos(0.0f, 0.0f, 0.0f);
 glm::vec3 sRotAngles;
-static size_t const sNumPoints{ 32 };
+static size_t const sNumPoints{ 128 };
 
 static camera sCamera(sWinSize.x, sWinSize.y);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -141,7 +141,7 @@ int runVisual()
     std::generate_n(std::back_inserter(verts), sNumPoints, [&uniDist, &randGen]()
     {
         glm::vec2 const polar(0.0f, uniDist(randGen) * glm::pi<float>());
-        auto const decVec = glm::euclidean(polar) * 0.5f;// *(uniDist(randGen) + 1.0f) * 0.5f;
+        auto const decVec = glm::euclidean(polar) * (uniDist(randGen) + 1.0f) * 0.5f;
         return glm::vec3(decVec.z, decVec.x, 2.1f);
     });
 
