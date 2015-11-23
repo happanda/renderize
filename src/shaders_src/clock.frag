@@ -8,7 +8,7 @@ uniform float iGlobalTime;
 vec4 fragCoord;
 
 float timeFactor = 2.0;
-float time = iGlobalTime / timeFactor;
+float time = iGlobalTime * timeFactor;
 float aspect = iResolution.y / iResolution.x;
 vec2 center = iResolution.xy / 2.0;
 vec2 frag;
@@ -19,7 +19,7 @@ float cTime = floor(time);
 float fTime = fract(time);
 const int NumStars = 100;
 const float NumStarsF = float(NumStars);
-float Radius = 3.0;
+float Radius = 5.0;
 float Intensity = 0.8;
 
 const float M_PI = 3.1415926535,
@@ -79,21 +79,41 @@ void main()
           G = 0.0,
           B = 0.0;
     
+    int Seconds = 60;
     int Minutes = 60;
+    float SecondsF = float(Seconds);
     float MinutesF = float(Minutes);
+    int timeS = int(time) % Seconds;
+    int timeM = (int(time) / Seconds) % Minutes;
 
-    int timeN = int(iGlobalTime) % Minutes;
-
-    for (int i = 0; i < Minutes; ++i)
+    float fracT = fract(time);
+    float fracP = fracT * M_PI + M_PI * float(timeS % 2);
+    for (int i = 0; i < Seconds; ++i)
     {
-        if (i == timeN)
-            continue;
-        float angle = M_2PI / MinutesF * (MinutesF - i + float(Minutes) / 4.0);
+        float deltaR = 0.0;
+        float deltaA = 0.0;
+        
+        float angle = M_2PI / SecondsF * (SecondsF - i + float(Seconds) / 4.0);
         float radius = centLen / 2.0;
         vec2 decar = decart(vec2(radius, angle));
-
         float intens = Intensity;
-        R += pressence(vec3(decar.xy, 0.0), Radius) * intens;
+        R += pressence(vec3(decar.xy, 0.0), Radius * (i == timeM && !(0 == timeS && time > 1.0) ? 5.0 : 1.0)) * intens;
+
+        if (i == timeS)
+        {
+            deltaR = sin(fracP) * 25.0f;
+            deltaA = fracT * M_2PI / SecondsF;
+            decar = decart(vec2(radius + deltaR, angle - deltaA));
+            R += pressence(vec3(decar.xy, 0.0), Radius) * intens;
+        }
+
+        if (0 == timeS && time > 1.0)
+        {
+            deltaR = sin(fracP) * 25.0f;
+            deltaA = fracT * M_2PI / SecondsF;
+            decar = decart(vec2(radius + deltaR, M_2PI / SecondsF * (SecondsF - timeM + 1.0 + float(Seconds) / 4.0) - deltaA));
+            R += pressence(vec3(decar.xy, 0.0), Radius * 5.0) * intens;
+        }
     }
 
     fragColor = vec4(R, R, R, 1.);
