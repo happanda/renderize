@@ -37,7 +37,7 @@ static float sScreenRatio = sWinSize.x / sWinSize.y;
 static bool sMouseVisible{ false };
 glm::vec3 const sCubePos(0.0f, 0.0f, 0.0f);
 glm::vec3 sRotAngles;
-static size_t const sNumPoints{ 8 };
+static size_t const sNumPoints{ 32 };
 
 static camera sCamera(sWinSize.x, sWinSize.y);
 static std::vector<bool> sKeys(GLFW_KEY_LAST, false);
@@ -200,7 +200,7 @@ int runVisual()
         {
             motors[i].update(dt);
         }
-        if (motors[movingI].dist() < 0.1f)
+        if (motors[movingI].dist() < 0.05f)
         {
             int nextI = (movingI + 1) % sNumPoints;
             motors[nextI].mFinish = verts[(nextI + 1) % sNumPoints];
@@ -236,7 +236,7 @@ int runVisual()
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        glPointSize(3);
+        glPointSize(5);
 
 
         glBindVertexArray(VAO);
