@@ -141,7 +141,7 @@ int runVisual()
     std::generate_n(std::back_inserter(verts), sNumPoints, [&uniDist, &randGen]()
     {
         glm::vec2 const polar(0.0f, uniDist(randGen) * glm::pi<float>());
-        auto const decVec = glm::euclidean(polar) * (uniDist(randGen) + 1.0f) * 0.5f;
+        auto const decVec = glm::euclidean(polar) * 0.5f;// *(uniDist(randGen) + 1.0f) * 0.5f;
         return glm::vec3(decVec.z, decVec.x, 2.1f);
     });
 
