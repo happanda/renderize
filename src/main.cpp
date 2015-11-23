@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 {
     //return runLandscape();
     //return runSpiral();
-    //return runUniverse();
-    return runVisual();
+    return runUniverse();
+    //return runVisual();
     //return runCubes();
 }

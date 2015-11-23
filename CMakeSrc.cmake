@@ -36,6 +36,7 @@ ${SourcePath}/textures/texture.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
+${SourcePath}/shaders_src/clock.frag
 ${SourcePath}/shaders_src/cube.vert
 ${SourcePath}/shaders_src/cube.frag
 ${SourcePath}/shaders_src/form.frag
