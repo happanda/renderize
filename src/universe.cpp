@@ -1,5 +1,6 @@
 #include "universe.h"
 #include <array>
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <list>
@@ -118,7 +119,7 @@ int runUniverse()
         // Shaders
     shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-    CHECK(fragShader.compile(readAllText("shaders/clock.frag"), GL_FRAGMENT_SHADER), fragShader.lastError(), return -1;);
+    CHECK(fragShader.compile(readAllText("shaders/clock.frag"), GL_FRAGMENT_SHADER, IncludeCommonCode::Yes), fragShader.lastError(), return -1;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
@@ -148,8 +149,14 @@ int runUniverse()
         glm::mat4 model;
 
         prog.use();
+        auto tmPnt = std::chrono::high_resolution_clock::now();
+        std::chrono::milliseconds mseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tmPnt.time_since_epoch());
+        
+        glm::vec4 iDate(0.0f, 0.0f, 0.0f, static_cast<float>(mseconds.count() % (24 * 60 * 60 * 1000)) / 1000.0f);
         prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0);
         prog["iGlobalTime"] = curTime;
+        prog["iDate"] = iDate;
+        std::cout << iDate.w << std::endl;
         
         // Rendering
         glClearColor(0.0f, 0.0f, 0.2f, 0.0f);

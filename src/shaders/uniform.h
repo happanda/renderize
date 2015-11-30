@@ -102,6 +102,35 @@ struct uniform
     }
 
 
+    /*=========== vec4 ===========*/
+    template<glm::precision P, class Real>
+    void operator=(glm::tvec4<Real, P> const& vec);
+
+    template<glm::precision P>
+    void operator=(glm::tvec4<float, P> const& vec)
+    {
+        glUniform4fv(mLoc, 1, glm::value_ptr(vec));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tvec4<double, P> const& vec)
+    {
+        glUniform4dv(mLoc, 1, glm::value_ptr(vec));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tvec4<int, P> const& vec)
+    {
+        glUniform4iv(mLoc, 1, glm::value_ptr(vec));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tvec4<unsigned int, P> const& vec)
+    {
+        glUniform4uiv(mLoc, 1, glm::value_ptr(vec));
+    }
+
+
     /*=========== tmat4x4 ===========*/
     template<glm::precision P, class Real>
     void operator=(glm::tmat4x4<Real, P> const& mat);

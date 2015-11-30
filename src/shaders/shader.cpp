@@ -14,9 +14,26 @@ shader::~shader()
     glDeleteShader(mShader);
 }
 
-bool shader::compile(GLstring const& code, GLenum type)
+bool shader::compile(GLstring const& code, GLenum type, IncludeCommonCode inc)
 {
-    GLchar const* const text = code.c_str();
+    mLastError.clear();
+
+    GLchar const* text = code.c_str();
+    std::string common;
+    if (inc == IncludeCommonCode::Yes)
+    {
+        if (type == GL_FRAGMENT_SHADER)
+        {
+            common = readAllText("shaders/common.frag");
+            if (common.empty())
+            {
+                mLastError = "Cannot read file shaders/common.frag";
+                return false;
+            }
+            common += code;
+            text = static_cast<GLchar const*>(common.c_str());
+        }
+    }
 
     mShader = glCreateShader(type);
     if (!mShader)
@@ -32,6 +49,8 @@ bool shader::compile(GLstring const& code, GLenum type)
 
 GLstring shader::lastError() const
 {
+    if (!mLastError.empty())
+        return mLastError;
     GLint logLen{ 0 };
     glGetShaderiv(mShader, GL_INFO_LOG_LENGTH, &logLen);
     std::vector<GLchar> log;
