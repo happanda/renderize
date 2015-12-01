@@ -1,12 +1,4 @@
-#version 330 core
 
-out vec4 color;
-
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-
-const float PI = 3.1415926535,
-            PI2 = PI / 2.;
 const vec2 Grid = vec2(20.);
 
 #define permute(xvec)  mod(((xvec * 34.0) + 1.0) * xvec, 289.0)
@@ -44,28 +36,7 @@ float snoise(vec2 v)
     return 130.0 * dot(m, g);
 }
 
-
-vec3 rgb2hsv(vec3 c)
-{
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-    float d = q.x - min(q.w, q.y);
-    float e = 1.0e-10;
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-#define CS(p) vec2(cos(p), sin(p))
-
-#define noise2vec(noise, pos) CS((noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * PI * 2.)
+#define noise2vec(noise, pos) CS((noise + iGlobalTime * cos(pos.x) * sin(pos.y)) * M_2PI)
 
 #define poly6rp(val0, val1, t) mix(val0, val1, t * t * t * (t * (t * 6. - 15.) + 10.))
 
@@ -92,12 +63,12 @@ void main()
           V = 0.;    
     vec2 gridStep = iResolution.xy / (Grid - 1.);
     
-    float val = (perlin(gl_FragCoord.xy, gridStep) + 1.) / 2.;
+    float val = (perlin(Frag, gridStep) + 1.) / 2.;
     H = mod(val * 3. + iGlobalTime, 1.);
 
     float middleVal = (cos(iGlobalTime * 2.) + 1.) / 2.;
     float theta = abs(mod(H, 1.) - middleVal);
     float eps = 0.05 + (sin(iGlobalTime / 2.) / 512.);
     S = V = (theta > eps) ? (eps / theta) : 0.85;
-    color = vec4(hsv2rgb(vec3(H, S, V)), 1.);
+    fragColor = vec4(hsv2rgb(vec3(H, S, V)), 1.);
 }
