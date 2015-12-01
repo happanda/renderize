@@ -12,7 +12,7 @@ const float M_PI = 3.1415926535,
 M_2PI = M_PI * 2.0,
 M_PI2 = M_PI / 2.0;
 
-const float timeFactor = 1.0;
+float timeFactor = 1.0;
 float time = iGlobalTime * timeFactor;
 vec2 Center = iResolution.xy / 2.0;
 float Aspect = iResolution.y / iResolution.x;
@@ -25,8 +25,8 @@ float fTime = fract(time);
 #define CS(p) vec2(cos(p), sin(p))
 #define DECART(p) (p.x * CS(p.y))
 #define POLAR(d) vec2(length(d), atan(d.y, d.x))
-#define PRESSENCE(pos, rad) (rad - clamp(dot(pos - Frag, pos - Frag), 0.0, rad))
-#define cPRESSENCE(pos, rad) (rad - clamp(dot(pos - cFrag, pos - cFrag), 0.0, rad))
+#define PRESSENCE(pos, rad) (rad - clamp(dot(pos.xy - Frag, pos.xy - Frag), 0.0, rad))
+#define cPRESSENCE(pos, rad) (rad - clamp(dot(pos.xy - cFrag, pos.xy - cFrag), 0.0, rad))
 float pressence(vec2 pos, float rad)
 {
     vec2 dif = pos - cFrag;
