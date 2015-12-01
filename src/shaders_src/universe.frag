@@ -17,7 +17,7 @@ float transit(float min0, float max0, float min1, float max1, float val)
 float timeFactor = 2.0;
 float time = iGlobalTime / timeFactor;
 float aspect = iResolution.y / iResolution.x;
-vec2 center = iResolution.xy / 2.0 + CS(iGlobalTime) * iResolution.xy / 10.0;
+vec2 center = iResolution.xy / 2.0;
 vec2 frag;
 vec2 cFrag;
 

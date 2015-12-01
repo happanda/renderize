@@ -45,7 +45,6 @@ ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/landscape.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
-${SourcePath}/shaders_src/spiral.frag
 ${SourcePath}/shaders_src/tex_noise.frag
 ${SourcePath}/shaders_src/universe.frag
 ${SourcePath}/shaders_src/visual.frag
@@ -61,8 +60,6 @@ ${SourcePath}/cubes.cpp
 ${SourcePath}/landscape.h
 ${SourcePath}/landscape.cpp
 ${SourcePath}/main.cpp
-${SourcePath}/spiral.h
-${SourcePath}/spiral.cpp
 ${SourcePath}/universe.h
 ${SourcePath}/universe.cpp
 ${SourcePath}/visual.h
