@@ -25,6 +25,7 @@
 #include "shaders/shader.h"
 #include "textures/texture.h"
 #include "util/checked_call.h"
+#include "util/date.h"
 
 
 static float const sPI = 3.1415926535f;
@@ -149,10 +150,8 @@ int runUniverse()
         glm::mat4 model;
 
         prog.use();
-        auto tmPnt = std::chrono::high_resolution_clock::now();
-        std::chrono::milliseconds mseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tmPnt.time_since_epoch());
-        
-        glm::vec4 iDate(0.0f, 0.0f, 0.0f, static_cast<float>(mseconds.count() % (24 * 60 * 60 * 1000)) / 1000.0f);
+
+        glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
         prog["iResolution"] = glm::vec3(sWinWidth, sWinHeight, 0.0);
         prog["iGlobalTime"] = curTime;
         prog["iDate"] = iDate;

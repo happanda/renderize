@@ -52,6 +52,8 @@ ${SourcePath}/shaders_src/visual.frag
 
 set(SOURCE_FILES_UTIL
 ${SourcePath}/util/checked_call.h
+${SourcePath}/util/date.h
+${SourcePath}/util/date.cpp
 )
 
 set(SOURCE_FILES
