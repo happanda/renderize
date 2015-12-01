@@ -16,8 +16,8 @@ const float timeFactor = 1.0;
 float time = iGlobalTime * timeFactor;
 vec2 Center = iResolution.xy / 2.0;
 float Aspect = iResolution.y / iResolution.x;
-vec2 Frag;
-vec2 cFrag;
+vec2 Frag = fragCoord.xy;
+vec2 cFrag = Frag - Center;
 
 float cTime = floor(time);
 float fTime = fract(time);
@@ -59,5 +59,10 @@ vec3 hsv2rgb(vec3 c)
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
+
+
+
+
+
 
 

@@ -1,22 +1,3 @@
-#version 330 core
-
-out vec4 fragColor;
-
-uniform vec3 iResolution;
-uniform float iGlobalTime;
-
-vec4 fragCoord;
-
-float timeFactor = 8.0;
-float time = iGlobalTime / timeFactor;
-float aspect = iResolution.y / iResolution.x;
-vec2 center = iResolution.xy / 2.0;
-vec2 frag;
-vec2 cFrag;
-
-
-float cTime = floor(time);
-float fTime = fract(time);
 const int NumPnts = 16;
 const float NumPntsF = float(NumPnts);
 float Heights[1];
@@ -24,28 +5,6 @@ const int NumPntsSq = (NumPnts + 1) * (NumPnts + 1);
 uniform float Land[NumPntsSq];
 float Radius = 2.0;
 float Intensity = 0.8;
-
-const float M_PI = 3.1415926535,
-            M_2PI = M_PI * 2.0,
-            M_PI2 = M_PI / 2.0;
-
-float snoise(vec2 v)
-{
-    return fract(sin(dot(v.xy, vec2(12.9898,78.233))) * 43758.5453);
-}
-
-#define CS(p) vec2(cos(p), sin(p))
-
-float transit(float val, float min0, float max0, float min1, float max1)
-{
-    return (val - min0) / (max0 - min0) * (max1 - min1) + min1;
-}
-
-float pressence(vec3 pos, float rad)
-{
-    vec2 dif = pos.xy - cFrag;
-    return (rad - clamp(dif.x * dif.x + dif.y * dif.y, 0.0, rad));
-}
 
 void mapHeights(float line)
 {
@@ -59,7 +18,7 @@ void mapHeights(float line)
     //    for (int k = halfStep; k < NumPnts; k += step)
     //    {
     //        Heights[k] = (Heights[k - halfStep] + Heights[k + halfStep]) / 2.0
-    //            + transit(snoise(vec2(line, k)), -1.0, 1.0, -hardness, hardness);
+    //            + TRANSIT(snoise(vec2(line, k)), -1.0, 1.0, -hardness, hardness);
     //    }
     //}
 }
@@ -93,7 +52,7 @@ void land()
             {
                 float value = (lval(x - halfStep, y - halfStep) + lval(x - halfStep, y + halfStep)
                     + lval(x + halfStep, y - halfStep) + lval(x + halfStep, y + halfStep)) / 4.0
-                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + TRANSIT(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -106,7 +65,7 @@ void land()
                     ym += NumPnts;
                 float value = (lval(x - halfStep, y) + lval(x, ym)
                     + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + TRANSIT(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -119,7 +78,7 @@ void land()
                     xm += NumPnts;
                 float value = (lval(xm, y) + lval(x, y - halfStep)
                     + lval(x + halfStep, y) + lval(x, y + halfStep)) / 4.0
-                    + transit(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
+                    + TRANSIT(snoise(vec2(x, y)), 0.0, 1.0, -hardness, hardness);
                 lset(x, y, value);
             }
         }
@@ -129,23 +88,19 @@ void land()
 
 void main()
 {
-    fragCoord = gl_FragCoord;
-    frag = fragCoord.xy;
-    cFrag = frag - center;
-    
     mat4 pMat = mat4(0.0);
     float fov = M_PI2;
     float tanFov = tan(fov / 2.0);
     const float near = 0.0;
     const float far = 10.0;
 
-    pMat[0][0] = 1.0 / (aspect * tanFov);
+    pMat[0][0] = 1.0 / (Aspect * tanFov);
     pMat[1][1] = 1.0 / tanFov;
     pMat[2][2] = -(near + far) / (far - near);
     pMat[2][3] = -1.0;
     pMat[3][2] = 2.0 * near * far / (far - near);
     
-    float centLen = length(center);
+    float centLen = length(Center);
     float R = 0.0;
     float xWidth = 4.0;
     float xWidth2 = xWidth / 2.0;
@@ -164,9 +119,9 @@ void main()
         float xc = iFl / NumPntsF;
         float yc = Heights[i];
         vec3 screenPos;
-        screenPos.x = transit(xc, 0.0, 1.0, -center.x, center.x);
-        screenPos.y = transit(yc, -1.0, 1.0, -center.y, center.y);
-        R += pressence(screenPos, Radius);
+        screenPos.x = TRANSIT(xc, 0.0, 1.0, -Center.x, Center.x);
+        screenPos.y = TRANSIT(yc, -1.0, 1.0, -Center.y, Center.y);
+        R += cPRESSENCE(screenPos, Radius);
     }
     */
     /*
@@ -190,9 +145,9 @@ void main()
             vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
             persPos.xy = persPos.xy * centLen / persPos.w;
-            float transVal = transit(zWidth - zc, 0.0, 1.0, 0.2, 0.3);
+            float transVal = TRANSIT(zWidth - zc, 0.0, 1.0, 0.2, 0.3);
             float intens = Intensity * transVal;
-            R += pressence(persPos.xyz, Radius * transVal) * intens;
+            R += cPRESSENCE(persPos.xyz, Radius * transVal) * intens;
         }
     }
     */
@@ -215,9 +170,9 @@ void main()
             vec4 dPos = vec4(xc, yc, zc, 1.0);
             vec4 persPos = pMat * dPos;
             persPos.xy = persPos.xy * centLen / persPos.w;
-            float transVal = transit(zWidth - zc, 0.0, 1.0, 0.2, 0.3);
+            float transVal = TRANSIT(zWidth - zc, 0.0, 1.0, 0.2, 0.3);
             float intens = Intensity * transVal;
-            R += pressence(persPos.xyz, Radius * transVal) * intens;
+            R += cPRESSENCE(persPos.xy, Radius * transVal) * intens;
         }
     }
     fragColor = vec4(R, R, R, 1.);

@@ -196,7 +196,7 @@ int runLandscape()
         // Shaders
     shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-    CHECK(fragShader.compile(readAllText("shaders/landscape.frag"), GL_FRAGMENT_SHADER), fragShader.lastError(), return -1;);
+    CHECK(fragShader.compile(readAllText("shaders/landscape.frag"), GL_FRAGMENT_SHADER, IncludeCommonCode::Yes), fragShader.lastError(), return -1;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
