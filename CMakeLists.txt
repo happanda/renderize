@@ -23,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/build)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
 
 # C++ compilation flags
-# no flags :)
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DGLEW_STATIC")
 
 include(CMakeSrc.cmake)
 add_executable(Renderize ${SOURCE_FILES_ALL})

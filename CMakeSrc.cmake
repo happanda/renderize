@@ -41,6 +41,7 @@ ${SourcePath}/shaders_src/common.frag
 ${SourcePath}/shaders_src/cube.vert
 ${SourcePath}/shaders_src/cube.frag
 ${SourcePath}/shaders_src/form.frag
+${SourcePath}/shaders_src/fragment_demo.vert
 ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/landscape.frag
 ${SourcePath}/shaders_src/simple.vert
@@ -59,6 +60,8 @@ ${SourcePath}/util/date.cpp
 set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
+${SourcePath}/fragment_demo.h
+${SourcePath}/fragment_demo.cpp
 ${SourcePath}/landscape.h
 ${SourcePath}/landscape.cpp
 ${SourcePath}/main.cpp
@@ -89,7 +92,7 @@ set_source_files_properties(${SOURCE_FILES_SHADERS_SOURCE} PROPERTIES HEADER_FIL
 set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
 ${SOURCE_FILES_UTIL}
-#${SOURCE_FILES_APP}
+${SOURCE_FILES_APP}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_DATA}
 ${SOURCE_FILES_SHADERS}

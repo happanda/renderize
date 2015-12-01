@@ -1,5 +1,4 @@
 #include <iostream>
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -7,11 +6,13 @@
 #include "util/checked_call.h"
 
 
-
-void glfwErrorReporting(int errCode, char const* msg)
+namespace
 {
-    std::cerr << "ERROR " << errCode << ": " << msg << std::endl;
-}
+    void glfwErrorReporting(int errCode, char const* msg)
+    {
+        std::cerr << "ERROR " << errCode << ": " << msg << std::endl;
+    }
+} // anonymous namespace
 
 
 app::app()
@@ -108,5 +109,6 @@ void app::keyUp(int key)
 
 bool app::isPressed(int key)
 {
+    return mKeys[key];
 }
 
