@@ -1,4 +1,5 @@
 #include <iostream>
+#include "app/app.h"
 #include "cubes.h"
 #include "fragment_demo.h"
 #include "landscape.h"
@@ -8,10 +9,8 @@
 
 int main(int argc, char* argv[])
 {
-    runDemo("clock");
-    return 0;
-    //return runLandscape();
-    //return runUniverse();
-    //return runVisual();
-    //return runCubes();
+    app::create();
+    App().init();
+    App().runFragmentDemo("clock");
+    app::destroy();
 }
