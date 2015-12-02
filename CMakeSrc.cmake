@@ -60,15 +60,7 @@ ${SourcePath}/util/date.cpp
 set(SOURCE_FILES
 ${SourcePath}/cubes.h
 ${SourcePath}/cubes.cpp
-${SourcePath}/fragment_demo.h
-${SourcePath}/fragment_demo.cpp
-${SourcePath}/landscape.h
-${SourcePath}/landscape.cpp
 ${SourcePath}/main.cpp
-${SourcePath}/universe.h
-${SourcePath}/universe.cpp
-${SourcePath}/visual.h
-${SourcePath}/visual.cpp
 )
 
 #set(SOURCE_FILES_GLFW
