@@ -7,6 +7,6 @@ int main(int argc, char* argv[])
 {
     app::create();
     App().init();
-    App().runFragmentDemo("visual");
+    App().runFragmentDemo("complex");
     app::destroy();
 }

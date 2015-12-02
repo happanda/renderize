@@ -18,6 +18,8 @@ vec2 Center = iResolution.xy / 2.0;
 float Aspect = iResolution.y / iResolution.x;
 vec2 Frag = fragCoord.xy;
 vec2 cFrag = Frag - Center;
+vec2 UV = Frag / iResolution.xy;
+vec2 cUV = cFrag / Center;
 
 float cTime = floor(time);
 float fTime = fract(time);
@@ -33,8 +35,8 @@ float pressence(vec2 pos, float rad)
     return (rad - clamp(dot(dif, dif), 0.0, rad));
 }
 
-#define UV (Frag / iResolution.xy);
-#define cUV ((Frag - Center) / Center);
+//#define UV (Frag / iResolution.xy);
+//#define cUV ((Frag - Center) / Center);
 
 #define SimpleNoise(v) fract(sin(dot(v.xy, vec2(12.9898, 78.233))) * 43758.5453)
 
