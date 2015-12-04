@@ -6,9 +6,9 @@
 /*
 * General formula: z_{n+1} = A * z_{n}^D + B
 */
-const vec2 A = vec2(3.0, 1.0);
-const vec2 B = vec2(0.9, 0.0);
-float D = SINN(time) * 15.0 + 1.0;
+const vec2 A = vec2(1.0, 0.0);
+const vec2 B = vec2(-0.9, 0.18);
+float D = 7.0;//SINN(time) * 15.0 + 1.0;
 
 vec2 plxPow(vec2 plx, float deg)
 {
@@ -43,11 +43,12 @@ void main()
     while (iter < 10)
     {
         coord = nextIter(coord);
-        if (abs(coord.x) > Coeff || abs(coord.y) > Coeff)
+        if (abs(coord.x) > 5.0 || abs(coord.y) > 6.0)
             break;
         ++iter;
     }
-    R = iter * 0.1;
+    if (abs(coord.x) < 7.0 || abs(coord.y) > 3.0)
+        R = iter * 0.1;
 
     fragColor = vec4(R, R, R, 1.);
 }
