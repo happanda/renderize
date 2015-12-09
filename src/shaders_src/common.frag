@@ -62,9 +62,17 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+float rectReg(vec2 ul, vec2 dim, vec2 pos)
+{
+    vec2 res = step(ul, pos) * step(1.0 - dim - ul, 1.0 - pos);
+    return res.x * res.y;
+}
 
-
-
-
+float rect(vec2 ul, vec2 dim, vec2 thickness, vec2 pos)
+{
+    float outer = rectReg(ul, dim, pos);
+    float inner = rectReg(ul + thickness, dim - thickness - thickness, pos);
+    return (1.0 - inner) * outer;
+}
 
 
