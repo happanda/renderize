@@ -75,4 +75,14 @@ float rect(vec2 ul, vec2 dim, vec2 thickness, vec2 pos)
     return (1.0 - inner) * outer;
 }
 
+float circle(vec2 center, float rad, float smooth, vec2 pos)
+{
+    return smoothstep(rad - smooth, rad + smooth, distance(pos, center));
+}
+
+
+
+
+
+
 
