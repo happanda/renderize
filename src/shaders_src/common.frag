@@ -74,6 +74,28 @@ vec3 hsv2rgb(vec3 c)
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
+// YUV to RGB matrix
+// yuv2rgb * vec3(Y, U, V); // Y, U , V \in [-1.0, 1.0]
+mat3 yuv2rgb = mat3(1.0, 0.0, 1.13983, 
+                    1.0, -0.39465, -0.58060, 
+                    1.0, 2.03211, 0.0);
+
+// RGB to YUV matrix
+mat3 rgb2yuv = mat3(0.2126, 0.7152, 0.0722,
+                    -0.09991, -0.33609, 0.43600, 
+                    0.615, -0.5586, -0.05639);
+
+vec2 tiledConv(vec2 size, vec2 shift, vec2 pos)
+{
+    vec2 newpos = pos * size + shift;
+    return vec2(fract(newpos.x), fract(newpos.y));
+}
+
+vec2 tiledCoord(vec2 size, vec2 pos)
+{
+    vec2 newpos = pos * size;
+    return floor(newpos / size);
+}
 
 float rectReg(vec2 ul, vec2 dim, vec2 pos)
 {
@@ -106,10 +128,8 @@ float polyg(float n, vec2 center, float size, float smth, vec2 pos)
     float phi = M_2PI / n;
     float gamma = (floor(a / phi) + 0.5) * phi - a;
     float d = cos(gamma) * length(pos);
-    return 1.0 - smoothstep(size - smth, size + smth, d);
+    return smoothstep(size - smth, size + smth, d);
 }
-
-
 
 
 
