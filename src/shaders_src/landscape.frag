@@ -88,6 +88,8 @@ void land()
 
 void main()
 {
+    init();
+    
     mat4 pMat = mat4(0.0);
     float fov = M_PI2;
     float tanFov = tan(fov / 2.0);

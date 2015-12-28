@@ -1,8 +1,8 @@
 #version 330 core
 
-vec4 fragCoord = gl_FragCoord;
-
 out vec4 fragColor;
+
+vec4 fragCoord = gl_FragCoord;
 
 uniform vec3 iResolution;
 uniform float iGlobalTime;
@@ -35,15 +35,28 @@ float pressence(vec2 pos, float rad)
     return (rad - clamp(dot(dif, dif), 0.0, rad));
 }
 
-//#define UV (Frag / iResolution.xy);
-//#define cUV ((Frag - Center) / Center);
-
 #define SimpleNoise(v) fract(sin(dot(v.xy, vec2(12.9898, 78.233))) * 43758.5453)
 
 #define TRANSIT(val, min0, max0, min1, max1)  ((val - min0) / (max0 - min0) * (max1 - min1) + min1)
 
 #define SINN(x)  ((sin(x) + 1.0) / 2.0)
 #define COSN(x)  ((cos(x) + 1.0) / 2.0)
+
+void init()
+{
+    fragCoord = gl_FragCoord;
+    timeFactor = 1.0;
+    time = iGlobalTime * timeFactor;
+    Center = iResolution.xy / 2.0;
+    Aspect = iResolution.y / iResolution.x;
+    Frag = fragCoord.xy;
+    cFrag = Frag - Center;
+    UV = Frag / iResolution.xy;
+    cUV = cFrag / Center;
+    
+    cTime = floor(time);
+    fTime = fract(time);
+}
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -75,10 +88,27 @@ float rect(vec2 ul, vec2 dim, vec2 thickness, vec2 pos)
     return (1.0 - inner) * outer;
 }
 
-float circle(vec2 center, float rad, float smooth, vec2 pos)
+float circleReg(vec2 center, float rad, float smth, vec2 pos)
 {
-    return smoothstep(rad - smooth, rad + smooth, distance(pos, center));
+    return smoothstep(rad - smth, rad + smth, distance(pos, center));
 }
+
+float circle(vec2 center, float rad, float thickness, float smth, vec2 pos)
+{
+    return circleReg(center, rad + thickness / 2.0, smth, pos)
+     + 1.0 - circleReg(center, rad - thickness / 2.0, smth, pos);
+}
+
+float polyg(float n, vec2 center, float size, float smth, vec2 pos)
+{
+    pos = pos - center;
+    float a = atan(pos.y, pos.x);
+    float phi = M_2PI / n;
+    float gamma = (floor(a / phi) + 0.5) * phi - a;
+    float d = cos(gamma) * length(pos);
+    return 1.0 - smoothstep(size - smth, size + smth, d);
+}
+
 
 
 

@@ -1,4 +1,3 @@
-
 const int NumStars = 100;
 const float NumStarsF = float(NumStars);
 float Radius = 3.0;
@@ -6,6 +5,8 @@ float Intensity = 0.8;
 
 void main()
 {
+    init();
+    
     timeFactor = 0.5;
     time = iGlobalTime * timeFactor;
     

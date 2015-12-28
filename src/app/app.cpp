@@ -232,7 +232,8 @@ void app::runFragmentDemo(std::string const& demoName)
     // Shaders
     shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/fragment_demo.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
-    CHECK(fragShader.compile(readAllText("shaders/" + demoName + ".frag"), GL_FRAGMENT_SHADER, IncludeCommonCode::Yes), fragShader.lastError(), return;);
+    CHECK(fragShader.compile(readAllText("shaders/" + demoName + ".frag"), GL_FRAGMENT_SHADER,
+        IncludeCommonCode::Yes), fragShader.lastError(), return;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);

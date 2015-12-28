@@ -58,6 +58,7 @@ float perlin(vec2 pos, vec2 gridStep)
 
 void main()
 {
+    init();
     float H = 0.,
           S = 0.,
           V = 0.;    

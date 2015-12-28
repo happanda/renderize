@@ -3,9 +3,8 @@ float Intensity = 0.3;
 
 void main()
 {
-    time = iDate.w;
-    Frag = fragCoord.xy;
-    cFrag = fragCoord.xy - Center;
+    init();
+    float date = iDate.w;
     float R = 0.0,
           G = 0.0,
           B = 0.0;
@@ -13,9 +12,9 @@ void main()
     const float Seconds = 60.0;
     const float Minutes = 60.0;
     const float Hours = 12.0;
-    float timeS = mod(time, Seconds);
-    float timeM = mod(floor(time / Seconds), Minutes);
-    float timeH = mod(floor(floor(time / Seconds) / Minutes), Hours);
+    float timeS = mod(date, Seconds);
+    float timeM = mod(floor(date / Seconds), Minutes);
+    float timeH = mod(floor(floor(date / Seconds) / Minutes), Hours);
 
     float radius = Center.y / 2.0;
     vec2 polPnt, decPnt;
@@ -35,7 +34,7 @@ void main()
     
     polPnt.y = M_2PI * (1.25 - timeM / Minutes); //M_2PI / Minutes * (Minutes - timeM + Minutes / 4.0);
     polPnt.x = radius;
-    if (timeS < 1.0 && time >= 1.0)
+    if (timeS < 1.0 && date >= 1.0)
     {
         polPnt.y += (1.0 - timeS) * M_2PI / Minutes;
         polPnt.x += sin(timeS * M_PI) * 25.0;
@@ -45,7 +44,7 @@ void main()
     
     polPnt.y = M_2PI * (1.25 - timeH / Hours); //M_2PI / Hours * (Hours - timeH + Hours / 4.0);
     polPnt.x = radius;
-    if (timeS < 1.0 && timeM < 1.0 && time >= Seconds)
+    if (timeS < 1.0 && timeM < 1.0 && date >= Seconds)
     {
         polPnt.y += (1.0 - timeS) * M_2PI / Hours;
         polPnt.x += sin(timeS * M_PI) * 25.0;

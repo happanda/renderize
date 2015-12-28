@@ -22,17 +22,12 @@ vec2 plxPow(vec2 plx, float deg)
 vec2 nextIter(vec2 plx)
 {
     vec2 res = plxPow(plx, D);
-    //for (float i = 0.0; i < D; ++i)
-    //{
-    //    res = PLXMULT(res, plx);
-    //}
     return PLXMULT(A, res) + B;
 }
 
 void main()
 {
-    Frag = fragCoord.xy;
-    cFrag = fragCoord.xy - Center;
+    init();
     float R = 0.3,
           G = 0.3,
           B = 0.3;
