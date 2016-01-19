@@ -3,11 +3,11 @@
 #include <glm/vec3.hpp>
 
 
-struct camera
+struct Camera
 {
-    camera(float width, float height);
-    camera(int width, int height);
-    camera(size_t width, size_t height);
+    Camera(float width, float height);
+    Camera(int width, int height);
+    Camera(size_t width, size_t height);
 
     float near() const;
     float far() const;

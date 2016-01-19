@@ -5,8 +5,8 @@
 
 int main(int argc, char* argv[])
 {
-    app::create();
-    App().init();
-    App().runFragmentDemo("clock");
-    app::destroy();
+    App::create();
+    APP().init();
+    APP().runFragmentDemo("clock");
+    App::destroy();
 }

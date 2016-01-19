@@ -28,8 +28,8 @@ static TwBar* sATB{ nullptr };
 bool sMouseVisible{ false };
 
 bool sUseCam1{ true };
-camera sCamera(sWinWidth, sWinHeight);
-camera sCamera2(sWinWidth, sWinHeight);
+Camera sCamera(sWinWidth, sWinHeight);
+Camera sCamera2(sWinWidth, sWinHeight);
 float sCamDist{ 5.0f };
 float sCamAngle{ 0.01f };
 
@@ -179,17 +179,17 @@ int runCubes()
     glEnable(GL_DEPTH_TEST);
 
 
-    program shaderCube;
-    program shaderLamp;
+    Program shaderCube;
+    Program shaderLamp;
     CHECK(shaderCube.create(), shaderCube.lastError(), return -1;);
     CHECK(shaderLamp.create(), shaderLamp.lastError(), return -1;);
     {
         // Shaders
-        shader vertexShader;
+        Shader vertexShader;
         CHECK(vertexShader.compile(readAllText("shaders/cube.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-        shader fragCube;
+        Shader fragCube;
         CHECK(fragCube.compile(readAllText("shaders/cube.frag"), GL_FRAGMENT_SHADER), fragCube.lastError(), return -1;);
-        shader fragLamp;
+        Shader fragLamp;
         CHECK(fragLamp.compile(readAllText("shaders/lamp.frag"), GL_FRAGMENT_SHADER), fragLamp.lastError(), return -1;);
 
         // Shader program
@@ -201,13 +201,13 @@ int runCubes()
         CHECK(shaderLamp.link(), shaderLamp.lastError(), return -1;);
     }
 
-    program simpleProg;
+    Program simpleProg;
     CHECK(simpleProg.create(), simpleProg.lastError(), return -1;);
     {
         // Shaders
-        shader vertexShader;
+        Shader vertexShader;
         CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return -1;);
-        shader fragCube;
+        Shader fragCube;
         CHECK(fragCube.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER), fragCube.lastError(), return -1;);
         
         // Shader program
@@ -217,7 +217,7 @@ int runCubes()
     }
 
     // Texture loading
-    texture crateTex, crateSpecTex;
+    Texture crateTex, crateSpecTex;
     CHECK(crateTex.load("../tex/crate.png", true), "Error loading crate texture", );
     CHECK(crateSpecTex.load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
 
@@ -293,7 +293,7 @@ int runCubes()
 
 
 
-    render_target renderTex[2];
+    RenderTarget renderTex[2];
     CHECK(renderTex[0].create(sWinWidth, sWinHeight), "Error creating render target 0", return -1;);
     CHECK(renderTex[1].create(sWinWidth, sWinHeight), "Error creating render target 1", return -1;);
 

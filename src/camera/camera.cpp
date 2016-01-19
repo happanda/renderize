@@ -4,7 +4,7 @@
 #include "camera.h"
 
 
-camera::camera(float width, float height)
+Camera::Camera(float width, float height)
     : mSize(width, height)
     , mNear(0.1f)
     , mFar(7.0f)
@@ -15,7 +15,7 @@ camera::camera(float width, float height)
 {
 }
 
-camera::camera(int width, int height)
+Camera::Camera(int width, int height)
     : mSize(static_cast<float>(width), static_cast<float>(height))
     , mNear(0.1f)
     , mFar(7.0f)
@@ -26,7 +26,7 @@ camera::camera(int width, int height)
 {
 }
 
-camera::camera(size_t width, size_t height)
+Camera::Camera(size_t width, size_t height)
     : mSize(static_cast<float>(width), static_cast<float>(height))
     , mNear(0.1f)
     , mFar(7.0f)
@@ -37,69 +37,69 @@ camera::camera(size_t width, size_t height)
 {
 }
 
-float camera::near() const
+float Camera::near() const
 {
     return mNear;
 }
 
-float camera::far() const
+float Camera::far() const
 {
     return mFar;
 }
 
-float camera::fov() const
+float Camera::fov() const
 {
     return mFov;
 }
 
-void camera::near(float val)
+void Camera::near(float val)
 {
     // TODO: maybe clamp by mNear?
     mNear = glm::clamp(val, 0.0f, std::numeric_limits<float>::max());
 }
 
-void camera::far(float val)
+void Camera::far(float val)
 {
     // TODO: maybe clamp by mFar?
     mFar = glm::clamp(val, 0.0f, std::numeric_limits<float>::max());
 }
 
-void camera::fov(float val)
+void Camera::fov(float val)
 {
     mFov = glm::clamp(val, 0.0f, 360.0f);
 }
 
-glm::mat4 camera::projection() const
+glm::mat4 Camera::projection() const
 {
     return glm::perspective(glm::radians(mFov), static_cast<GLfloat>(mSize.x) / static_cast<GLfloat>(mSize.y), mNear, mFar);
 }
 
-glm::vec3 const& camera::pos() const
+glm::vec3 const& Camera::pos() const
 {
     return mPos;
 }
 
-glm::vec3 const& camera::front() const
+glm::vec3 const& Camera::front() const
 {
     return mFront;
 }
 
-glm::vec3 const& camera::up() const
+glm::vec3 const& Camera::up() const
 {
     return mUp;
 }
 
-void camera::pos(glm::vec3 const& v)
+void Camera::pos(glm::vec3 const& v)
 {
     mPos = v;
 }
 
-void camera::front(glm::vec3 const& v)
+void Camera::front(glm::vec3 const& v)
 {
     mFront = glm::normalize(v);
 }
 
-void camera::front(float pitch, float yaw)
+void Camera::front(float pitch, float yaw)
 {
     float const pitchRad = glm::radians(pitch);
     float const yawRad = glm::radians(yaw - 90);
@@ -113,12 +113,12 @@ void camera::front(float pitch, float yaw)
     mUp = glm::normalize(glm::cross(mFront, right));
 }
 
-void camera::up(glm::vec3 const& v)
+void Camera::up(glm::vec3 const& v)
 {
     mUp = glm::normalize(v);
 }
 
-glm::mat4 camera::view() const
+glm::mat4 Camera::view() const
 {
     return glm::lookAt(mPos, mPos + mFront, mUp);
 }

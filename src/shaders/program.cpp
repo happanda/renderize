@@ -2,28 +2,28 @@
 #include "program.h"
 
 
-program::program()
+Program::Program()
     : mProg(0)
 {
 }
 
-program::~program()
+Program::~Program()
 {
     glDeleteProgram(mProg);
 }
 
-bool program::create()
+bool Program::create()
 {
     mProg = glCreateProgram();
     return mProg != 0;
 }
 
-void program::attach(shader const& sh)
+void Program::attach(Shader const& sh)
 {
     glAttachShader(mProg, sh);
 }
 
-bool program::link()
+bool Program::link()
 {
     if (!mProg)
         return false;
@@ -33,17 +33,17 @@ bool program::link()
     return success == GL_TRUE;
 }
 
-void program::use() const
+void Program::use() const
 {
     glUseProgram(mProg);
 }
 
-GLenum program::get() const
+GLenum Program::get() const
 {
     return mProg;
 }
 
-GLstring program::lastError() const
+GLstring Program::lastError() const
 {
     GLint logLen{ 0 };
     glGetProgramiv(mProg, GL_INFO_LOG_LENGTH, &logLen);
@@ -53,17 +53,17 @@ GLstring program::lastError() const
     return GLstring(std::cbegin(log), std::cend(log));
 }
 
-program::operator GLenum() const
+Program::operator GLenum() const
 {
     return mProg;
 }
 
-uniform program::operator[](std::string const& uniName) const
+Uniform Program::operator[](std::string const& uniName) const
 {
-    return uniform(*this, uniName);
+    return Uniform(*this, uniName);
 }
 
-uniform program::operator[](char const* uniName) const
+Uniform Program::operator[](char const* uniName) const
 {
-    return uniform(*this, uniName);
+    return Uniform(*this, uniName);
 }

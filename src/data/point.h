@@ -2,11 +2,11 @@
 #include <glm/vec3.hpp>
 
 
-struct point
+struct Point
 {
-    point(glm::vec3& pos);
-    point& operator=(point const& other) = default;
-    virtual ~point();
+    Point(glm::vec3& pos);
+    Point& operator=(Point const& other) = default;
+    virtual ~Point();
 
     void update(float dt);
 
@@ -17,11 +17,11 @@ protected:
     float  mTime;
 };
 
-struct pointCos
-    : public point
+struct PointCos
+    : public Point
 {
-    pointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& finishPos);
-    pointCos& operator=(pointCos const& other) = default;
+    PointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& finishPos);
+    PointCos& operator=(PointCos const& other) = default;
 
     float mPhase;
     float mFreq;
@@ -36,11 +36,11 @@ private:
 };
 
 
-struct pointFromTo
-    : public point
+struct PointFromTo
+    : public Point
 {
-    pointFromTo(glm::vec3& pos, glm::vec3 const& finishPos);
-    pointFromTo& operator=(pointFromTo const& other) = default;
+    PointFromTo(glm::vec3& pos, glm::vec3 const& finishPos);
+    PointFromTo& operator=(PointFromTo const& other) = default;
 
     float mMoveTime;
     float mForceCoeff;
@@ -62,10 +62,10 @@ private:
 
 
 template <class Iter>
-struct pointCycle
-    : public point
+struct PointCycle
+    : public Point
 {
-    pointCycle(glm::vec3& pos, Iter first, Iter last, Iter current)
+    PointCycle(glm::vec3& pos, Iter first, Iter last, Iter current)
         : point(pos)
         , mFirst(first)
         , mLast(last)

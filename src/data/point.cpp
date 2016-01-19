@@ -3,25 +3,25 @@
 #include "point.h"
 
 
-point::point(glm::vec3& pos)
+Point::Point(glm::vec3& pos)
     : mPnt(pos)
     , mTime(0.0f)
 {
 }
 
-point::~point()
+Point::~Point()
 {
 }
 
-void point::update(float dt)
+void Point::update(float dt)
 {
     mTime += dt;
     updateImpl(dt);
 }
 
 
-pointCos::pointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& finishPos)
-    : point(pos)
+PointCos::PointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& finishPos)
+    : Point(pos)
     , mPhase(0.0f)
     , mFreq(1.0f)
     , mStart(startPos)
@@ -31,7 +31,7 @@ pointCos::pointCos(glm::vec3& pos, glm::vec3 const& startPos, glm::vec3 const& f
 {
 }
 
-void pointCos::updateImpl(float)
+void PointCos::updateImpl(float)
 {
     int const phase = static_cast<int>(mTime * mFreq / 3.14f) % 3;
     if (phase == 0)
@@ -39,8 +39,8 @@ void pointCos::updateImpl(float)
 }
 
 
-pointFromTo::pointFromTo(glm::vec3& pos, glm::vec3 const& finishPos)
-    : point(pos)
+PointFromTo::PointFromTo(glm::vec3& pos, glm::vec3 const& finishPos)
+    : Point(pos)
     , mMoveTime(2.0f)
     , mForceCoeff(2.4f)
     , mMass(1.0f)
@@ -52,12 +52,12 @@ pointFromTo::pointFromTo(glm::vec3& pos, glm::vec3 const& finishPos)
 {
 }
 
-float pointFromTo::dist() const
+float PointFromTo::dist() const
 {
     return length(mDir);
 }
 
-void pointFromTo::updateImpl(float dt)
+void PointFromTo::updateImpl(float dt)
 {
     mDir = mFinish - mPnt;
     mDirLen = length(mDir);

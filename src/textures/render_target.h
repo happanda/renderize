@@ -2,10 +2,10 @@
 #include <GL/glew.h>
 
 
-struct render_target
+struct RenderTarget
 {
-    render_target();
-    ~render_target();
+    RenderTarget();
+    ~RenderTarget();
 
     bool create(GLsizei width, GLsizei height);
 

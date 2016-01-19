@@ -4,13 +4,13 @@
 
 struct GLFWwindow;
 
-struct app
+struct App
 {
     static void create();
     static void destroy();
-    static app& inst();
+    static App& inst();
 
-    ~app();
+    ~App();
     
     bool init();
     bool shouldClose() const;
@@ -26,10 +26,11 @@ struct app
     bool isPressed(int key);
     void onGLFWError(int errCode, char const* msg);
 
+    void run();
     void runFragmentDemo(std::string const& demoName);
 
 private:
-    app();
+    App();
 
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
@@ -39,4 +40,4 @@ private:
 };
 
 
-app& App();
+App& APP();

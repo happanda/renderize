@@ -14,34 +14,34 @@
 
 namespace
 {
-    app*  sAppInstance{ nullptr };
+    App*  sAppInstance{ nullptr };
 
     void glfwErrorReporting(int errCode, char const* msg)
     {
-        App().onGLFWError(errCode, msg);
+        APP().onGLFWError(errCode, msg);
     }
 
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
     {
         if (action == GLFW_PRESS)
-            App().keyDown(key);
+            APP().keyDown(key);
         else
-            App().keyUp(key);
+            APP().keyUp(key);
     }
 
     void mouseCallback(GLFWwindow* window, double x, double y)
     {
-        App().mouse(glm::vec2(static_cast<float>(x), static_cast<float>(y)));
+        APP().mouse(glm::vec2(static_cast<float>(x), static_cast<float>(y)));
     }
 
     void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
     {
-        App().scroll(static_cast<float>(xDiff), static_cast<float>(yDiff));
+        APP().scroll(static_cast<float>(xDiff), static_cast<float>(yDiff));
     }
 
     void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
     {
-        App().touchDown(button);
+        APP().touchDown(button);
     }
 
     void charCallback(GLFWwindow* window, unsigned int symb)
@@ -50,19 +50,19 @@ namespace
 
     void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
     {
-        App().resize(sizeX, sizeY);
+        APP().resize(sizeX, sizeY);
     }
 } // anonymous namespace
 
 
 
-void app::create()
+void App::create()
 {
     if (!sAppInstance)
-        sAppInstance = new app();
+        sAppInstance = new App();
 }
 
-void app::destroy()
+void App::destroy()
 {
     if (sAppInstance)
     {
@@ -71,25 +71,25 @@ void app::destroy()
     }
 }
 
-app& app::inst()
+App& App::inst()
 {
     return *sAppInstance;
 }
 
-app::app()
+App::App()
     : mWinSize(800, 800)
     , mWindow(nullptr)
     , mKeys(GLFW_KEY_LAST, false)
 {
 }
 
-app::~app()
+App::~App()
 {
     glfwDestroyWindow(mWindow);
     glfwTerminate();
 }
 
-bool app::init()
+bool App::init()
 {
     glfwSetErrorCallback(glfwErrorReporting);
 
@@ -129,18 +129,18 @@ bool app::init()
     return true;
 }
 
-bool app::shouldClose() const
+bool App::shouldClose() const
 {
     return glfwWindowShouldClose(mWindow) != 0;
 }
 
-void app::resize(int width, int height)
+void App::resize(int width, int height)
 {
     mWinSize = glm::ivec2(width, height);
     glViewport(0, 0, mWinSize.x, mWinSize.y);
 }
 
-void app::mouse(glm::vec2 const& pos)
+void App::mouse(glm::vec2 const& pos)
 {
     float const xFloat = static_cast<GLfloat>(pos.x);
     float const yFloat = static_cast<GLfloat>(pos.y);
@@ -162,20 +162,20 @@ void app::mouse(glm::vec2 const& pos)
     yDiff *= sensitivity;
 }
 
-void app::scroll(float xDiff, float yDiff)
+void App::scroll(float xDiff, float yDiff)
 {
     //sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
 }
 
-void app::touchDown(int button)
+void App::touchDown(int button)
 {
 }
 
-void app::touchUp(int button)
+void App::touchUp(int button)
 {
 }
 
-void app::keyDown(int key)
+void App::keyDown(int key)
 {
     if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(mWindow, GL_TRUE);
@@ -186,21 +186,25 @@ void app::keyDown(int key)
     }
 }
 
-void app::keyUp(int key)
+void App::keyUp(int key)
 {
 }
 
-bool app::isPressed(int key)
+bool App::isPressed(int key)
 {
     return mKeys[key];
 }
 
-void app::onGLFWError(int errCode, char const* msg)
+void App::onGLFWError(int errCode, char const* msg)
 {
     std::cerr << "ERROR " << errCode << ": " << msg << std::endl;
 }
 
-void app::runFragmentDemo(std::string const& demoName)
+void App::run()
+{
+}
+
+void App::runFragmentDemo(std::string const& demoName)
 {
     glm::vec3 quad[] = {
         glm::vec3(-1.0f, -1.0f, 0.0f),
@@ -226,11 +230,11 @@ void app::runFragmentDemo(std::string const& demoName)
     }
 
 
-    program prog;
+    Program prog;
     CHECK(prog.create(), prog.lastError(), return;);
 
     // Shaders
-    shader vertexShader, fragShader;
+    Shader vertexShader, fragShader;
     CHECK(vertexShader.compile(readAllText("shaders/fragment_demo.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
     CHECK(fragShader.compile(readAllText("shaders/" + demoName + ".frag"), GL_FRAGMENT_SHADER,
         IncludeCommonCode::Yes), fragShader.lastError(), return;);
@@ -276,7 +280,7 @@ void app::runFragmentDemo(std::string const& demoName)
 }
 
 
-app& App()
+App& APP()
 {
-    return app::inst();
+    return App::inst();
 }

@@ -3,13 +3,13 @@
 #include "uniform.h"
 
 
-struct program
+struct Program
 {
-    program();
-    ~program();
+    Program();
+    ~Program();
 
     bool create();
-    void attach(shader const& sh);
+    void attach(Shader const& sh);
     bool link();
     void use() const;
 
@@ -19,8 +19,8 @@ struct program
 
     operator GLenum() const;
 
-    uniform operator[](std::string const& uniName) const;
-    uniform operator[](char const* uniName) const;
+    Uniform operator[](std::string const& uniName) const;
+    Uniform operator[](char const* uniName) const;
 
 private:
     GLenum mProg;

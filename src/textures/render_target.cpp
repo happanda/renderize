@@ -1,21 +1,21 @@
 #include "render_target.h"
 
 
-render_target::render_target()
+RenderTarget::RenderTarget()
     : mFBufid(0)
     , mTex(0)
     , mDepthBuf(0)
 {
 }
 
-render_target::~render_target()
+RenderTarget::~RenderTarget()
 {
     glDeleteRenderbuffers(1, &mDepthBuf);
     glDeleteTextures(1, &mTex);
     glDeleteFramebuffers(1, &mFBufid);
 }
 
-bool render_target::create(GLsizei width, GLsizei height)
+bool RenderTarget::create(GLsizei width, GLsizei height)
 {
     glGenFramebuffers(1, &mFBufid);
     glBindFramebuffer(GL_FRAMEBUFFER, mFBufid);
@@ -40,32 +40,32 @@ bool render_target::create(GLsizei width, GLsizei height)
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
-render_target::operator GLuint() const
+RenderTarget::operator GLuint() const
 {
     return mFBufid;
 }
 
-void render_target::bind() const
+void RenderTarget::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, mFBufid);
 }
 
-void render_target::unbind() const
+void RenderTarget::unbind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void render_target::bindTex() const
+void RenderTarget::bindTex() const
 {
     glBindTexture(GL_TEXTURE_2D, mTex);
 }
 
-void render_target::unbindTex() const
+void RenderTarget::unbindTex() const
 {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void render_target::activeTex(GLenum textureSlot) const
+void RenderTarget::activeTex(GLenum textureSlot) const
 {
     glActiveTexture(textureSlot);
     bindTex();

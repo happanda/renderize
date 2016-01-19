@@ -12,10 +12,10 @@ enum class IncludeCommonCode
 };
 
 
-struct shader
+struct Shader
 {
-    shader();
-    ~shader();
+    Shader();
+    ~Shader();
 
     bool compile(GLstring const& code, GLenum type, IncludeCommonCode inc = IncludeCommonCode::No);
 

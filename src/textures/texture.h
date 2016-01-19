@@ -3,10 +3,10 @@
 #include <GL/glew.h>
 
 
-struct texture
+struct Texture
 {
-    texture();
-    ~texture();
+    Texture();
+    ~Texture();
 
     bool load(std::string const& path, bool genMipMap);
     void setFilter(GLenum filter, GLint type);

@@ -7,11 +7,11 @@
 #include <glm/vec3.hpp>
 
 
-struct program;
+struct Program;
 
-struct uniform
+struct Uniform
 {
-    uniform(program const& prog, std::string const& name);
+    Uniform(Program const& prog, std::string const& name);
 
     operator GLint() const;
 

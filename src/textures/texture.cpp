@@ -2,17 +2,17 @@
 #include <SOIL.h>
 
 
-texture::texture()
+Texture::Texture()
     : mTex(0)
 {
 }
 
-texture::~texture()
+Texture::~Texture()
 {
     glDeleteTextures(1, &mTex);
 }
 
-bool texture::load(std::string const& path, bool genMipMap)
+bool Texture::load(std::string const& path, bool genMipMap)
 {
     glGenTextures(1, &mTex);
     bind();
@@ -38,7 +38,7 @@ bool texture::load(std::string const& path, bool genMipMap)
     return true;
 }
 
-void texture::setFilter(GLenum filter, GLint type)
+void Texture::setFilter(GLenum filter, GLint type)
 {
     if (!mTex)
         return;
@@ -48,7 +48,7 @@ void texture::setFilter(GLenum filter, GLint type)
 }
 
 
-void texture::setWrap(GLenum axis, GLint type)
+void Texture::setWrap(GLenum axis, GLint type)
 {
     if (!mTex)
         return;
@@ -57,22 +57,22 @@ void texture::setWrap(GLenum axis, GLint type)
     unbind();
 }
 
-texture::operator GLuint() const
+Texture::operator GLuint() const
 {
     return mTex;
 }
 
-void texture::bind() const
+void Texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, mTex);
 }
 
-void texture::unbind() const
+void Texture::unbind() const
 {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void texture::active(GLenum textureSlot) const
+void Texture::active(GLenum textureSlot) const
 {
     glActiveTexture(textureSlot);
     bind();

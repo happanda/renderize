@@ -59,9 +59,9 @@ include_directories(${ATBPath}/include)
 target_link_libraries(Renderize ${ATBPath}/lib/AntTweakBar.lib)
 
 ### ASSIMP ###
-#set(AssimpPath ${ExtPath}/assimp-3.1.1)
-#include_directories(${AssimpPath}/include)
-#target_link_libraries(Renderize ${AssimpPath}/lib/assimp.lib)
+set(AssimpPath ${ExtPath}/assimp-3.1.1)
+include_directories(${AssimpPath}/include)
+target_link_libraries(Renderize ${AssimpPath}/lib/assimp.lib)
 
 
 
@@ -81,6 +81,11 @@ add_dependencies(Renderize CopyShaderFiles)
 
 add_custom_target(CopyDlls)
 foreach(DllFile ${ATBPath}/lib/AntTweakBar.dll)
+    get_filename_component(DllFileName ${DllFile} NAME)
+    add_custom_command(TARGET CopyDlls PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${DllFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DllFileName})
+endforeach()
+foreach(DllFile ${AssimpPath}/lib/assimp.dll)
     get_filename_component(DllFileName ${DllFile} NAME)
     add_custom_command(TARGET CopyDlls PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${DllFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DllFileName})
