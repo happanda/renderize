@@ -4,6 +4,7 @@
 
 Texture::Texture()
     : mTex(0)
+    , mType(TexType::Normal)
 {
 }
 
@@ -38,6 +39,11 @@ bool Texture::load(std::string const& path, bool genMipMap)
     return true;
 }
 
+void Texture::setType(TexType type)
+{
+    mType = type;
+}
+
 void Texture::setFilter(GLenum filter, GLint type)
 {
     if (!mTex)
@@ -60,6 +66,11 @@ void Texture::setWrap(GLenum axis, GLint type)
 Texture::operator GLuint() const
 {
     return mTex;
+}
+
+TexType Texture::type() const
+{
+    return mType;
 }
 
 void Texture::bind() const
