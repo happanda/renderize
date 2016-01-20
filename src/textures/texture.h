@@ -14,7 +14,7 @@ struct Texture
     Texture();
     ~Texture();
 
-    bool load(std::string const& path, bool genMipMap);
+    bool load(std::string const& path, bool genMipMap = true);
     void setType(TexType type);
     void setFilter(GLenum filter, GLint type);
     void setWrap(GLenum axis, GLint type);
