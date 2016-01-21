@@ -273,6 +273,28 @@ void App::run()
         prog["projection"] = mCamera.projection();
         prog["viewerPos"] = mCamera.pos();
 
+        prog["dirLight.direction"] = dirLight.direction;
+        prog["dirLight.ambient"] = dirLight.ambient;
+        prog["dirLight.diffuse"] = dirLight.diffuse;
+        prog["dirLight.specular"] = dirLight.specular;
+        prog["pLight.position"] = pLight.position;
+        prog["pLight.ambient"] = pLight.ambient;
+        prog["pLight.diffuse"] = pLight.diffuse;
+        prog["pLight.specular"] = pLight.specular;
+        prog["pLight.constCoeff"] = pLight.constCoeff;
+        prog["pLight.linCoeff"] = pLight.linCoeff;
+        prog["pLight.quadCoeff"] = pLight.quadCoeff;
+        prog["spLight.position"] = sLight.position;
+        prog["spLight.direction"] = sLight.direction;
+        prog["spLight.ambient"] = sLight.ambient;
+        prog["spLight.diffuse"] = sLight.diffuse;
+        prog["spLight.specular"] = sLight.specular;
+        prog["spLight.constCoeff"] = sLight.constCoeff;
+        prog["spLight.linCoeff"] = sLight.linCoeff;
+        prog["spLight.quadCoeff"] = sLight.quadCoeff;
+        prog["spLight.cutOff"] = glm::cos(sLight.cutOff);
+        prog["spLight.outerCutOff"] = glm::cos(sLight.outerCutOff);
+
         glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
         prog["iResolution"] = glm::vec3(mWinSize, 0.0);
         prog["iGlobalTime"] = curTime;

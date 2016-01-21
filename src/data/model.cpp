@@ -53,7 +53,7 @@ void Mesh::draw(Program const& prog) const
     {
         glActiveTexture(GL_TEXTURE0 + i);
 
-        std::string paramName = "mat.";
+        std::string paramName = "material.";
         switch (mTextures[i].type())
         {
         case TexType::Normal:
