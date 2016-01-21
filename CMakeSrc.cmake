@@ -38,6 +38,7 @@ ${SourcePath}/textures/texture.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
+${SourcePath}/shaders_src/anaglyph.frag
 ${SourcePath}/shaders_src/clock.frag
 ${SourcePath}/shaders_src/common.frag
 ${SourcePath}/shaders_src/complex.frag

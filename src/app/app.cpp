@@ -7,6 +7,8 @@
 #include <glm/vec3.hpp>
 
 #include "app.h"
+#include "data/light.h"
+#include "data/model.h"
 #include "shaders/program.h"
 #include "util/checked_call.h"
 #include "util/date.h"
@@ -80,6 +82,7 @@ App::App()
     : mWinSize(800, 800)
     , mWindow(nullptr)
     , mKeys(GLFW_KEY_LAST, false)
+    , mCamera(mWinSize.x, mWinSize.y)
 {
 }
 
@@ -160,11 +163,14 @@ void App::mouse(glm::vec2 const& pos)
     GLfloat const sensitivity = 0.08f;
     xDiff *= sensitivity;
     yDiff *= sensitivity;
+
+    mYaw += xDiff;
+    mPitch = glm::clamp(mPitch - yDiff, -89.0f, 89.0f);
 }
 
 void App::scroll(float xDiff, float yDiff)
 {
-    //sCamera.fov(sCamera.fov() - static_cast<float>(yDiff));
+    mCamera.fov(mCamera.fov() - static_cast<float>(yDiff));
 }
 
 void App::touchDown(int button)
@@ -202,6 +208,84 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
+    DirLight dirLight{
+        { 1.0f, 1.0f, -0.3f },
+        { 0.1f, 0.1f, 0.1f },
+        { 0.8f, 0.8f, 0.8f },
+        { 0.4f, 0.4f, 0.4f },
+    };
+    PointLight pLight
+    {
+        { -1.0f, -1.0f, 0.0f },
+        { 0.1f, 0.1f, 0.1f },
+        { 0.3f, 0.02f, 0.02f },
+        { 0.5f, 0.1f, 0.1f },
+        1.0f, 0.09f, 0.05f
+    };
+    SpotLight sLight;
+    sLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+    sLight.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    sLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    sLight.constCoeff = pLight.constCoeff;
+    sLight.linCoeff = pLight.linCoeff;
+    sLight.quadCoeff = pLight.quadCoeff;
+    sLight.cutOff = 0.05f;
+    sLight.outerCutOff = 0.2f;
+
+
+    Program prog;
+    CHECK(prog.create(), prog.lastError(), return;);
+
+    // Shaders
+    Shader vertexShader, fragShader;
+    CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
+    CHECK(fragShader.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER,
+        IncludeCommonCode::No), fragShader.lastError(), return;);
+
+    prog.attach(vertexShader);
+    prog.attach(fragShader);
+    CHECK(prog.link(), prog.lastError(), return;);
+
+    Model model("nanosuit/nanosuit.obj");
+
+    float lastTime = static_cast<float>(glfwGetTime());
+    float dt{ 0.0f };
+    float const dT{ 0.0125f };
+    // Game Loop
+    while (!glfwWindowShouldClose(mWindow))
+    {
+        glfwPollEvents();
+
+        float const curTime = static_cast<float>(glfwGetTime());
+        dt = curTime - lastTime;
+        if (dt < dT)
+            continue;
+        lastTime = curTime;
+
+        moveCamera(dt);
+
+        sLight.position = mCamera.pos();
+        sLight.direction = mCamera.front();
+
+        prog.use();
+        prog["model"] = glm::mat4();
+        prog["view"] = mCamera.view();
+        prog["projection"] = mCamera.projection();
+        prog["viewerPos"] = mCamera.pos();
+
+        glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
+        prog["iResolution"] = glm::vec3(mWinSize, 0.0);
+        prog["iGlobalTime"] = curTime;
+        prog["iDate"] = iDate;
+
+        // Rendering
+        glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        model.draw(prog);
+
+        glfwSwapBuffers(mWindow);
+    }
 }
 
 void App::runFragmentDemo(std::string const& demoName)
@@ -277,6 +361,26 @@ void App::runFragmentDemo(std::string const& demoName)
 
         glfwSwapBuffers(mWindow);
     }
+}
+
+void App::moveCamera(float dt)
+{
+    GLfloat cameraSpeed = 5.0f * dt;
+    auto camPos = mCamera.pos();
+    if (mKeys[GLFW_KEY_W])
+        camPos += cameraSpeed * mCamera.front();
+    if (mKeys[GLFW_KEY_S])
+        camPos -= cameraSpeed * mCamera.front();
+    if (mKeys[GLFW_KEY_A])
+        camPos -= glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
+    if (mKeys[GLFW_KEY_D])
+        camPos += glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
+    if (mKeys[GLFW_KEY_SPACE])
+        camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
+    if (mKeys[GLFW_KEY_LEFT_SHIFT] || mKeys[GLFW_KEY_RIGHT_SHIFT])
+        camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
+    mCamera.pos(camPos);
+    mCamera.front(mPitch, mYaw);
 }
 
 

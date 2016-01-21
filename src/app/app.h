@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/vec2.hpp>
+#include "camera/camera.h"
 
 struct GLFWwindow;
 
@@ -31,12 +32,17 @@ struct App
 
 private:
     App();
+    void moveCamera(float dt);
 
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
     std::vector<bool> mKeys;
     bool mMouseVisible{ false };
     glm::vec2 mMPos;
+
+    float mYaw{ 0.0f };
+    float mPitch{ 0.0f };
+    Camera mCamera;
 };
 
 
