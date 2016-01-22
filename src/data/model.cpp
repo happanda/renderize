@@ -45,15 +45,12 @@ void Mesh::initMesh()
 
 void Mesh::draw(Program const& prog) const
 {
-    GLuint normTexN = 0;
-    GLuint diffTexN = 0;
-    GLuint specTexN = 0;
+    GLuint normTexN = 1;
+    GLuint diffTexN = 1;
+    GLuint specTexN = 1;
 
     for (GLint i = 0; i < mTextures.size(); ++i)
     {
-        //glActiveTexture(GL_TEXTURE0 + i);
-        mTextures[i].active(GL_TEXTURE0 + i);
-
         std::string paramName = "material.";
         switch (mTextures[i].type())
         {
@@ -67,10 +64,8 @@ void Mesh::draw(Program const& prog) const
             paramName.append("texSpec" + std::to_string(specTexN++));
             break;
         }
-
         prog[paramName] = i;
-        //glBindTexture(GL_TEXTURE_2D, mTextures[i]);
-        mTextures[i].bind();
+        mTextures[i].active(GL_TEXTURE0 + i);
     }
 
     glBindVertexArray(mVAO);
@@ -210,5 +205,3 @@ void Model::draw(Program const& prog) const
     for (auto const& mesh : mMeshes)
         mesh.draw(prog);
 }
-
-

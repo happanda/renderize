@@ -119,8 +119,8 @@ bool App::init()
 
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
     //glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_SRC_COLOR);
 
     // Initialize some GLFW callbacks
@@ -276,7 +276,7 @@ void App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         prog.use();
-        prog["model"] = glm::scale(glm::mat4(), glm::vec3(0.2f));
+        prog["model"] = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.2f)), glm::vec3(0.0f, -8.0f, 0.0f));
         prog["view"] = mCamera.view();
         prog["projection"] = mCamera.projection();
         prog["viewerPos"] = mCamera.pos();
