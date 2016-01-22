@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec3.hpp>
 
 #include "app.h"
@@ -27,7 +28,7 @@ namespace
     {
         if (action == GLFW_PRESS)
             APP().keyDown(key);
-        else
+        else if (action == GLFW_RELEASE)
             APP().keyUp(key);
     }
 
@@ -84,6 +85,7 @@ App::App()
     , mKeys(GLFW_KEY_LAST, false)
     , mCamera(mWinSize.x, mWinSize.y)
 {
+    mCamera.far(120.0f);
 }
 
 App::~App()
@@ -183,6 +185,7 @@ void App::touchUp(int button)
 
 void App::keyDown(int key)
 {
+    mKeys[key] = true;
     if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(mWindow, GL_TRUE);
     else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT)
@@ -194,6 +197,7 @@ void App::keyDown(int key)
 
 void App::keyUp(int key)
 {
+    mKeys[key] = false;
 }
 
 bool App::isPressed(int key)
@@ -267,8 +271,12 @@ void App::run()
         sLight.position = mCamera.pos();
         sLight.direction = mCamera.front();
 
+        // Rendering
+        glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         prog.use();
-        prog["model"] = glm::mat4();
+        prog["model"] = glm::scale(glm::mat4(), glm::vec3(0.2f));
         prog["view"] = mCamera.view();
         prog["projection"] = mCamera.projection();
         prog["viewerPos"] = mCamera.pos();
@@ -295,14 +303,10 @@ void App::run()
         prog["spLight.cutOff"] = glm::cos(sLight.cutOff);
         prog["spLight.outerCutOff"] = glm::cos(sLight.outerCutOff);
 
-        glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
-        prog["iResolution"] = glm::vec3(mWinSize, 0.0);
-        prog["iGlobalTime"] = curTime;
-        prog["iDate"] = iDate;
-
-        // Rendering
-        glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
+        //prog["iResolution"] = glm::vec3(mWinSize, 0.0);
+        //prog["iGlobalTime"] = curTime;
+        //prog["iDate"] = iDate;
 
         model.draw(prog);
 
@@ -389,17 +393,17 @@ void App::moveCamera(float dt)
 {
     GLfloat cameraSpeed = 5.0f * dt;
     auto camPos = mCamera.pos();
-    if (mKeys[GLFW_KEY_W])
+    if (isPressed(GLFW_KEY_W))
         camPos += cameraSpeed * mCamera.front();
-    if (mKeys[GLFW_KEY_S])
+    if (isPressed(GLFW_KEY_S))
         camPos -= cameraSpeed * mCamera.front();
-    if (mKeys[GLFW_KEY_A])
+    if (isPressed(GLFW_KEY_A))
         camPos -= glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (mKeys[GLFW_KEY_D])
+    if (isPressed(GLFW_KEY_D))
         camPos += glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (mKeys[GLFW_KEY_SPACE])
+    if (isPressed(GLFW_KEY_SPACE))
         camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    if (mKeys[GLFW_KEY_LEFT_SHIFT] || mKeys[GLFW_KEY_RIGHT_SHIFT])
+    if (isPressed(GLFW_KEY_LEFT_SHIFT) || isPressed(GLFW_KEY_RIGHT_SHIFT))
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     mCamera.pos(camPos);
     mCamera.front(mPitch, mYaw);

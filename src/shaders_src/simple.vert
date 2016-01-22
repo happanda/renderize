@@ -11,15 +11,11 @@ uniform mat4 projection;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
-out vec4 ColFromPos;
 
 void main()
 {
-    vec4 mPos = model * vec4(position, 1.0);
-    vec4 vPos = view * mPos;
-    gl_Position = projection * vPos;
+    gl_Position = projection * view * model * vec4(position, 1.0);
     Normal = mat3(model) * normal;
     FragPos = (model * vec4(position, 1.0)).xyz;
     TexCoords = texCoords;
-    ColFromPos = vec4(abs(normalize(1.0 - position)), 1.0);
 }

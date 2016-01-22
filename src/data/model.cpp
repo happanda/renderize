@@ -45,13 +45,14 @@ void Mesh::initMesh()
 
 void Mesh::draw(Program const& prog) const
 {
-    GLuint normTexN = 1;
-    GLuint diffTexN = 1;
-    GLuint specTexN = 1;
+    GLuint normTexN = 0;
+    GLuint diffTexN = 0;
+    GLuint specTexN = 0;
 
-    for (GLuint i = 0; i < mTextures.size(); ++i)
+    for (GLint i = 0; i < mTextures.size(); ++i)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
+        //glActiveTexture(GL_TEXTURE0 + i);
+        mTextures[i].active(GL_TEXTURE0 + i);
 
         std::string paramName = "material.";
         switch (mTextures[i].type())
@@ -68,12 +69,19 @@ void Mesh::draw(Program const& prog) const
         }
 
         prog[paramName] = i;
-        glBindTexture(GL_TEXTURE_2D, mTextures[i]);
+        //glBindTexture(GL_TEXTURE_2D, mTextures[i]);
+        mTextures[i].bind();
     }
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
+    for (GLint i = 0; i < mTextures.size(); ++i)
+    {
+        mTextures[i].active(GL_TEXTURE0 + i);
+        mTextures[i].unbind();
+    }
 }
 
 Mesh::Mesh(Mesh&& rhs)
@@ -147,8 +155,8 @@ Mesh Model::processMesh(aiMesh* mesh, aiScene const* scene)
         vertex.normal.z = mesh->mNormals[i].z;
         if (mesh->mTextureCoords[0])
         {
-            vertex.texCoords.x = mesh->mTextureCoords[0]->x;
-            vertex.texCoords.y = mesh->mTextureCoords[0]->y;
+            vertex.texCoords.x = mesh->mTextureCoords[0][i].x;
+            vertex.texCoords.y = mesh->mTextureCoords[0][i].y;
         }
         vertices.emplace_back(vertex);
     }
@@ -188,7 +196,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         else
         {
             Texture tex;
-            tex.load(mDir + texPath);
+            tex.load(mDir + "/" + texPath);
             tex.setType(type);
             mLoadedTextures[texPath] = tex;
             textures.push_back(tex);

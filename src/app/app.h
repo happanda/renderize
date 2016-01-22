@@ -37,7 +37,7 @@ private:
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
     std::vector<bool> mKeys;
-    bool mMouseVisible{ false };
+    bool mMouseVisible{ true };
     glm::vec2 mMPos;
 
     float mYaw{ 0.0f };
