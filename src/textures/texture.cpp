@@ -88,3 +88,9 @@ void Texture::active(GLenum textureSlot) const
     glActiveTexture(textureSlot);
     bind();
 }
+
+void Texture::unactive(GLenum textureSlot) const
+{
+    glActiveTexture(textureSlot);
+    unbind();
+}

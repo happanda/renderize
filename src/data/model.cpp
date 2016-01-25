@@ -9,7 +9,7 @@
 #include "shaders/program.h"
 
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures)
     : mVertices(std::move(vertices))
     , mIndices(std::move(indices))
     , mTextures(std::move(textures))
@@ -49,10 +49,11 @@ void Mesh::draw(Program const& prog) const
     GLuint diffTexN = 1;
     GLuint specTexN = 1;
 
+    //prog.use();
     for (GLint i = 0; i < mTextures.size(); ++i)
     {
         std::string paramName = "material.";
-        switch (mTextures[i].type())
+        switch (mTextures[i]->type())
         {
         case TexType::Normal:
             paramName.append("texNorm" + std::to_string(normTexN++));
@@ -65,7 +66,7 @@ void Mesh::draw(Program const& prog) const
             break;
         }
         prog[paramName] = i;
-        mTextures[i].active(GL_TEXTURE0 + i);
+        mTextures[i]->active(GL_TEXTURE0 + i);
     }
 
     glBindVertexArray(mVAO);
@@ -74,8 +75,7 @@ void Mesh::draw(Program const& prog) const
 
     for (GLint i = 0; i < mTextures.size(); ++i)
     {
-        mTextures[i].active(GL_TEXTURE0 + i);
-        mTextures[i].unbind();
+        mTextures[i]->unactive(GL_TEXTURE0 + i);
     }
 }
 
@@ -138,7 +138,7 @@ Mesh Model::processMesh(aiMesh* mesh, aiScene const* scene)
 {
     std::vector<Vertex>  vertices;
     std::vector<GLuint>  indices;
-    std::vector<Texture> textures;
+    std::vector<TexturePtr> textures;
     for (GLuint i = 0; i < mesh->mNumVertices; ++i)
     {
         Vertex vertex;
@@ -166,19 +166,19 @@ Mesh Model::processMesh(aiMesh* mesh, aiScene const* scene)
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        std::vector<Texture> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TexType::Diffuse);
+        std::vector<TexturePtr> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TexType::Diffuse);
         textures.insert(textures.cend(), diffMaps.cbegin(), diffMaps.cend());
 
-        std::vector<Texture> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TexType::Specular);
+        std::vector<TexturePtr> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TexType::Specular);
         textures.insert(textures.cend(), specMaps.cbegin(), specMaps.cend());
     }
 
     return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType aiType, TexType type)
+std::vector<TexturePtr> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType aiType, TexType type)
 {
-    std::vector<Texture> textures;
+    std::vector<TexturePtr> textures;
     for (unsigned i = 0; i < mat->GetTextureCount(aiType); ++i)
     {
         aiString str;
@@ -190,9 +190,9 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
             textures.push_back(texIt->second);
         else
         {
-            Texture tex;
-            tex.load(mDir + "/" + texPath);
-            tex.setType(type);
+            TexturePtr tex(new Texture);
+            tex->load(mDir + "/" + texPath);
+            tex->setType(type);
             mLoadedTextures[texPath] = tex;
             textures.push_back(tex);
         }

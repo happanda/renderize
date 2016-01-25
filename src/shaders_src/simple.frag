@@ -58,16 +58,14 @@ void main()
 {
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
-    color = compDirLight(dirLight, normal, viewDir);
-        //+ compPointLight(pLight, normal, FragPos, viewDir)
-        //+ compSpotLight(spLight, normal, FragPos, viewDir);
+    color = compDirLight(dirLight, normal, viewDir)
+        + compPointLight(pLight, normal, FragPos, viewDir)
+        + compSpotLight(spLight, normal, FragPos, viewDir);
 }
 
 
 vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-    //return vec4(TexCoords.xyy, 1.0);
-    return vec4(vec3(texture(material.texDiff1, TexCoords)), 1.0);
     vec3 ambient = light.ambient * vec3(texture(material.texDiff1, TexCoords));
     
     vec3 lightDir = normalize(-light.direction);

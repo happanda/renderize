@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <GL/glew.h>
 
@@ -24,8 +25,14 @@ struct Texture
     void bind() const;
     void unbind() const;
     void active(GLenum textureSlot) const;
+    void unactive(GLenum textureSlot) const;
 
 private:
+    Texture(Texture const&);
+    Texture const& operator=(Texture const&);
+
     GLuint mTex;
     TexType mType;
 };
+
+typedef std::shared_ptr<Texture>  TexturePtr;

@@ -24,7 +24,7 @@ struct aiScene;
 
 struct Mesh
 {
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures);
     void draw(Program const& prog) const;
 
     Mesh(Mesh&& rhs);
@@ -37,7 +37,7 @@ private:
 
     std::vector<Vertex>  mVertices;
     std::vector<GLuint>  mIndices;
-    std::vector<Texture> mTextures;
+    std::vector<TexturePtr> mTextures;
 };
 
 
@@ -52,10 +52,10 @@ private:
     void processNode(aiNode* node, aiScene const* scene);
     Mesh processMesh(aiMesh* mesh, aiScene const* scene);
 
-    std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType aiType, TexType type);
+    std::vector<TexturePtr> loadMaterialTextures(aiMaterial* mat, aiTextureType aiType, TexType type);
 
     std::vector<Mesh> mMeshes;
     std::string mDir;
 
-    std::map<std::string, Texture> mLoadedTextures;
+    std::map<std::string, TexturePtr> mLoadedTextures;
 };
