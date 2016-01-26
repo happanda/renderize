@@ -51,6 +51,7 @@ ${SourcePath}/shaders_src/landscape.frag
 ${SourcePath}/shaders_src/mondria.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
+${SourcePath}/shaders_src/solid_color.frag
 ${SourcePath}/shaders_src/tex_noise.frag
 ${SourcePath}/shaders_src/universe.frag
 ${SourcePath}/shaders_src/visual.frag

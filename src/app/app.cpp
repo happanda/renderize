@@ -237,20 +237,29 @@ void App::run()
     sLight.outerCutOff = 0.2f;
 
 
-    Program prog;
+    Program prog, scProg;
     CHECK(prog.create(), prog.lastError(), return;);
+    CHECK(scProg.create(), prog.lastError(), return;);
 
     // Shaders
-    Shader vertexShader, fragShader;
+    Shader vertexShader, fragShader, solColShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
     CHECK(fragShader.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER,
         IncludeCommonCode::No), fragShader.lastError(), return;);
+    CHECK(solColShader.compile(readAllText("shaders/solid_color.frag"), GL_FRAGMENT_SHADER,
+        IncludeCommonCode::No), solColShader.lastError(), return;);
 
     prog.attach(vertexShader);
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return;);
 
+    scProg.attach(vertexShader);
+    scProg.attach(solColShader);
+    CHECK(scProg.link(), scProg.lastError(), return;);
+
     Model model("nanosuit/nanosuit.obj");
+
+    glEnable(GL_STENCIL_TEST);
 
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
@@ -273,10 +282,12 @@ void App::run()
 
         // Rendering
         glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         prog.use();
-        prog["model"] = glm::translate(glm::scale(glm::mat4(), glm::vec3(0.2f)), glm::vec3(0.0f, -8.0f, 0.0f));
+        auto scaleMat = glm::scale(glm::mat4(), glm::vec3(0.2f));
+        auto transVec = glm::vec3(0.0f, -8.0f, 0.0f);
+        prog["model"] = glm::translate(scaleMat, transVec);
         prog["view"] = mCamera.view();
         prog["projection"] = mCamera.projection();
         prog["viewerPos"] = mCamera.pos();
@@ -308,7 +319,25 @@ void App::run()
         //prog["iGlobalTime"] = curTime;
         //prog["iDate"] = iDate;
 
+        glEnable(GL_DEPTH_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
         model.draw(prog);
+
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        scProg.use();
+        scaleMat = glm::scale(glm::mat4(), glm::vec3(0.205f));
+        scProg["model"] = glm::translate(scaleMat, transVec);
+        scProg["view"] = mCamera.view();
+        scProg["projection"] = mCamera.projection();
+        scProg["uColor"] = glm::vec4(0.1f, 0.7f, 0.11f, 1.0f);
+        model.draw(scProg);
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
 
         glfwSwapBuffers(mWindow);
     }
