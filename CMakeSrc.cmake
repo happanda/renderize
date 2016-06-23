@@ -13,6 +13,8 @@ set(SOURCE_FILES_DATA
 ${SourcePath}/data/cube.h
 ${SourcePath}/data/cube.cpp
 ${SourcePath}/data/cycle.h
+${SourcePath}/data/light.h
+${SourcePath}/data/light.cpp
 ${SourcePath}/data/model.h
 ${SourcePath}/data/model.cpp
 ${SourcePath}/data/point.h

@@ -212,29 +212,30 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
-    DirLight dirLight{
-        { 1.0f, 1.0f, -0.3f },
-        { 0.1f, 0.1f, 0.1f },
-        { 0.8f, 0.8f, 0.8f },
-        { 0.4f, 0.4f, 0.4f },
-    };
-    PointLight pLight
-    {
-        { -1.0f, -1.0f, 0.0f },
-        { 0.1f, 0.1f, 0.1f },
-        { 0.3f, 0.02f, 0.02f },
-        { 0.5f, 0.1f, 0.1f },
-        1.0f, 0.09f, 0.05f
-    };
-    SpotLight sLight;
-    sLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-    sLight.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    sLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
-    sLight.constCoeff = pLight.constCoeff;
-    sLight.linCoeff = pLight.linCoeff;
-    sLight.quadCoeff = pLight.quadCoeff;
-    sLight.cutOff = 0.05f;
-    sLight.outerCutOff = 0.2f;
+    DirLight dirLight = DirLight()
+        .direction({ 1.0f, 1.0f, -0.3f })
+        .ambient({ 0.5f, 0.5f, 0.5f })
+        .diffuse({ 0.8f, 0.8f, 0.8f })
+        .specular({ 0.4f, 0.4f, 0.4f });
+
+    PointLight pLight = PointLight()
+        .position({ -1.0f, -1.0f, 0.0f })
+        .ambient({ 0.1f, 0.1f, 0.1f })
+        .diffuse({ 0.3f, 0.02f, 0.02f })
+        .specular({ 0.5f, 0.1f, 0.1f })
+        .constCoeff(1.0f)
+        .linCoeff(0.09f)
+        .quadCoeff(0.05f);
+
+    SpotLight sLight = SpotLight()
+        .ambient({ 0.1f, 0.1f, 0.1f })
+        .diffuse({ 0.5f, 0.5f, 0.5f })
+        .specular({ 0.5f, 0.5f, 0.5f })
+        .constCoeff(pLight.mConstCoeff)
+        .linCoeff(pLight.mLinCoeff)
+        .quadCoeff(pLight.mQuadCoeff)
+        .cutOff(0.05f)
+        .outerCutOff(0.2f);
 
 
     Program prog, scProg;
@@ -277,8 +278,8 @@ void App::run()
 
         moveCamera(dt);
 
-        sLight.position = mCamera.pos();
-        sLight.direction = mCamera.front();
+        sLight.position(mCamera.pos());
+        sLight.direction(mCamera.front());
 
         // Rendering
         glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
@@ -292,27 +293,27 @@ void App::run()
         prog["projection"] = mCamera.projection();
         prog["viewerPos"] = mCamera.pos();
 
-        prog["dirLight.direction"] = dirLight.direction;
-        prog["dirLight.ambient"] = dirLight.ambient;
-        prog["dirLight.diffuse"] = dirLight.diffuse;
-        prog["dirLight.specular"] = dirLight.specular;
-        prog["pLight.position"] = pLight.position;
-        prog["pLight.ambient"] = pLight.ambient;
-        prog["pLight.diffuse"] = pLight.diffuse;
-        prog["pLight.specular"] = pLight.specular;
-        prog["pLight.constCoeff"] = pLight.constCoeff;
-        prog["pLight.linCoeff"] = pLight.linCoeff;
-        prog["pLight.quadCoeff"] = pLight.quadCoeff;
-        prog["spLight.position"] = sLight.position;
-        prog["spLight.direction"] = sLight.direction;
-        prog["spLight.ambient"] = sLight.ambient;
-        prog["spLight.diffuse"] = sLight.diffuse;
-        prog["spLight.specular"] = sLight.specular;
-        prog["spLight.constCoeff"] = sLight.constCoeff;
-        prog["spLight.linCoeff"] = sLight.linCoeff;
-        prog["spLight.quadCoeff"] = sLight.quadCoeff;
-        prog["spLight.cutOff"] = glm::cos(sLight.cutOff);
-        prog["spLight.outerCutOff"] = glm::cos(sLight.outerCutOff);
+        prog["dirLight.direction"] = dirLight.mDirection;
+        prog["dirLight.ambient"] = dirLight.mAmbient;
+        prog["dirLight.diffuse"] = dirLight.mDiffuse;
+        prog["dirLight.specular"] = dirLight.mSpecular;
+        prog["pLight.position"] = pLight.mPosition;
+        prog["pLight.ambient"] = pLight.mAmbient;
+        prog["pLight.diffuse"] = pLight.mDiffuse;
+        prog["pLight.specular"] = pLight.mSpecular;
+        prog["pLight.constCoeff"] = pLight.mConstCoeff;
+        prog["pLight.linCoeff"] = pLight.mLinCoeff;
+        prog["pLight.quadCoeff"] = pLight.mQuadCoeff;
+        prog["spLight.position"] = sLight.mPosition;
+        prog["spLight.direction"] = sLight.mDirection;
+        prog["spLight.ambient"] = sLight.mAmbient;
+        prog["spLight.diffuse"] = sLight.mDiffuse;
+        prog["spLight.specular"] = sLight.mSpecular;
+        prog["spLight.constCoeff"] = sLight.mConstCoeff;
+        prog["spLight.linCoeff"] = sLight.mLinCoeff;
+        prog["spLight.quadCoeff"] = sLight.mQuadCoeff;
+        prog["spLight.cutOff"] = glm::cos(sLight.mCutOff);
+        prog["spLight.outerCutOff"] = glm::cos(sLight.mOuterCutOff);
 
         //glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
         //prog["iResolution"] = glm::vec3(mWinSize, 0.0);
