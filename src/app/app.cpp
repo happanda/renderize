@@ -8,6 +8,7 @@
 #include <glm/vec3.hpp>
 
 #include "app.h"
+#include "data/cube.h"
 #include "data/light.h"
 #include "data/model.h"
 #include "shaders/program.h"
@@ -214,7 +215,7 @@ void App::run()
 {
     DirLight dirLight = DirLight()
         .direction({ 1.0f, 1.0f, -0.3f })
-        .ambient({ 0.5f, 0.5f, 0.5f })
+        .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 0.8f, 0.8f, 0.8f })
         .specular({ 0.4f, 0.4f, 0.4f });
 
@@ -229,7 +230,7 @@ void App::run()
 
     SpotLight sLight = SpotLight()
         .ambient({ 0.1f, 0.1f, 0.1f })
-        .diffuse({ 0.5f, 0.5f, 0.5f })
+        .diffuse({ 0.1f, 0.9f, 0.1f })
         .specular({ 0.5f, 0.5f, 0.5f })
         .constCoeff(pLight.mConstCoeff)
         .linCoeff(pLight.mLinCoeff)
@@ -260,6 +261,15 @@ void App::run()
 
     Model model("nanosuit/nanosuit.obj");
 
+    std::vector<TexturePtr> crateTexs(2);
+    crateTexs[0].reset(new Texture);
+    crateTexs[1].reset(new Texture);
+    CHECK(crateTexs[0]->load("../tex/crate2.png", true), "Error loading crate texture", );
+    CHECK(crateTexs[1]->load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
+    crateTexs[0]->setType(TexType::Normal);
+    crateTexs[1]->setType(TexType::Specular);
+    Mesh cubemesh = cubeMesh(crateTexs);
+
     glEnable(GL_STENCIL_TEST);
 
     float lastTime = static_cast<float>(glfwGetTime());
@@ -286,8 +296,8 @@ void App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         prog.use();
-        auto scaleMat = glm::scale(glm::mat4(), glm::vec3(0.2f));
-        auto transVec = glm::vec3(0.0f, -8.0f, 0.0f);
+        auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
+        auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
         prog["model"] = glm::translate(scaleMat, transVec);
         prog["view"] = mCamera.view();
         prog["projection"] = mCamera.projection();
@@ -324,19 +334,22 @@ void App::run()
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
-        model.draw(prog);
+        //model.draw(prog);
+        cubemesh.draw(prog);
 
-
+        
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
         glDisable(GL_DEPTH_TEST);
         scProg.use();
-        scaleMat = glm::scale(glm::mat4(), glm::vec3(0.205f));
+        scaleMat = glm::scale(glm::mat4(), glm::vec3(1.05f));
         scProg["model"] = glm::translate(scaleMat, transVec);
         scProg["view"] = mCamera.view();
         scProg["projection"] = mCamera.projection();
         scProg["uColor"] = glm::vec4(0.1f, 0.7f, 0.11f, 1.0f);
-        model.draw(scProg);
+        //model.draw(scProg);
+        cubemesh.draw(prog);
+        
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
 

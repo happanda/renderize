@@ -1,105 +1,10 @@
-#include <iostream>
 #include <string>
 #include <assimp/Importer.hpp>
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
 #include "model.h"
 #include "shaders/program.h"
-
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures)
-    : mVertices(std::move(vertices))
-    , mIndices(std::move(indices))
-    , mTextures(std::move(textures))
-{
-    initMesh();
-}
-
-void Mesh::initMesh()
-{
-    glGenVertexArrays(1, &mVAO);
-    glGenBuffers(1, &mVBO);
-    glGenBuffers(1, &mEBO);
-
-    glBindVertexArray(mVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndices.size() * sizeof(GLuint), mIndices.data(), GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texCoords));
-
-    glBindVertexArray(0);
-}
-
-void Mesh::draw(Program const& prog) const
-{
-    GLuint normTexN = 1;
-    GLuint diffTexN = 1;
-    GLuint specTexN = 1;
-
-    //prog.use();
-    for (GLint i = 0; i < mTextures.size(); ++i)
-    {
-        std::string paramName = "material.";
-        switch (mTextures[i]->type())
-        {
-        case TexType::Normal:
-            paramName.append("texNorm" + std::to_string(normTexN++));
-            break;
-        case TexType::Diffuse:
-            paramName.append("texDiff" + std::to_string(diffTexN++));
-            break;
-        case TexType::Specular:
-            paramName.append("texSpec" + std::to_string(specTexN++));
-            break;
-        }
-        prog[paramName] = i;
-        mTextures[i]->active(GL_TEXTURE0 + i);
-    }
-
-    glBindVertexArray(mVAO);
-    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-
-    for (GLint i = 0; i < mTextures.size(); ++i)
-    {
-        mTextures[i]->unactive(GL_TEXTURE0 + i);
-    }
-}
-
-Mesh::Mesh(Mesh&& rhs)
-    : mVAO(rhs.mVAO)
-    , mVBO(rhs.mVBO)
-    , mEBO(rhs.mEBO)
-    , mVertices(std::move(rhs.mVertices))
-    , mIndices(std::move(rhs.mIndices))
-    , mTextures(std::move(rhs.mTextures))
-{
-}
-
-Mesh const& Mesh::operator=(Mesh&& rhs)
-{
-    mVAO = rhs.mVAO;
-    mVBO = rhs.mVBO;
-    mEBO = rhs.mEBO;
-    mVertices = std::move(rhs.mVertices);
-    mIndices = std::move(rhs.mIndices);
-    mTextures = std::move(rhs.mTextures);
-    return *this;
-}
-
 
 
 Model::Model(std::string const& path)
@@ -114,7 +19,7 @@ void Model::loadModel(std::string const& path)
     if (!scene || ((scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == AI_SCENE_FLAGS_INCOMPLETE)
         || !scene->mRootNode)
     {
-        std::cerr << "ERROR loading model with Assimp: " << importer.GetErrorString() << std::endl;
+        //std::cerr << "ERROR loading model with Assimp: " << importer.GetErrorString() << std::endl;
         return;
     }
     mDir = path.substr(0, path.find_last_of('/'));

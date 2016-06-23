@@ -90,3 +90,18 @@ std::vector<glm::vec3> getCube(float sideLen, size_t vertsOnSide)
 
     return cube;
 }
+
+Mesh cubeMesh(std::vector<TexturePtr> const& textures)
+{
+    std::vector<Vertex> vertices;
+    for (size_t i = 0; i < sNumVertices; i += 8)
+    {
+        Vertex vertex = {
+            { sVertices[i], sVertices[i + 1], sVertices[i + 2] },
+            { sVertices[i + 3], sVertices[i + 4], sVertices[i + 5] },
+            { sVertices[i + 6], sVertices[i + 7] }
+        };
+        vertices.emplace_back(vertex);
+    }
+    return Mesh(vertices, std::vector<GLuint>(), textures);
+}
