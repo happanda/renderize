@@ -11,6 +11,7 @@
 #include "data/cube.h"
 #include "data/light.h"
 #include "data/model.h"
+#include "data/quad.h"
 #include "shaders/program.h"
 #include "util/checked_call.h"
 #include "util/date.h"
@@ -259,8 +260,10 @@ void App::run()
     scProg.attach(solColShader);
     CHECK(scProg.link(), scProg.lastError(), return;);
 
+        /// NANOSUIT
     Model model("nanosuit/nanosuit.obj");
 
+        /// CUBE
     std::vector<TexturePtr> crateTexs(2);
     crateTexs[0].reset(new Texture);
     crateTexs[1].reset(new Texture);
@@ -269,6 +272,13 @@ void App::run()
     crateTexs[0]->setType(TexType::Normal);
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
+
+        /// QUAD
+    std::vector<TexturePtr> quadTexs(1);
+    quadTexs[0].reset(new Texture);
+    CHECK(quadTexs[0]->load("../tex/transparent_window.png", true), "Error loading crate texture", );
+    quadTexs[0]->setType(TexType::Normal);
+    Mesh quadmesh = quadMesh(quadTexs);
 
     glEnable(GL_STENCIL_TEST);
 
@@ -334,8 +344,11 @@ void App::run()
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
-        //model.draw(prog);
+        model.draw(prog);
         cubemesh.draw(prog);
+
+        prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 3.0f));
+        quadmesh.draw(prog);
 
         
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -347,7 +360,7 @@ void App::run()
         scProg["view"] = mCamera.view();
         scProg["projection"] = mCamera.projection();
         scProg["uColor"] = glm::vec4(0.1f, 0.7f, 0.11f, 1.0f);
-        //model.draw(scProg);
+        model.draw(scProg);
         cubemesh.draw(prog);
         
         glStencilMask(0xFF);

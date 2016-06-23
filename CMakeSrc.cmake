@@ -21,6 +21,8 @@ ${SourcePath}/data/model.h
 ${SourcePath}/data/model.cpp
 ${SourcePath}/data/point.h
 ${SourcePath}/data/point.cpp
+${SourcePath}/data/quad.h
+${SourcePath}/data/quad.cpp
 ${SourcePath}/data/triangle.h
 ${SourcePath}/data/triangle.cpp
 )
