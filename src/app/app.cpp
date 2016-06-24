@@ -121,9 +121,9 @@ bool App::init()
 
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_BLEND);
-    //glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_SRC_COLOR);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -341,16 +341,16 @@ void App::run()
         //prog["iDate"] = iDate;
 
         glEnable(GL_DEPTH_TEST);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        //glStencilMask(0xFF);
         model.draw(prog);
         cubemesh.draw(prog);
 
         prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 3.0f));
         quadmesh.draw(prog);
 
-        
+        /*
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
         glDisable(GL_DEPTH_TEST);
@@ -365,6 +365,7 @@ void App::run()
         
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
+        */
 
         glfwSwapBuffers(mWindow);
     }

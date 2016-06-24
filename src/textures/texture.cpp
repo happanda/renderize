@@ -19,14 +19,14 @@ bool Texture::load(std::string const& path, bool genMipMap)
 
     int texWidth = 0,
         texHeight = 0;
-    auto image = SOIL_load_image(path.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
+    auto image = SOIL_load_image(path.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGBA);
     if (!image)
     {
         glDeleteTextures(1, &mTex);
         return false;
     }
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
     if (genMipMap)
         glGenerateMipmap(GL_TEXTURE_2D);
 
