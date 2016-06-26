@@ -195,6 +195,10 @@ void App::keyDown(int key)
         mMouseVisible = !mMouseVisible;
         glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     }
+    else if (key == GLFW_KEY_F)
+    {
+        mSpotLightOn = !mSpotLightOn;
+    }
 }
 
 void App::keyUp(int key)
@@ -267,7 +271,7 @@ void App::run()
     std::vector<TexturePtr> crateTexs(2);
     crateTexs[0].reset(new Texture);
     crateTexs[1].reset(new Texture);
-    CHECK(crateTexs[0]->load("../tex/crate2.png", true), "Error loading crate texture", );
+    CHECK(crateTexs[0]->load("../tex/crate.png", true), "Error loading crate texture", );
     CHECK(crateTexs[1]->load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
     crateTexs[0]->setType(TexType::Normal);
     crateTexs[1]->setType(TexType::Specular);
@@ -335,6 +339,7 @@ void App::run()
         prog["spLight.cutOff"] = glm::cos(sLight.mCutOff);
         prog["spLight.outerCutOff"] = glm::cos(sLight.mOuterCutOff);
 
+        prog["SpotLightOn"] = mSpotLightOn;
         //glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
         //prog["iResolution"] = glm::vec3(mWinSize, 0.0);
         //prog["iGlobalTime"] = curTime;
@@ -347,6 +352,8 @@ void App::run()
         model.draw(prog);
         cubemesh.draw(prog);
 
+        prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 2.0f));
+        quadmesh.draw(prog);
         prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 3.0f));
         quadmesh.draw(prog);
 

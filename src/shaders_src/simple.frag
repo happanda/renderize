@@ -36,6 +36,7 @@ struct SpotLight
     float cutOff;
     float outerCutOff;
 };
+uniform bool SpotLightOn;
 
 
 in vec3 FragPos;
@@ -59,8 +60,9 @@ void main()
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
     color = compDirLight(dirLight, normal, viewDir)
-        + compPointLight(pLight, normal, FragPos, viewDir)
-        + compSpotLight(spLight, normal, FragPos, viewDir);
+        + compPointLight(pLight, normal, FragPos, viewDir);
+    if (SpotLightOn)
+        color += compSpotLight(spLight, normal, FragPos, viewDir);
 }
 
 
@@ -122,5 +124,5 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         return (ambient + diffuse + specular) * intens * attenuation;
     }
     else
-        return vec4(vec3(0.0f), 1.0f);
+        return vec4(vec3(0.0f), 0.0f);
 }

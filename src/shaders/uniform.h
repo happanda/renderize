@@ -21,6 +21,12 @@ struct Uniform
     void operator=(Real val);
 
     template<>
+    void operator=(bool val)
+    {
+        glUniform1i(mLoc, static_cast<GLint>(val));
+    }
+
+    template<>
     void operator=(float val)
     {
         glUniform1f(mLoc, val);
