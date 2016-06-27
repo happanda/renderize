@@ -45,6 +45,17 @@ void Mesh::blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, G
     mDfactorAlpha = dfactorAlpha;
 }
 
+void Mesh::noCulling()
+{
+    mCulling = false;
+}
+
+void Mesh::culling(GLenum mode)
+{
+    mCulling = true;
+    mCullMode = mode;
+}
+
 void Mesh::initMesh()
 {
     bool indexed = !mIndices.empty();
@@ -113,6 +124,14 @@ void Mesh::draw(Program const& prog) const
         else
             glBlendFuncSeparate(mSfactorRGB, mDfactorRGB, mSfactorAlpha, mDfactorAlpha);
     }
+
+    if (mCulling)
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(mCullMode);
+    }
+    else
+        glDisable(GL_CULL_FACE);
 
     glBindVertexArray(mVAO);
     if (mIndices.empty())

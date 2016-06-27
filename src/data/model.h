@@ -17,6 +17,9 @@ struct Model
     void blending(GLenum sfactor, GLenum dfactor);
     void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
+    void noCulling();
+    void culling(GLenum mode);
+
     void draw(Program const& prog) const;
 
 private:

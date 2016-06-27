@@ -124,6 +124,7 @@ bool App::init()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -269,6 +270,7 @@ void App::run()
         /// NANOSUIT
     Model model("nanosuit/nanosuit.obj");
     model.noBlending();
+    model.culling(GL_FRONT);
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -280,6 +282,7 @@ void App::run()
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
     cubemesh.noBlending();
+    model.culling(GL_FRONT);
 
         /// QUAD
     std::vector<TexturePtr> quadTexs(1);
@@ -288,6 +291,7 @@ void App::run()
     quadTexs[0]->setType(TexType::Normal);
     Mesh quadmesh = quadMesh(quadTexs);
     quadmesh.blending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    quadmesh.noCulling();
 
     glm::vec3 const quad1pos(0.0f, 0.0f, 2.0f);
     glm::vec3 const quad2pos(0.0f, 0.0f, 3.0f);
@@ -364,12 +368,9 @@ void App::run()
         //glStencilFunc(GL_ALWAYS, 1, 0xFF);
         //glStencilMask(0xFF);
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
         model.draw(prog);
         cubemesh.draw(prog);
 
-        glDisable(GL_CULL_FACE);
         meshSorter.sort(mCamera.pos());
         for (auto const& mesh : meshSorter.meshes())
         {

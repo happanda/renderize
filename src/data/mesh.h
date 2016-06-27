@@ -26,6 +26,9 @@ struct Mesh
     void blending(GLenum sfactor, GLenum dfactor);
     void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
+    void noCulling();
+    void culling(GLenum mode);
+
     void draw(Program const& prog) const;
     
     Mesh(Mesh&& rhs);
@@ -51,4 +54,7 @@ private:
     GLenum mDfactorRGB{ 0 };
     GLenum mSfactorAlpha{ 0 };
     GLenum mDfactorAlpha{ 0 };
+
+    bool mCulling{ false };
+    GLenum mCullMode{ 0 };
 };

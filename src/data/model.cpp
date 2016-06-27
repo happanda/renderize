@@ -30,6 +30,18 @@ void Model::blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, 
         mesh.blending(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
 }
 
+void Model::noCulling()
+{
+    for (auto& mesh : mMeshes)
+        mesh.noCulling();
+}
+
+void Model::culling(GLenum mode)
+{
+    for (auto& mesh : mMeshes)
+        mesh.culling(mode);
+}
+
 void Model::loadModel(std::string const& path)
 {
     Assimp::Importer importer;
