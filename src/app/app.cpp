@@ -122,6 +122,8 @@ bool App::init()
 
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -220,7 +222,7 @@ void App::run()
 
     DirLight dirLight = DirLight()
         .direction({ 1.0f, 1.0f, -0.3f })
-        .ambient({ 0.3f, 0.3f, 0.3f })
+        .ambient({ 0.4f, 0.4f, 0.4f })
         .diffuse({ 0.8f, 0.8f, 0.8f })
         .specular({ 0.4f, 0.4f, 0.4f });
 
@@ -362,9 +364,12 @@ void App::run()
         //glStencilFunc(GL_ALWAYS, 1, 0xFF);
         //glStencilMask(0xFF);
 
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         model.draw(prog);
         cubemesh.draw(prog);
 
+        glDisable(GL_CULL_FACE);
         meshSorter.sort(mCamera.pos());
         for (auto const& mesh : meshSorter.meshes())
         {

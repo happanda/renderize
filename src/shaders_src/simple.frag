@@ -59,8 +59,8 @@ void main()
 {
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
-    color = compDirLight(dirLight, normal, viewDir)
-        + compPointLight(pLight, normal, FragPos, viewDir);
+    color = compDirLight(dirLight, normal, viewDir);
+        //+ compPointLight(pLight, normal, FragPos, viewDir);
     if (SpotLightOn)
         color += compSpotLight(spLight, normal, FragPos, viewDir);
 }
