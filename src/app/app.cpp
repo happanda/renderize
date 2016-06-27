@@ -282,7 +282,7 @@ void App::run()
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
     cubemesh.noBlending();
-    model.culling(GL_FRONT);
+    cubemesh.culling(GL_FRONT);
 
         /// QUAD
     std::vector<TexturePtr> quadTexs(1);

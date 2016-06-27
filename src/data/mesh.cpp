@@ -129,6 +129,7 @@ void Mesh::draw(Program const& prog) const
     {
         glEnable(GL_CULL_FACE);
         glCullFace(mCullMode);
+        glFrontFace(GL_CCW);
     }
     else
         glDisable(GL_CULL_FACE);
