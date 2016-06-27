@@ -21,8 +21,13 @@ struct Mesh
 {
     Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures);
     ~Mesh();
-    void draw(Program const& prog) const;
 
+    void noBlending();
+    void blending(GLenum sfactor, GLenum dfactor);
+    void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+
+    void draw(Program const& prog) const;
+    
     Mesh(Mesh&& rhs);
     Mesh const& operator=(Mesh&& rhs);
 
@@ -34,4 +39,16 @@ private:
     std::vector<Vertex>  mVertices;
     std::vector<GLuint>  mIndices;
     std::vector<TexturePtr> mTextures;
+
+    enum class Blending : char
+    {
+        None,
+        Simple,
+        Separate
+    };
+    Blending mBlending{ Blending::None };
+    GLenum mSfactorRGB{ 0 };
+    GLenum mDfactorRGB{ 0 };
+    GLenum mSfactorAlpha{ 0 };
+    GLenum mDfactorAlpha{ 0 };
 };

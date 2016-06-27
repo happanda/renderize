@@ -24,6 +24,27 @@ Mesh::~Mesh()
         glDeleteVertexArrays(1, &mVAO);
 }
 
+void Mesh::noBlending()
+{
+    mBlending = Blending::None;
+}
+
+void Mesh::blending(GLenum sfactor, GLenum dfactor)
+{
+    mBlending = Blending::Simple;
+    mSfactorAlpha = sfactor;
+    mDfactorAlpha = dfactor;
+}
+
+void Mesh::blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
+{
+    mBlending = Blending::Separate;
+    mSfactorRGB = sfactorRGB;
+    mDfactorRGB = dfactorRGB;
+    mSfactorAlpha = sfactorAlpha;
+    mDfactorAlpha = dfactorAlpha;
+}
+
 void Mesh::initMesh()
 {
     bool indexed = !mIndices.empty();
@@ -80,6 +101,17 @@ void Mesh::draw(Program const& prog) const
         }
         prog[paramName] = i;
         mTextures[i]->active(GL_TEXTURE0 + i);
+    }
+
+    if (mBlending == Blending::None)
+        glDisable(GL_BLEND);
+    else
+    {
+        glEnable(GL_BLEND);
+        if (mBlending == Blending::Simple)
+            glBlendFunc(mSfactorAlpha, mDfactorAlpha);
+        else
+            glBlendFuncSeparate(mSfactorRGB, mDfactorRGB, mSfactorAlpha, mDfactorAlpha);
     }
 
     glBindVertexArray(mVAO);

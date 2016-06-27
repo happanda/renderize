@@ -10,6 +10,7 @@
 #include "app.h"
 #include "data/cube.h"
 #include "data/light.h"
+#include "data/mesh_sorter.h"
 #include "data/model.h"
 #include "data/quad.h"
 #include "shaders/program.h"
@@ -122,9 +123,6 @@ bool App::init()
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
     
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(mWindow, keyCallback);
@@ -218,6 +216,8 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
+    MeshSorter meshSorter;
+
     DirLight dirLight = DirLight()
         .direction({ 1.0f, 1.0f, -0.3f })
         .ambient({ 0.3f, 0.3f, 0.3f })
@@ -266,6 +266,7 @@ void App::run()
 
         /// NANOSUIT
     Model model("nanosuit/nanosuit.obj");
+    model.noBlending();
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -276,6 +277,7 @@ void App::run()
     crateTexs[0]->setType(TexType::Normal);
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
+    cubemesh.noBlending();
 
         /// QUAD
     std::vector<TexturePtr> quadTexs(1);
@@ -283,6 +285,16 @@ void App::run()
     CHECK(quadTexs[0]->load("../tex/transparent_window.png", true), "Error loading crate texture", );
     quadTexs[0]->setType(TexType::Normal);
     Mesh quadmesh = quadMesh(quadTexs);
+    quadmesh.blending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glm::vec3 const quad1pos(0.0f, 0.0f, 2.0f);
+    glm::vec3 const quad2pos(0.0f, 0.0f, 3.0f);
+    glm::vec3 const quad3pos(0.0f, 0.0f, -4.0f);
+    glm::vec3 const quad4pos(0.0f, 0.0f, -5.0f);
+    meshSorter.addMesh(quad1pos, &quadmesh);
+    meshSorter.addMesh(quad2pos, &quadmesh);
+    meshSorter.addMesh(quad3pos, &quadmesh);
+    meshSorter.addMesh(quad4pos, &quadmesh);
 
     glEnable(GL_STENCIL_TEST);
 
@@ -349,13 +361,16 @@ void App::run()
         //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         //glStencilFunc(GL_ALWAYS, 1, 0xFF);
         //glStencilMask(0xFF);
+
         model.draw(prog);
         cubemesh.draw(prog);
 
-        prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 2.0f));
-        quadmesh.draw(prog);
-        prog["model"] = glm::translate(scaleMat, glm::vec3(0.0f, 0.0f, 3.0f));
-        quadmesh.draw(prog);
+        meshSorter.sort(mCamera.pos());
+        for (auto const& mesh : meshSorter.meshes())
+        {
+            prog["model"] = glm::translate(scaleMat, mesh.first);
+            mesh.second->draw(prog);
+        }
 
         /*
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);

@@ -13,6 +13,10 @@ struct Model
 {
     Model(std::string const& path);
 
+    void noBlending();
+    void blending(GLenum sfactor, GLenum dfactor);
+    void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+
     void draw(Program const& prog) const;
 
 private:

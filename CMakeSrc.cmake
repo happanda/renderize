@@ -17,6 +17,8 @@ ${SourcePath}/data/light.h
 ${SourcePath}/data/light.cpp
 ${SourcePath}/data/mesh.h
 ${SourcePath}/data/mesh.cpp
+${SourcePath}/data/mesh_sorter.h
+${SourcePath}/data/mesh_sorter.cpp
 ${SourcePath}/data/model.h
 ${SourcePath}/data/model.cpp
 ${SourcePath}/data/point.h

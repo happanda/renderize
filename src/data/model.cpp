@@ -12,6 +12,24 @@ Model::Model(std::string const& path)
     loadModel(path);
 }
 
+void Model::noBlending()
+{
+    for (auto& mesh : mMeshes)
+        mesh.noBlending();
+}
+
+void Model::blending(GLenum sfactor, GLenum dfactor)
+{
+    for (auto& mesh : mMeshes)
+        mesh.blending(sfactor, dfactor);
+}
+
+void Model::blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
+{
+    for (auto& mesh : mMeshes)
+        mesh.blending(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+}
+
 void Model::loadModel(std::string const& path)
 {
     Assimp::Importer importer;
