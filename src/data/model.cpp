@@ -12,6 +12,21 @@ Model::Model(std::string const& path)
     loadModel(path);
 }
 
+Model::Model(Model&& rhs)
+    : mMeshes(std::move(rhs.mMeshes))
+    , mDir(std::move(rhs.mDir))
+    , mLoadedTextures(std::move(rhs.mLoadedTextures))
+{
+}
+
+Model const& Model::operator=(Model&& rhs)
+{
+    mMeshes = std::move(rhs.mMeshes);
+    mDir = std::move(rhs.mDir);
+    mLoadedTextures = std::move(rhs.mLoadedTextures);
+    return *this;
+}
+
 void Model::noBlending()
 {
     for (auto& mesh : mMeshes)

@@ -24,6 +24,29 @@ Mesh::~Mesh()
         glDeleteVertexArrays(1, &mVAO);
 }
 
+Mesh::Mesh(Mesh&& rhs)
+    : mVAO(rhs.mVAO)
+    , mVBO(rhs.mVBO)
+    , mEBO(rhs.mEBO)
+    , mVertices(std::move(rhs.mVertices))
+    , mIndices(std::move(rhs.mIndices))
+    , mTextures(std::move(rhs.mTextures))
+{
+    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
+}
+
+Mesh const& Mesh::operator=(Mesh&& rhs)
+{
+    mVAO = rhs.mVAO;
+    mVBO = rhs.mVBO;
+    mEBO = rhs.mEBO;
+    mVertices = std::move(rhs.mVertices);
+    mIndices = std::move(rhs.mIndices);
+    mTextures = std::move(rhs.mTextures);
+    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
+    return *this;
+}
+
 void Mesh::noBlending()
 {
     mBlending = Blending::None;
@@ -145,27 +168,4 @@ void Mesh::draw(Program const& prog) const
     {
         mTextures[i]->unactive(GL_TEXTURE0 + i);
     }
-}
-
-Mesh::Mesh(Mesh&& rhs)
-    : mVAO(rhs.mVAO)
-    , mVBO(rhs.mVBO)
-    , mEBO(rhs.mEBO)
-    , mVertices(std::move(rhs.mVertices))
-    , mIndices(std::move(rhs.mIndices))
-    , mTextures(std::move(rhs.mTextures))
-{
-    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
-}
-
-Mesh const& Mesh::operator=(Mesh&& rhs)
-{
-    mVAO = rhs.mVAO;
-    mVBO = rhs.mVBO;
-    mEBO = rhs.mEBO;
-    mVertices = std::move(rhs.mVertices);
-    mIndices = std::move(rhs.mIndices);
-    mTextures = std::move(rhs.mTextures);
-    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
-    return *this;
 }

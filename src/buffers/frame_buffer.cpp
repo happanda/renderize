@@ -2,7 +2,7 @@
 
 
 FrameBuffer::FrameBuffer()
-    : mFBufid(0)
+    : mFBO(0)
     , mTex(0)
     , mDepthBuf(0)
 {
@@ -10,22 +10,88 @@ FrameBuffer::FrameBuffer()
 
 FrameBuffer::~FrameBuffer()
 {
-    glDeleteRenderbuffers(1, &mDepthBuf);
-    glDeleteTextures(1, &mTex);
-    glDeleteFramebuffers(1, &mFBufid);
+    if (mDepthBuf)
+        glDeleteRenderbuffers(1, &mDepthBuf);
+    if (mTex)
+        glDeleteTextures(1, &mTex);
+    if (mFBO)
+        glDeleteFramebuffers(1, &mFBO);
+}
+
+FrameBuffer(FrameBuffer&& rhs)
+    : mFBO = rhs.mFBO
+    , mTex = rhs.mTex
+    , mDepthBuf = rhs.mDepthBuf
+{
+    rhs.mFBO = rhs.mTex = rhs.mDepthBuf = 0;
+}
+
+FrameBuffer const& operator=(FrameBuffer&& rhs)
+{
+    mFBO = rhs.mFBO;
+    mTex = rhs.mTex;
+    mDepthBuf = rhs.mDepthBuf;
+    rhs.mFBO = rhs.mTex = rhs.mDepthBuf = 0;
+}
+
+void FrameBuffer::attachColorTexture2D(GLsizei width, GLsizei height, GLenum target)
+{
+    glGenFramebuffers(1, &mFBO);
+    glBindFramebuffer(target, mFBO);
+
+    glGenTextures(1, &mTex);
+    glBindTexture(GL_TEXTURE_2D, mTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTex, 0);
+}
+
+void FrameBuffer::attachDepthTexture2D(GLsizei width, GLsizei height, GLenum target)
+{
+    glGenFramebuffers(1, &mFBO);
+    glBindFramebuffer(target, mFBO);
+
+    glGenTextures(1, &mTex);
+    glBindTexture(GL_TEXTURE_2D, mTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+    glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mTex, 0);
+}
+
+void FrameBuffer::attachColorRenderbuffer2D(GLsizei width, GLsizei height, GLenum target)
+{
+    glGenFramebuffers(1, &mFBO);
+    glBindFramebuffer(target, mFBO);
+
+    glGenTextures(1, &mTex);
+    glBindTexture(GL_TEXTURE_2D, mTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTex, 0);
+}
+
+void FrameBuffer::attachDepthRenderbuffer2D(GLsizei width, GLsizei height, GLenum target)
+{
+    glGenFramebuffers(1, &mFBO);
+    glBindFramebuffer(target, mFBO);
+
+    glGenTextures(1, &mTex);
+    glBindTexture(GL_TEXTURE_2D, mTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+    glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mTex, 0);
 }
 
 bool FrameBuffer::create(GLsizei width, GLsizei height)
 {
-    glGenFramebuffers(1, &mFBufid);
-    glBindFramebuffer(GL_FRAMEBUFFER, mFBufid);
+    glGenFramebuffers(1, &mFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 
     glGenTextures(1, &mTex);
     glBindTexture(GL_TEXTURE_2D, mTex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenRenderbuffers(1, &mDepthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, mDepthBuf);
@@ -40,14 +106,30 @@ bool FrameBuffer::create(GLsizei width, GLsizei height)
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
+bool FrameBuffer::isComplete() const
+{
+    bind();
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
 FrameBuffer::operator GLuint() const
 {
-    return mFBufid;
+    return mFBO;
 }
 
 void FrameBuffer::bind() const
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, mFBufid);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+}
+
+void FrameBuffer::bindRead() const
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
+}
+
+void FrameBuffer::bindWrite() const
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO);
 }
 
 void FrameBuffer::unbind() const

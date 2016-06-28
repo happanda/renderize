@@ -22,6 +22,11 @@ struct Mesh
     Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures);
     ~Mesh();
 
+    Mesh(Mesh&& rhs);
+    Mesh const& operator=(Mesh&& rhs);
+    Mesh(Mesh const&) = delete;
+    Mesh const& operator=(Mesh const&) = delete;
+
     void noBlending();
     void blending(GLenum sfactor, GLenum dfactor);
     void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
@@ -30,9 +35,6 @@ struct Mesh
     void culling(GLenum mode);
 
     void draw(Program const& prog) const;
-    
-    Mesh(Mesh&& rhs);
-    Mesh const& operator=(Mesh&& rhs);
 
 private:
     void initMesh();

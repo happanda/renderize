@@ -13,6 +13,11 @@ struct Model
 {
     Model(std::string const& path);
 
+    Model(Model&& rhs);
+    Model const& operator=(Model&& rhs);
+    Model(Model const&) = delete;
+    Model const& operator=(Model const&) = delete;
+
     void noBlending();
     void blending(GLenum sfactor, GLenum dfactor);
     void blending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
