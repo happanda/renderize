@@ -2,10 +2,10 @@
 #include <GL/glew.h>
 
 
-struct RenderTarget
+struct FrameBuffer
 {
-    RenderTarget();
-    ~RenderTarget();
+    FrameBuffer();
+    ~FrameBuffer();
 
     bool create(GLsizei width, GLsizei height);
 

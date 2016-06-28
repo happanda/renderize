@@ -222,7 +222,7 @@ void App::run()
     MeshSorter meshSorter;
 
     DirLight dirLight = DirLight()
-        .direction({ 1.0f, 1.0f, -0.3f })
+        .direction({ 1.0f, 1.0f, -1.0f })
         .ambient({ 0.4f, 0.4f, 0.4f })
         .diffuse({ 0.8f, 0.8f, 0.8f })
         .specular({ 0.4f, 0.4f, 0.4f });
@@ -270,19 +270,19 @@ void App::run()
         /// NANOSUIT
     Model model("nanosuit/nanosuit.obj");
     model.noBlending();
-    model.culling(GL_FRONT);
+    model.culling(GL_BACK);
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
     crateTexs[0].reset(new Texture);
     crateTexs[1].reset(new Texture);
-    CHECK(crateTexs[0]->load("../tex/crate.png", true), "Error loading crate texture", );
+    CHECK(crateTexs[0]->load("../tex/crate2.png", true), "Error loading crate texture", );
     CHECK(crateTexs[1]->load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
     crateTexs[0]->setType(TexType::Normal);
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
     cubemesh.noBlending();
-    cubemesh.culling(GL_FRONT);
+    cubemesh.culling(GL_BACK);
 
         /// QUAD
     std::vector<TexturePtr> quadTexs(1);

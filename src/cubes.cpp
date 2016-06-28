@@ -17,8 +17,8 @@
 #include "camera/camera.h"
 #include "data/cube.h"
 #include "shaders/program.h"
-#include "textures/render_target.h"
-#include "textures/texture.h"
+#include "buffers/frame_buffer.h"
+#include "buffers/texture.h"
 #include "util/checked_call.h"
 
 
@@ -293,7 +293,7 @@ int runCubes()
 
 
 
-    RenderTarget renderTex[2];
+    FrameBuffer renderTex[2];
     CHECK(renderTex[0].create(sWinWidth, sWinHeight), "Error creating render target 0", return -1;);
     CHECK(renderTex[1].create(sWinWidth, sWinHeight), "Error creating render target 1", return -1;);
 

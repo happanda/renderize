@@ -4,6 +4,13 @@ ${SourcePath}/app/app.h
 ${SourcePath}/app/app.cpp
 )
 
+set(SOURCE_FILES_BUFFERS
+${SourcePath}/buffers/frame_buffer.h
+${SourcePath}/buffers/frame_buffer.cpp
+${SourcePath}/buffers/texture.h
+${SourcePath}/buffers/texture.cpp
+)
+
 set(SOURCE_FILES_CAMERA
 ${SourcePath}/camera/camera.h
 ${SourcePath}/camera/camera.cpp
@@ -36,13 +43,6 @@ ${SourcePath}/shaders/shader.h
 ${SourcePath}/shaders/shader.cpp
 ${SourcePath}/shaders/uniform.h
 ${SourcePath}/shaders/uniform.cpp
-)
-
-set(SOURCE_FILES_TEXTURES
-${SourcePath}/textures/render_target.h
-${SourcePath}/textures/render_target.cpp
-${SourcePath}/textures/texture.h
-${SourcePath}/textures/texture.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
@@ -86,10 +86,10 @@ ${SourcePath}/main.cpp
 #source_group(glfw  FILES  ${SOURCE_FILES_GLFW})
 source_group(""  FILES  ${SOURCE_FILES})
 source_group(app FILES ${SOURCE_FILES_APP})
+source_group(buffers  FILES  ${SOURCE_FILES_BUFFERS})
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(data FILES ${SOURCE_FILES_DATA})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
-source_group(textures  FILES  ${SOURCE_FILES_TEXTURES})
 source_group(shaders_src  FILES  ${SOURCE_FILES_SHADERS_SOURCE})
 source_group(util  FILES  ${SOURCE_FILES_UTIL})
 set_source_files_properties(${SOURCE_FILES_SHADERS_SOURCE} PROPERTIES HEADER_FILE_ONLY TRUE)
@@ -99,10 +99,10 @@ set(SOURCE_FILES_ALL
 ${SOURCE_FILES}
 ${SOURCE_FILES_UTIL}
 ${SOURCE_FILES_APP}
+${SOURCE_FILES_BUFFERS}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_DATA}
 ${SOURCE_FILES_SHADERS}
-${SOURCE_FILES_TEXTURES}
 ${SOURCE_FILES_SHADERS_SOURCE}
 #${SOURCE_FILES_GLFW}
 )
