@@ -92,31 +92,7 @@ void Texture::genMipMap()
     glGenerateMipmap(GL_TEXTURE_2D);
     unbind();
 }
-/*
-bool Texture::load(std::string const& path, bool genMipMap)
-{
-    int texWidth = 0,
-        texHeight = 0;
-    auto image = SOIL_load_image(path.c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGBA);
-    if (!image)
-    {
-        glDeleteTextures(1, &mTex);
-        return false;
-    }
-    bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    if (genMipMap)
-        glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    unbind();
-    SOIL_free_image_data(image);
-    return true;
-}
-*/
 void Texture::setType(TexType type)
 {
     mType = type;

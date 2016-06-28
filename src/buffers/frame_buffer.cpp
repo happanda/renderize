@@ -53,7 +53,7 @@ FrameBuffer const& FrameBuffer::operator=(FrameBuffer&& rhs)
     rhs.mFBO = rhs.mColTex = rhs.mDepthTex = rhs.mStencilTex = rhs.mColBuf = rhs.mDepthBuf = rhs.mStencilBuf = 0;
     return *this;
 }
-
+/*
 void FrameBuffer::attachColorTexture2D(GLsizei width, GLsizei height, GLenum target)
 {
     glGenFramebuffers(1, &mFBO);
@@ -101,12 +101,12 @@ void FrameBuffer::attachDepthRenderbuffer2D(GLsizei width, GLsizei height, GLenu
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
     glFramebufferTexture2D(target, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mTex, 0);
 }
-
+*/
 bool FrameBuffer::create(GLsizei width, GLsizei height)
 {
     glGenFramebuffers(1, &mFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-
+    /*
     glGenTextures(1, &mTex);
     glBindTexture(GL_TEXTURE_2D, mTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -122,7 +122,7 @@ bool FrameBuffer::create(GLsizei width, GLsizei height)
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mTex, 0);
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, DrawBuffers);
-
+    */
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
@@ -159,7 +159,7 @@ void FrameBuffer::unbind() const
 
 void FrameBuffer::bindTex() const
 {
-    glBindTexture(GL_TEXTURE_2D, mTex);
+//    glBindTexture(GL_TEXTURE_2D, mTex);
 }
 
 void FrameBuffer::unbindTex() const

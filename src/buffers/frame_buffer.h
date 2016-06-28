@@ -12,10 +12,10 @@ struct FrameBuffer
     FrameBuffer(FrameBuffer const&) = delete;
     FrameBuffer const& operator=(FrameBuffer const&) = delete;
 
-    void attachColorTexture2D(GLsizei width, GLsizei height, GLenum target);
-    void attachDepthTexture2D(GLsizei width, GLsizei height, GLenum target);
-    void attachColorRenderbuffer2D(GLsizei width, GLsizei height, GLenum target);
-    void attachDepthRenderbuffer2D(GLsizei width, GLsizei height, GLenum target);
+    //void attachColorTexture2D(GLsizei width, GLsizei height, GLenum target);
+    //void attachDepthTexture2D(GLsizei width, GLsizei height, GLenum target);
+    //void attachColorRenderbuffer2D(GLsizei width, GLsizei height, GLenum target);
+    //void attachDepthRenderbuffer2D(GLsizei width, GLsizei height, GLenum target);
 
     bool create(GLsizei width, GLsizei height);
 

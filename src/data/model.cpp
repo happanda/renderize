@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include "model.h"
 #include "shaders/program.h"
+#include "util/soil_image.h"
 
 
 Model::Model(std::string const& path)
@@ -141,7 +142,10 @@ std::vector<TexturePtr> Model::loadMaterialTextures(aiMaterial* mat, aiTextureTy
         else
         {
             TexturePtr tex(new Texture);
-            tex->load(mDir + "/" + texPath);
+            SoilImage soilImage;
+            soilImage.load(mDir + "/" + texPath);
+            tex->create(soilImage);
+            tex->genMipMap();
             tex->setType(type);
             mLoadedTextures[texPath] = tex;
             textures.push_back(tex);

@@ -279,7 +279,7 @@ void App::run()
     crateTexs[1].reset(new Texture);
 
     SoilImage soilImage;
-    CHECK(soilImage.load("../tex/crate2.png"), "Error loading crate texture", );
+    CHECK(soilImage.load("../tex/crate.png"), "Error loading crate texture", );
     crateTexs[0]->create(soilImage);
     CHECK(soilImage.load("../tex/crate_specular.png"), "Error loading crate specular texture", );
     crateTexs[1]->create(soilImage);
