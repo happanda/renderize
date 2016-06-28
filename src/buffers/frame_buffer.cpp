@@ -3,35 +3,55 @@
 
 FrameBuffer::FrameBuffer()
     : mFBO(0)
-    , mTex(0)
+    , mColTex(0)
+    , mDepthTex(0)
+    , mStencilTex(0)
+    , mColBuf(0)
     , mDepthBuf(0)
+    , mStencilBuf(0)
 {
 }
 
 FrameBuffer::~FrameBuffer()
 {
+    if (mColTex)
+        glDeleteTextures(1, &mColTex);
+    if (mDepthTex)
+        glDeleteTextures(1, &mDepthTex);
+    if (mStencilTex)
+        glDeleteTextures(1, &mStencilTex);
+    if (mColBuf)
+        glDeleteRenderbuffers(1, &mColBuf);
     if (mDepthBuf)
         glDeleteRenderbuffers(1, &mDepthBuf);
-    if (mTex)
-        glDeleteTextures(1, &mTex);
+    if (mStencilBuf)
+        glDeleteRenderbuffers(1, &mStencilBuf);
     if (mFBO)
         glDeleteFramebuffers(1, &mFBO);
 }
 
-FrameBuffer(FrameBuffer&& rhs)
-    : mFBO = rhs.mFBO
-    , mTex = rhs.mTex
-    , mDepthBuf = rhs.mDepthBuf
+FrameBuffer::FrameBuffer(FrameBuffer&& rhs)
+    : mFBO(rhs.mFBO)
+    , mColTex(rhs.mColTex)
+    , mDepthTex(rhs.mDepthTex)
+    , mStencilTex(rhs.mStencilTex)
+    , mColBuf(rhs.mColBuf)
+    , mDepthBuf(rhs.mDepthBuf)
+    , mStencilBuf(rhs.mStencilBuf)
 {
-    rhs.mFBO = rhs.mTex = rhs.mDepthBuf = 0;
+    rhs.mFBO = rhs.mColTex = rhs.mDepthTex = rhs.mStencilTex = rhs.mColBuf = rhs.mDepthBuf = rhs.mStencilBuf = 0;
 }
 
-FrameBuffer const& operator=(FrameBuffer&& rhs)
+FrameBuffer const& FrameBuffer::operator=(FrameBuffer&& rhs)
 {
     mFBO = rhs.mFBO;
-    mTex = rhs.mTex;
+    mColTex = rhs.mColTex;
+    mDepthTex = rhs.mDepthTex;
+    mStencilTex = rhs.mStencilTex;
+    mColBuf = rhs.mColBuf;
     mDepthBuf = rhs.mDepthBuf;
-    rhs.mFBO = rhs.mTex = rhs.mDepthBuf = 0;
+    rhs.mFBO = rhs.mColTex = rhs.mDepthTex = rhs.mStencilTex = rhs.mColBuf = rhs.mDepthBuf = rhs.mStencilBuf = 0;
+    return *this;
 }
 
 void FrameBuffer::attachColorTexture2D(GLsizei width, GLsizei height, GLenum target)

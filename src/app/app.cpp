@@ -16,6 +16,7 @@
 #include "shaders/program.h"
 #include "util/checked_call.h"
 #include "util/date.h"
+#include "util/soil_image.h"
 
 
 namespace
@@ -276,9 +277,15 @@ void App::run()
     std::vector<TexturePtr> crateTexs(2);
     crateTexs[0].reset(new Texture);
     crateTexs[1].reset(new Texture);
-    CHECK(crateTexs[0]->load("../tex/crate2.png", true), "Error loading crate texture", );
-    CHECK(crateTexs[1]->load("../tex/crate_specular.png", true), "Error loading crate specular texture", );
+
+    SoilImage soilImage;
+    CHECK(soilImage.load("../tex/crate2.png"), "Error loading crate texture", );
+    crateTexs[0]->create(soilImage);
+    CHECK(soilImage.load("../tex/crate_specular.png"), "Error loading crate specular texture", );
+    crateTexs[1]->create(soilImage);
+    crateTexs[0]->genMipMap();
     crateTexs[0]->setType(TexType::Normal);
+    crateTexs[1]->genMipMap();
     crateTexs[1]->setType(TexType::Specular);
     Mesh cubemesh = cubeMesh(crateTexs);
     cubemesh.noBlending();
@@ -287,7 +294,9 @@ void App::run()
         /// QUAD
     std::vector<TexturePtr> quadTexs(1);
     quadTexs[0].reset(new Texture);
-    CHECK(quadTexs[0]->load("../tex/transparent_window.png", true), "Error loading crate texture", );
+    CHECK(soilImage.load("../tex/transparent_window.png"), "Error loading transparent window texture", );
+    quadTexs[0]->create(soilImage);
+    quadTexs[0]->genMipMap();
     quadTexs[0]->setType(TexType::Normal);
     Mesh quadmesh = quadMesh(quadTexs);
     quadmesh.blending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

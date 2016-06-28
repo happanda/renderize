@@ -33,7 +33,13 @@ struct FrameBuffer
     void activeTex(GLenum textureSlot) const;
 
 private:
+    
+
     GLuint mFBO;
-    GLuint mTex;
+    GLuint mColTex;
+    GLuint mDepthTex;
+    GLuint mStencilTex;
+    GLuint mColBuf;
     GLuint mDepthBuf;
+    GLuint mStencilBuf;
 };

@@ -69,11 +69,13 @@ set(SOURCE_FILES_UTIL
 ${SourcePath}/util/checked_call.h
 ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
+${SourcePath}/util/soil_image.h
+${SourcePath}/util/soil_image.cpp
 )
 
 set(SOURCE_FILES
-${SourcePath}/cubes.h
-${SourcePath}/cubes.cpp
+#${SourcePath}/cubes.h
+#${SourcePath}/cubes.cpp
 ${SourcePath}/main.cpp
 )
 
