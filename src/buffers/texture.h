@@ -34,6 +34,7 @@ struct Texture
     void setType(TexType type);
 
     operator GLuint() const;
+    GLint internalFormat() const;
     TexType type() const;
 
     void bind() const;
@@ -45,5 +46,6 @@ private:
     void free();
 
     GLuint mTex;
+    GLint mInternalFormat;
     TexType mType;
 };

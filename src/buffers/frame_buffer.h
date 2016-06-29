@@ -15,8 +15,8 @@ struct FrameBuffer
 
     bool create(GLsizei width, GLsizei height);
 
-    void attach(TexturePtr tex);
-    void attach(RenderBufferPtr rb);
+    void attach(Texture& tex);
+    void attach(RenderBuffer& rb);
 
     bool isComplete() const;
 

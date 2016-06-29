@@ -7,6 +7,7 @@ using std::swap;
 
 Texture::Texture()
     : mTex(0)
+    , mInternalFormat(0)
     , mType(TexType::Normal)
 {
 }
@@ -18,9 +19,11 @@ Texture::~Texture()
 
 Texture::Texture(Texture&& rhs)
     : mTex(0)
+    , mInternalFormat(0)
     , mType(TexType::Normal)
 {
     swap(mTex, rhs.mTex);
+    swap(mInternalFormat, rhs.mInternalFormat);
     swap(mType, rhs.mType);
 }
 
@@ -38,28 +41,27 @@ void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
 
     glGenTextures(1, &mTex);
     bind();
-    GLint internalFormat = 0;
     GLenum format = 0;
     switch (fmt)
     {
         case InternalFormat::Color:
-            internalFormat = GL_RGBA;
+            mInternalFormat = GL_RGBA;
             format = GL_RGBA;
             break;
         case InternalFormat::Depth:
-            internalFormat = GL_DEPTH_COMPONENT;
+            mInternalFormat = GL_DEPTH_COMPONENT;
             format = GL_DEPTH_COMPONENT;
             break;
         case InternalFormat::Stencil:
-            internalFormat = GL_STENCIL_INDEX;
+            mInternalFormat = GL_STENCIL_INDEX;
             format =  GL_STENCIL_INDEX;
             break;
         case InternalFormat::DepthStencil:
-            internalFormat = GL_DEPTH_STENCIL;
+            mInternalFormat = GL_DEPTH_STENCIL;
             format = GL_DEPTH_STENCIL;
             break;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
     unbind();
 }
 
@@ -67,6 +69,7 @@ void Texture::create(SoilImage const& image)
 {
     glGenTextures(1, &mTex);
     bind();
+    mInternalFormat = GL_RGBA;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
     unbind();
 }
@@ -108,6 +111,11 @@ Texture::operator GLuint() const
     return mTex;
 }
 
+GLint Texture::internalFormat() const
+{
+    return mInternalFormat;
+}
+
 TexType Texture::type() const
 {
     return mType;
@@ -141,6 +149,7 @@ void Texture::free()
     {
         glDeleteTextures(1, &mTex);
         mTex = 0;
+        mInternalFormat = 0;
         mType = TexType::Normal;
     }
 }

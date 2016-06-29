@@ -8,6 +8,9 @@
 #include <glm/vec3.hpp>
 
 #include "app.h"
+#include "buffers/frame_buffer.h"
+#include "buffers/render_buffer.h"
+#include "buffers/texture.h"
 #include "data/cube.h"
 #include "data/light.h"
 #include "data/mesh_sorter.h"
@@ -269,9 +272,9 @@ void App::run()
     CHECK(scProg.link(), scProg.lastError(), return;);
 
         /// NANOSUIT
-    Model model("nanosuit/nanosuit.obj");
-    model.noBlending();
-    model.culling(GL_BACK);
+    //Model model("nanosuit/nanosuit.obj");
+    //model.noBlending();
+    //model.culling(GL_BACK);
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -313,6 +316,32 @@ void App::run()
 
     glEnable(GL_STENCIL_TEST);
 
+
+    FrameBuffer frameBuffer;
+    Texture texture;
+    RenderBuffer renderBuffer;
+    frameBuffer.create(mWinSize.x, mWinSize.y);
+    texture.create(mWinSize.x, mWinSize.y, InternalFormat::Color);
+    frameBuffer.attach(texture);
+    renderBuffer.create(mWinSize.x, mWinSize.y, InternalFormat::Depth);
+    frameBuffer.attach(renderBuffer);
+    CHECK(frameBuffer.isComplete(), "Error: FrameBuffer is not complete", );
+    frameBuffer.unbind();
+
+
+    Program quadProg;
+    CHECK(quadProg.create(), quadProg.lastError(), return;);
+    Shader quadVertShader, quadFragShader;
+    CHECK(quadVertShader.compile(readAllText("shaders/asis.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
+    CHECK(quadFragShader.compile(readAllText("shaders/asis.frag"), GL_FRAGMENT_SHADER), fragShader.lastError(), return;);
+    quadProg.attach(vertexShader);
+    quadProg.attach(fragShader);
+    CHECK(quadProg.link(), quadProg.lastError(), return;);
+    Mesh quadScreen = quadMesh(std::vector<TexturePtr>());
+    quadScreen.noBlending();
+    quadScreen.noCulling();
+
+
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
     float const dT{ 0.0125f };
@@ -333,6 +362,7 @@ void App::run()
         sLight.direction(mCamera.front());
 
         // Rendering
+        frameBuffer.bind();
         glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -377,7 +407,7 @@ void App::run()
         //glStencilFunc(GL_ALWAYS, 1, 0xFF);
         //glStencilMask(0xFF);
 
-        model.draw(prog);
+        //model.draw(prog);
         cubemesh.draw(prog);
 
         meshSorter.sort(mCamera.pos());
@@ -403,6 +433,12 @@ void App::run()
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
         */
+
+        frameBuffer.unbind();
+        glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        texture.bind();
+        quadScreen.draw(quadProg);
 
         glfwSwapBuffers(mWindow);
     }

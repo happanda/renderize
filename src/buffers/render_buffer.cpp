@@ -32,28 +32,32 @@ void RenderBuffer::create(GLsizei width, GLsizei height, InternalFormat fmt)
 
     glGenRenderbuffers(1, &mRBO);
     bind();
-    GLint internalFormat = 0;
     switch (fmt)
     {
         case InternalFormat::Color:
-            internalFormat = GL_RGBA;
+            mInternalFormat = GL_RGBA;
             break;
         case InternalFormat::Depth:
-            internalFormat = GL_DEPTH_COMPONENT;
+            mInternalFormat = GL_DEPTH_COMPONENT;
             break;
         case InternalFormat::Stencil:
-            internalFormat = GL_STENCIL;
+            mInternalFormat = GL_STENCIL;
             break;
         case InternalFormat::DepthStencil:
-            internalFormat = GL_DEPTH_STENCIL;
+            mInternalFormat = GL_DEPTH_STENCIL;
             break;
     }
-    glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, mInternalFormat, width, height);
 }
 
 RenderBuffer::operator GLuint() const
 {
     return mRBO;
+}
+
+GLint RenderBuffer::internalFormat() const
+{
+    return mInternalFormat;
 }
 
 void RenderBuffer::bind() const

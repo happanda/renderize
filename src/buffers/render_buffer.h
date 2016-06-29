@@ -17,6 +17,7 @@ struct RenderBuffer
     void create(GLsizei width, GLsizei height, InternalFormat fmt);
 
     operator GLuint() const;
+    GLint internalFormat() const;
 
     void bind() const;
     void unbind() const;
@@ -25,4 +26,5 @@ private:
     void free();
 
     GLuint mRBO;
+    GLint mInternalFormat;
 };

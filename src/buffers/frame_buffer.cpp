@@ -38,14 +38,12 @@ bool FrameBuffer::create(GLsizei width, GLsizei height)
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
-void FrameBuffer::attach(TexturePtr tex)
+void FrameBuffer::attach(Texture& tex)
 {
     bind();
-    tex->bind();
-    GLint param = 0;
-    glGetTextureParameteriv(*tex, GL_DEPTH_STENCIL_TEXTURE_MODE, &param);
+    tex.bind();
     GLenum attachment = 0;
-    switch (param)
+    switch (tex.internalFormat())
     {
     case GL_RGBA:
         attachment = GL_COLOR_ATTACHMENT0;
@@ -60,17 +58,15 @@ void FrameBuffer::attach(TexturePtr tex)
         attachment = GL_DEPTH_STENCIL_ATTACHMENT;
         break;
     }
-    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, *tex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
 }
 
-void FrameBuffer::attach(RenderBufferPtr rb)
+void FrameBuffer::attach(RenderBuffer& rb)
 {
     bind();
-    rb->bind();
-    GLint param = 0;
-    glGetRenderbufferParameteriv(*rb, GL_RENDERBUFFER_INTERNAL_FORMAT, &param);
+    rb.bind();
     GLenum attachment = 0;
-    switch (param)
+    switch (rb.internalFormat())
     {
     case GL_RGBA:
         attachment = GL_COLOR_ATTACHMENT0;
@@ -85,7 +81,7 @@ void FrameBuffer::attach(RenderBufferPtr rb)
         attachment = GL_DEPTH_STENCIL_ATTACHMENT;
         break;
     }
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, *rb);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rb);
 }
 
 bool FrameBuffer::isComplete() const
