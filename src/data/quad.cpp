@@ -24,3 +24,14 @@ Mesh quadMesh(std::vector<TexturePtr> const& textures)
     }
     return Mesh(vertices, std::vector<GLuint>(), textures);
 }
+
+std::array<GLfloat, sNumScreenQuadVertices> sScreenQuadVertices = {
+    // Positions  // TexCoords
+    -1.0f,  1.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+     1.0f, -1.0f, 1.0f, 0.0f,
+
+    -1.0f,  1.0f, 0.0f, 1.0f,
+     1.0f, -1.0f, 1.0f, 0.0f,
+     1.0f,  1.0f, 1.0f, 1.0f
+};

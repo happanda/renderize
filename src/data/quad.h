@@ -9,3 +9,8 @@ const int sNumQuadVertices = (3 + 3 + 2) * 6;
 extern std::array<GLfloat, sNumQuadVertices>  sQuadVertices;
 
 Mesh quadMesh(std::vector<TexturePtr> const& textures);
+
+
+const int sNumScreenQuadVertices = (3 + 3 + 2) * 6;
+extern std::array<GLfloat, sNumScreenQuadVertices>  sScreenQuadVertices;
+

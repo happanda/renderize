@@ -126,9 +126,6 @@ bool App::init()
 
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
     
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
@@ -313,10 +310,7 @@ void App::run()
     meshSorter.addMesh(quad2pos, &quadmesh);
     meshSorter.addMesh(quad3pos, &quadmesh);
     meshSorter.addMesh(quad4pos, &quadmesh);
-
-    glEnable(GL_STENCIL_TEST);
-
-
+    
     FrameBuffer frameBuffer;
     Texture texture;
     RenderBuffer renderBuffer;
@@ -327,19 +321,39 @@ void App::run()
     frameBuffer.attach(renderBuffer);
     CHECK(frameBuffer.isComplete(), "Error: FrameBuffer is not complete", );
     frameBuffer.unbind();
-
+    
 
     Program quadProg;
     CHECK(quadProg.create(), quadProg.lastError(), return;);
     Shader quadVertShader, quadFragShader;
-    CHECK(quadVertShader.compile(readAllText("shaders/asis.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
-    CHECK(quadFragShader.compile(readAllText("shaders/asis.frag"), GL_FRAGMENT_SHADER), fragShader.lastError(), return;);
-    quadProg.attach(vertexShader);
-    quadProg.attach(fragShader);
+    CHECK(quadVertShader.compile(readAllText("shaders/asis.vert"), GL_VERTEX_SHADER), quadVertShader.lastError(), return;);
+    CHECK(quadFragShader.compile(readAllText("shaders/asis.frag"), GL_FRAGMENT_SHADER), quadFragShader.lastError(), return;);
+    quadProg.attach(quadVertShader);
+    quadProg.attach(quadFragShader);
     CHECK(quadProg.link(), quadProg.lastError(), return;);
-    Mesh quadScreen = quadMesh(std::vector<TexturePtr>());
-    quadScreen.noBlending();
-    quadScreen.noCulling();
+
+    
+    GLfloat quadVertices[] = {
+        // Positions   // TexCoords
+        -1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+
+        -1.0f,  1.0f, 0.0f, 1.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f
+    };
+    GLuint quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+    glBindVertexArray(0);
 
 
     float lastTime = static_cast<float>(glfwGetTime());
@@ -355,7 +369,7 @@ void App::run()
         if (dt < dT)
             continue;
         lastTime = curTime;
-
+        /*
         moveCamera(dt);
 
         sLight.position(mCamera.pos());
@@ -417,28 +431,29 @@ void App::run()
             mesh.second->draw(prog);
         }
 
-        /*
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-        scProg.use();
-        scaleMat = glm::scale(glm::mat4(), glm::vec3(1.05f));
-        scProg["model"] = glm::translate(scaleMat, transVec);
-        scProg["view"] = mCamera.view();
-        scProg["projection"] = mCamera.projection();
-        scProg["uColor"] = glm::vec4(0.1f, 0.7f, 0.11f, 1.0f);
-        model.draw(scProg);
-        cubemesh.draw(prog);
-        
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+        frameBuffer.unbind();
         */
 
-        frameBuffer.unbind();
-        glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //quadProg.use();
+        //glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glBindVertexArray(quadScreenVAO);
+        ////glDisable(GL_DEPTH_TEST);
+        ////texture.bind();
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        //glBindVertexArray(0);
+
+
+        // Rendering
+        glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        quadProg.use();
+        glBindVertexArray(quadVAO);
         texture.bind();
-        quadScreen.draw(quadProg);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        glDisableVertexAttribArray(0);
 
         glfwSwapBuffers(mWindow);
     }
