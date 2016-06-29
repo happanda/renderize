@@ -7,6 +7,9 @@ ${SourcePath}/app/app.cpp
 set(SOURCE_FILES_BUFFERS
 ${SourcePath}/buffers/frame_buffer.h
 ${SourcePath}/buffers/frame_buffer.cpp
+${SourcePath}/buffers/fwd.h
+${SourcePath}/buffers/render_buffer.h
+${SourcePath}/buffers/render_buffer.cpp
 ${SourcePath}/buffers/texture.h
 ${SourcePath}/buffers/texture.cpp
 )

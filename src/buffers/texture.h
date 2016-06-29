@@ -2,20 +2,15 @@
 #include <memory>
 #include <string>
 #include <GL/glew.h>
+#include "buffers/format.h"
+#include "buffers/fwd.h"
+
 
 enum class TexType
 {
     Normal,
     Diffuse,
     Specular
-};
-
-enum class TextureType
-{
-    Color,
-    Depth,
-    Stencil,
-    DepthStencil
 };
 
 struct SoilImage;
@@ -29,7 +24,7 @@ struct Texture
     Texture(Texture const&) = delete;
     Texture const& operator=(Texture const&) = delete;
 
-    void create(GLsizei width, GLsizei height, TextureType ttype);
+    void create(GLsizei width, GLsizei height, InternalFormat fmt);
     void create(SoilImage const& image);
 
     void setFilter(GLenum filter, GLint type);
@@ -41,15 +36,14 @@ struct Texture
     operator GLuint() const;
     TexType type() const;
 
-
     void bind() const;
     void unbind() const;
     void active(GLenum textureSlot) const;
     void unactive(GLenum textureSlot) const;
 
 private:
+    void free();
+
     GLuint mTex;
     TexType mType;
 };
-
-typedef std::shared_ptr<Texture>  TexturePtr;
