@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include "program.h"
 
@@ -101,14 +102,22 @@ Program createProgram(std::string const& vertShaderPath, std::string const& frag
         return Program();
     // Shaders
     Shader vertexShader, fragShader;
-    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER)
-        || !fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
     {
+        std::cerr << vertexShader.lastError();
+        return Program();
+    }
+    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    {
+        std::cerr << fragShader.lastError();
         return Program();
     }
     prog.attach(vertexShader);
     prog.attach(fragShader);
     if (!prog.link())
+    {
+        std::cerr << prog.lastError();
         return Program();
+    }
     return prog;
 }

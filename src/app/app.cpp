@@ -21,6 +21,7 @@
 #include "util/date.h"
 #include "util/soil_image.h"
 
+glm::mat3x3 sKernel;
 
 namespace
 {
@@ -201,6 +202,9 @@ void App::keyDown(int key)
     {
         mSpotLightOn = !mSpotLightOn;
     }
+    else if (key == GLFW_KEY_R)
+    {
+    }
 }
 
 void App::keyUp(int key)
@@ -252,9 +256,9 @@ void App::run()
     CHECK(prog, "Error creating shader program", return;);
 
         /// NANOSUIT
-    Model model("nanosuit/nanosuit.obj");
-    model.noBlending();
-    model.culling(GL_BACK);
+    //Model model("nanosuit/nanosuit.obj");
+    //model.noBlending();
+    //model.culling(GL_BACK);
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -307,7 +311,7 @@ void App::run()
     frameBuffer.unbind();
     
 
-    Program quadProg = createProgram("shaders/asis.vert", "shaders/asis.frag");
+    Program quadProg = createProgram("shaders/asis.vert", "shaders/post_kernel3x3.frag");
     CHECK(quadProg, "Error creating quad shader program", return;);
 
     
@@ -392,7 +396,7 @@ void App::run()
 
         prog["SpotLightOn"] = mSpotLightOn;
 
-        model.draw(prog);
+        //model.draw(prog);
         cubemesh.draw(prog);
 
         meshSorter.sort(mCamera.pos());
@@ -409,6 +413,17 @@ void App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         quadProg.use();
+        quadProg["offset"] = glm::vec2(1.0f / 400.0f, 1.0f / 400.0f);// glm::vec2(1 / static_cast<float>(mWinSize.x), 1 / static_cast<float>(mWinSize.y));
+        /*quadProg["kernel"] = glm::mat3x3(
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  9.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f
+            );*/
+        quadProg["kernel"] = glm::mat3x3(
+            0.0f, 1.0f, 2.0f,
+            3.0f, -4.0f, 5.0f,
+            6.0f, -7.0f, -8.0f
+            ) / 32.0f;
         glBindVertexArray(quadVAO);
         texture.active(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, 6);

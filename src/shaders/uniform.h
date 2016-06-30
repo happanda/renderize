@@ -138,6 +138,35 @@ struct Uniform
     }
 
 
+    /*=========== tmat3x3 ===========*/
+    template<glm::precision P, class Real>
+    void operator=(glm::tmat3x3<Real, P> const& mat);
+
+    template<glm::precision P>
+    void operator=(glm::tmat3x3<float, P> const& mat)
+    {
+        glUniformMatrix3fv(mLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tmat3x3<double, P> const& mat)
+    {
+        glUniformMatrix3dv(mLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tmat3x3<int, P> const& mat)
+    {
+        glUniformMatrix3iv(mLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+    template<glm::precision P>
+    void operator=(glm::tmat3x3<unsigned int, P> const& mat)
+    {
+        glUniformMatrix3uiv(mLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+
     /*=========== tmat4x4 ===========*/
     template<glm::precision P, class Real>
     void operator=(glm::tmat4x4<Real, P> const& mat);
