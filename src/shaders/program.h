@@ -1,14 +1,20 @@
 #pragma once
 #include "shader.h"
+#include "shaders/fwd.h"
 #include "uniform.h"
+#include "util/ref_counter.h"
 
 
 struct Program
+    : public RefCounted
 {
     Program();
     ~Program();
+    Program(Program const&);
+    Program const& operator=(Program const&);
 
     bool create();
+
     void attach(Shader const& sh);
     bool link();
     void use() const;
@@ -23,5 +29,9 @@ struct Program
     Uniform operator[](char const* uniName) const;
 
 private:
+    void free();
+
     GLenum mProg;
 };
+
+Program createProgram(std::string const& vertShaderPath, std::string const& fragShaderPath);

@@ -248,21 +248,13 @@ void App::run()
         .outerCutOff(0.2f);
 
 
-    Program prog;
-    CHECK(prog.create(), prog.lastError(), return;);
-    // Shaders
-    Shader vertexShader, fragShader, solColShader;
-    CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
-    CHECK(fragShader.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER,
-        IncludeCommonCode::No), fragShader.lastError(), return;);
-    prog.attach(vertexShader);
-    prog.attach(fragShader);
-    CHECK(prog.link(), prog.lastError(), return;);
+    Program prog = createProgram("shaders/simple.vert", "shaders/simple.frag");
+    CHECK(prog, "Error creating shader program", return;);
 
         /// NANOSUIT
-    //Model model("nanosuit/nanosuit.obj");
-    //model.noBlending();
-    //model.culling(GL_BACK);
+    Model model("nanosuit/nanosuit.obj");
+    model.noBlending();
+    model.culling(GL_BACK);
 
         /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -314,14 +306,8 @@ void App::run()
     frameBuffer.unbind();
     
 
-    Program quadProg;
-    CHECK(quadProg.create(), quadProg.lastError(), return;);
-    Shader quadVertShader, quadFragShader;
-    CHECK(quadVertShader.compile(readAllText("shaders/asis.vert"), GL_VERTEX_SHADER), quadVertShader.lastError(), return;);
-    CHECK(quadFragShader.compile(readAllText("shaders/asis.frag"), GL_FRAGMENT_SHADER), quadFragShader.lastError(), return;);
-    quadProg.attach(quadVertShader);
-    quadProg.attach(quadFragShader);
-    CHECK(quadProg.link(), quadProg.lastError(), return;);
+    Program quadProg = createProgram("shaders/asis.vert", "shaders/asis.frag");
+    CHECK(quadProg, "Error creating quad shader program", return;);
 
     
     GLfloat quadVertices[] = {
@@ -405,7 +391,7 @@ void App::run()
 
         prog["SpotLightOn"] = mSpotLightOn;
 
-        //model.draw(prog);
+        model.draw(prog);
         cubemesh.draw(prog);
 
         meshSorter.sort(mCamera.pos());
@@ -428,12 +414,12 @@ void App::run()
 
 
         // Rendering
-        glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         quadProg.use();
         glBindVertexArray(quadVAO);
-        texture.bind();
+        texture.active(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);
@@ -468,18 +454,8 @@ void App::runFragmentDemo(std::string const& demoName)
     }
 
 
-    Program prog;
-    CHECK(prog.create(), prog.lastError(), return;);
-
-    // Shaders
-    Shader vertexShader, fragShader;
-    CHECK(vertexShader.compile(readAllText("shaders/fragment_demo.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
-    CHECK(fragShader.compile(readAllText("shaders/" + demoName + ".frag"), GL_FRAGMENT_SHADER,
-        IncludeCommonCode::Yes), fragShader.lastError(), return;);
-
-    prog.attach(vertexShader);
-    prog.attach(fragShader);
-    CHECK(prog.link(), prog.lastError(), return;);
+    Program prog = createProgram("shaders/fragment_demo.vert", "shaders/" + demoName + ".frag");
+    CHECK(prog, "Error creating shader program", return;);
 
 
     float lastTime = static_cast<float>(glfwGetTime());

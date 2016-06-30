@@ -1,6 +1,8 @@
 #include <vector>
 #include "program.h"
 
+using std::swap;
+
 
 Program::Program()
     : mProg(0)
@@ -9,7 +11,21 @@ Program::Program()
 
 Program::~Program()
 {
-    glDeleteProgram(mProg);
+    free();
+}
+
+Program::Program(Program const& rhs)
+    : RefCounted(rhs)
+    , mProg(rhs.mProg)
+{
+}
+
+Program const& Program::operator=(Program const& rhs)
+{
+    free();
+    RefCounted::operator=(rhs);
+    mProg = rhs.mProg;
+    return *this;
 }
 
 bool Program::create()
@@ -66,4 +82,33 @@ Uniform Program::operator[](std::string const& uniName) const
 Uniform Program::operator[](char const* uniName) const
 {
     return Uniform(*this, uniName);
+}
+
+void Program::free()
+{
+    if (mProg && lastInstance())
+    {
+        glDeleteProgram(mProg);
+        mProg = 0;
+    }
+}
+
+Program createProgram(std::string const& vertShaderPath, std::string const& fragShaderPath)
+{
+    Program prog;
+    prog.create();
+    if (static_cast<GLenum>(prog) == 0)
+        return Program();
+    // Shaders
+    Shader vertexShader, fragShader;
+    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER)
+        || !fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    {
+        return Program();
+    }
+    prog.attach(vertexShader);
+    prog.attach(fragShader);
+    if (!prog.link())
+        return Program();
+    return prog;
 }

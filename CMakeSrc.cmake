@@ -40,6 +40,7 @@ ${SourcePath}/data/triangle.cpp
 )
 
 set(SOURCE_FILES_SHADERS
+${SourcePath}/shaders/fwd.h
 ${SourcePath}/shaders/program.h
 ${SourcePath}/shaders/program.cpp
 ${SourcePath}/shaders/shader.h
@@ -74,6 +75,7 @@ set(SOURCE_FILES_UTIL
 ${SourcePath}/util/checked_call.h
 ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
+${SourcePath}/util/ref_counter.h
 ${SourcePath}/util/soil_image.h
 ${SourcePath}/util/soil_image.cpp
 )
