@@ -9,6 +9,7 @@ using std::swap;
 FrameBuffer::FrameBuffer()
     : mFBO(0)
 {
+    glGenFramebuffers(1, &mFBO);
 }
 
 FrameBuffer::~FrameBuffer()
@@ -26,16 +27,6 @@ FrameBuffer const& FrameBuffer::operator=(FrameBuffer&& rhs)
 {
     swap(mFBO, rhs.mFBO);
     return *this;
-}
-
-bool FrameBuffer::create(GLsizei width, GLsizei height)
-{
-    free();
-
-    glGenFramebuffers(1, &mFBO);
-    bind();
-
-    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 void FrameBuffer::attach(Texture& tex)

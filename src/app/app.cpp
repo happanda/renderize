@@ -248,25 +248,16 @@ void App::run()
         .outerCutOff(0.2f);
 
 
-    Program prog, scProg;
+    Program prog;
     CHECK(prog.create(), prog.lastError(), return;);
-    CHECK(scProg.create(), prog.lastError(), return;);
-
     // Shaders
     Shader vertexShader, fragShader, solColShader;
     CHECK(vertexShader.compile(readAllText("shaders/simple.vert"), GL_VERTEX_SHADER), vertexShader.lastError(), return;);
     CHECK(fragShader.compile(readAllText("shaders/simple.frag"), GL_FRAGMENT_SHADER,
         IncludeCommonCode::No), fragShader.lastError(), return;);
-    CHECK(solColShader.compile(readAllText("shaders/solid_color.frag"), GL_FRAGMENT_SHADER,
-        IncludeCommonCode::No), solColShader.lastError(), return;);
-
     prog.attach(vertexShader);
     prog.attach(fragShader);
     CHECK(prog.link(), prog.lastError(), return;);
-
-    scProg.attach(vertexShader);
-    scProg.attach(solColShader);
-    CHECK(scProg.link(), scProg.lastError(), return;);
 
         /// NANOSUIT
     //Model model("nanosuit/nanosuit.obj");
@@ -310,11 +301,11 @@ void App::run()
     meshSorter.addMesh(quad2pos, &quadmesh);
     meshSorter.addMesh(quad3pos, &quadmesh);
     meshSorter.addMesh(quad4pos, &quadmesh);
-    
+
+    GLenum errorCode = glGetError();
     FrameBuffer frameBuffer;
     Texture texture;
     RenderBuffer renderBuffer;
-    frameBuffer.create(mWinSize.x, mWinSize.y);
     texture.create(mWinSize.x, mWinSize.y, InternalFormat::Color);
     frameBuffer.attach(texture);
     renderBuffer.create(mWinSize.x, mWinSize.y, InternalFormat::Depth);
@@ -369,7 +360,7 @@ void App::run()
         if (dt < dT)
             continue;
         lastTime = curTime;
-        /*
+        
         moveCamera(dt);
 
         sLight.position(mCamera.pos());
@@ -377,7 +368,9 @@ void App::run()
 
         // Rendering
         frameBuffer.bind();
-        glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+        glEnable(GL_DEPTH_TEST);
+
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         prog.use();
@@ -411,15 +404,6 @@ void App::run()
         prog["spLight.outerCutOff"] = glm::cos(sLight.mOuterCutOff);
 
         prog["SpotLightOn"] = mSpotLightOn;
-        //glm::vec4 iDate(0.0f, 0.0f, 0.0f, secFrom00());
-        //prog["iResolution"] = glm::vec3(mWinSize, 0.0);
-        //prog["iGlobalTime"] = curTime;
-        //prog["iDate"] = iDate;
-
-        glEnable(GL_DEPTH_TEST);
-        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        //glStencilMask(0xFF);
 
         //model.draw(prog);
         cubemesh.draw(prog);
@@ -432,7 +416,6 @@ void App::run()
         }
 
         frameBuffer.unbind();
-        */
 
         //quadProg.use();
         //glClearColor(0.3f, 0.3f, 0.3f, 0.0f);

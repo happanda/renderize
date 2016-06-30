@@ -44,7 +44,7 @@ void RenderBuffer::create(GLsizei width, GLsizei height, InternalFormat fmt)
             mInternalFormat = GL_STENCIL;
             break;
         case InternalFormat::DepthStencil:
-            mInternalFormat = GL_DEPTH_STENCIL;
+            mInternalFormat = GL_DEPTH24_STENCIL8;
             break;
     }
     glRenderbufferStorage(GL_RENDERBUFFER, mInternalFormat, width, height);

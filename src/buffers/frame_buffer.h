@@ -13,8 +13,6 @@ struct FrameBuffer
     FrameBuffer(FrameBuffer const&) = delete;
     FrameBuffer const& operator=(FrameBuffer const&) = delete;
 
-    bool create(GLsizei width, GLsizei height);
-
     void attach(Texture& tex);
     void attach(RenderBuffer& rb);
 
