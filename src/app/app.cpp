@@ -282,6 +282,7 @@ void App::run()
     quadTexs[0]->genMipMap();
     quadTexs[0]->setType(TexType::Normal);
     Mesh quadmesh = quadMesh(quadTexs);
+    //quadmesh.noBlending();
     quadmesh.blending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     quadmesh.noCulling();
 
@@ -354,10 +355,10 @@ void App::run()
 
         // Rendering
         frameBuffer.bind();
-        glEnable(GL_DEPTH_TEST);
 
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
         prog.use();
         auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
@@ -402,19 +403,9 @@ void App::run()
         }
 
         frameBuffer.unbind();
-
-        //quadProg.use();
-        //glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glBindVertexArray(quadScreenVAO);
-        ////glDisable(GL_DEPTH_TEST);
-        ////texture.bind();
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        //glBindVertexArray(0);
-
-
+        
         // Rendering
-        //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         quadProg.use();

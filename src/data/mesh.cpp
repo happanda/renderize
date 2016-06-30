@@ -137,6 +137,9 @@ void Mesh::draw(Program const& prog) const
         mTextures[i]->active(GL_TEXTURE0 + i);
     }
 
+    GLboolean priorBlending = GL_FALSE;
+    glGetBooleanv(GL_BLEND, &priorBlending);
+
     if (mBlending == Blending::None)
         glDisable(GL_BLEND);
     else
@@ -147,6 +150,9 @@ void Mesh::draw(Program const& prog) const
         else
             glBlendFuncSeparate(mSfactorRGB, mDfactorRGB, mSfactorAlpha, mDfactorAlpha);
     }
+
+    GLboolean priorCulling = GL_FALSE;
+    glGetBooleanv(GL_CULL_FACE, &priorCulling);
 
     if (mCulling)
     {
@@ -168,4 +174,13 @@ void Mesh::draw(Program const& prog) const
     {
         mTextures[i]->unactive(GL_TEXTURE0 + i);
     }
+
+    if (priorBlending)
+        glEnable(GL_BLEND);
+    else
+        glDisable(GL_BLEND);
+    if (priorBlending)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
 }
