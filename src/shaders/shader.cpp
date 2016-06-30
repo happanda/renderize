@@ -11,7 +11,21 @@ Shader::Shader()
 
 Shader::~Shader()
 {
-    glDeleteShader(mShader);
+    free();
+}
+
+Shader::Shader(Shader const& rhs)
+    : RefCounted(rhs)
+    , mShader(rhs.mShader)
+{
+}
+
+Shader const& Shader::operator=(Shader const& rhs)
+{
+    free();
+    RefCounted::operator=(rhs);
+    mShader = rhs.mShader;
+    return *this;
 }
 
 bool Shader::compile(GLstring const& code, GLenum type, IncludeCommonCode inc)
@@ -84,4 +98,13 @@ std::string readAllText(std::string const& path)
     std::stringstream text;
     ifstr >> text.rdbuf();
     return text.str();
+}
+
+void Shader::free()
+{
+    if (mShader && lastInstance())
+    {
+        glDeleteShader(mShader);
+        mShader = 0;
+    }
 }

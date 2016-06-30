@@ -7,42 +7,13 @@ struct RefCounted
 protected:
     mutable std::uint32_t* mRefCounter;
 
-    RefCounted()
-        : mRefCounter(new std::uint32_t)
-    {
-        *mRefCounter = 1;
-    }
+    RefCounted();
+    virtual ~RefCounted();
+    RefCounted(RefCounted const& rhs);
+    RefCounted const& operator=(RefCounted const& rhs);
 
-    RefCounted(RefCounted const& rhs)
-        : mRefCounter(rhs.mRefCounter)
-    {
-        ++(*mRefCounter);
-    }
-
-    RefCounted const& operator=(RefCounted const& rhs)
-    {
-        decrementCounter();
-        mRefCounter = rhs.mRefCounter;
-        ++(*mRefCounter);
-        return *this;
-    }
-
-    virtual ~RefCounted()
-    {
-        decrementCounter();
-    }
-
-    bool lastInstance() const
-    {
-        return *mRefCounter == 1;
-    }
+    bool lastInstance() const;
 
 private:
-    void decrementCounter()
-    {
-        if (lastInstance())
-            delete mRefCounter;
-        else
-            --(*mRefCounter);
-    }
+    void decrementCounter();
 };

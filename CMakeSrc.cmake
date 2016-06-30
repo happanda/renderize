@@ -76,6 +76,7 @@ ${SourcePath}/util/checked_call.h
 ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
 ${SourcePath}/util/ref_counter.h
+${SourcePath}/util/ref_counter.cpp
 ${SourcePath}/util/soil_image.h
 ${SourcePath}/util/soil_image.cpp
 )
