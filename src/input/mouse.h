@@ -26,7 +26,7 @@ private:
     FRIEND_SINGLETON(Mouse)
 
     float mSensitivity;
-    glm::vec2  mPos;
+    glm::vec2 mPos;
     bool mVisible;
 };
 

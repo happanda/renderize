@@ -4,6 +4,7 @@
 #include "app/app.h"
 #include "camera.h"
 
+
 MainCameraUpdater::MainCameraUpdater(Camera& camera)
     : mCamera(camera)
 {

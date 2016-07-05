@@ -4,6 +4,7 @@
 #include "camera/camera.h"
 #include "util/singleton.h"
 
+
 struct GLFWwindow;
 
 struct App
