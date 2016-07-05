@@ -16,6 +16,7 @@
 #include "data/mesh_sorter.h"
 #include "data/model.h"
 #include "data/quad.h"
+#include "input/mouse.h"
 #include "shaders/program.h"
 #include "util/checked_call.h"
 #include "util/date.h"
@@ -25,8 +26,6 @@ glm::mat3x3 sKernel;
 
 namespace
 {
-    App*  sAppInstance{ nullptr };
-
     void glfwErrorReporting(int errCode, char const* msg)
     {
         APP().onGLFWError(errCode, msg);
@@ -40,60 +39,22 @@ namespace
             APP().keyUp(key);
     }
 
-    void mouseCallback(GLFWwindow* window, double x, double y)
-    {
-        APP().mouse(glm::vec2(static_cast<float>(x), static_cast<float>(y)));
-    }
-
-    void scrollCallback(GLFWwindow* window, double xDiff, double yDiff)
-    {
-        APP().scroll(static_cast<float>(xDiff), static_cast<float>(yDiff));
-    }
-
-    void mouseButtonCallback(GLFWwindow* window, int button, int action, int modifiers)
-    {
-        APP().touchDown(button);
-    }
-
     void charCallback(GLFWwindow* window, unsigned int symb)
     {
     }
 
     void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
     {
-        APP().resize(sizeX, sizeY);
+        APP().resize(glm::ivec2(sizeX, sizeY));
     }
 } // anonymous namespace
 
-
-
-void App::create()
-{
-    if (!sAppInstance)
-        sAppInstance = new App();
-}
-
-void App::destroy()
-{
-    if (sAppInstance)
-    {
-        delete sAppInstance;
-        sAppInstance = nullptr;
-    }
-}
-
-App& App::inst()
-{
-    return *sAppInstance;
-}
 
 App::App()
     : mWinSize(800, 800)
     , mWindow(nullptr)
     , mKeys(GLFW_KEY_LAST, false)
-    , mCamera(mWinSize.x, mWinSize.y)
 {
-    mCamera.far(120.0f);
 }
 
 App::~App()
@@ -131,9 +92,10 @@ bool App::init()
     // Initialize some GLFW callbacks
     glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(mWindow, keyCallback);
-    glfwSetCursorPosCallback(mWindow, mouseCallback);
-    glfwSetScrollCallback(mWindow, scrollCallback);
-    glfwSetMouseButtonCallback(mWindow, mouseButtonCallback);
+    Mouse::create(mWindow);
+    //glfwSetCursorPosCallback(mWindow, mouseCallback);
+    //glfwSetScrollCallback(mWindow, scrollCallback);
+    //glfwSetMouseButtonCallback(mWindow, mouseButtonCallback);
     glfwSetCharCallback(mWindow, charCallback);
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
     return true;
@@ -141,51 +103,14 @@ bool App::init()
 
 bool App::shouldClose() const
 {
+    Mouse::destroy();
     return glfwWindowShouldClose(mWindow) != 0;
 }
 
-void App::resize(int width, int height)
+void App::resize(glm::ivec2 const& size)
 {
-    mWinSize = glm::ivec2(width, height);
+    mWinSize = size;
     glViewport(0, 0, mWinSize.x, mWinSize.y);
-}
-
-void App::mouse(glm::vec2 const& pos)
-{
-    float const xFloat = static_cast<GLfloat>(pos.x);
-    float const yFloat = static_cast<GLfloat>(pos.y);
-    static GLfloat lastX = xFloat, lastY = yFloat;
-
-    if (mMouseVisible)
-    {
-        lastX = xFloat;
-        lastY = yFloat;
-        return;
-    }
-
-    GLfloat xDiff = xFloat - lastX;
-    GLfloat yDiff = yFloat - lastY;
-    lastX = xFloat;
-    lastY = yFloat;
-    GLfloat const sensitivity = 0.08f;
-    xDiff *= sensitivity;
-    yDiff *= sensitivity;
-
-    mYaw += xDiff;
-    mPitch = glm::clamp(mPitch - yDiff, -89.0f, 89.0f);
-}
-
-void App::scroll(float xDiff, float yDiff)
-{
-    mCamera.fov(mCamera.fov() - static_cast<float>(yDiff));
-}
-
-void App::touchDown(int button)
-{
-}
-
-void App::touchUp(int button)
-{
 }
 
 void App::keyDown(int key)
@@ -352,84 +277,82 @@ void App::run()
             continue;
         lastTime = curTime;
         
-        moveCamera(dt);
+        //sLight.position(mCamera.pos());
+        //sLight.direction(mCamera.front());
 
-        sLight.position(mCamera.pos());
-        sLight.direction(mCamera.front());
+        //// Rendering
+        //frameBuffer.bind();
 
-        // Rendering
-        frameBuffer.bind();
+        //glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glEnable(GL_DEPTH_TEST);
 
-        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
+        //prog.use();
+        //auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
+        //auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
+        //prog["model"] = glm::translate(scaleMat, transVec);
+        //prog["view"] = mCamera.view();
+        //prog["projection"] = mCamera.projection();
+        //prog["viewerPos"] = mCamera.pos();
 
-        prog.use();
-        auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
-        auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
-        prog["model"] = glm::translate(scaleMat, transVec);
-        prog["view"] = mCamera.view();
-        prog["projection"] = mCamera.projection();
-        prog["viewerPos"] = mCamera.pos();
+        //prog["dirLight.direction"] = dirLight.mDirection;
+        //prog["dirLight.ambient"] = dirLight.mAmbient;
+        //prog["dirLight.diffuse"] = dirLight.mDiffuse;
+        //prog["dirLight.specular"] = dirLight.mSpecular;
+        //prog["pLight.position"] = pLight.mPosition;
+        //prog["pLight.ambient"] = pLight.mAmbient;
+        //prog["pLight.diffuse"] = pLight.mDiffuse;
+        //prog["pLight.specular"] = pLight.mSpecular;
+        //prog["pLight.constCoeff"] = pLight.mConstCoeff;
+        //prog["pLight.linCoeff"] = pLight.mLinCoeff;
+        //prog["pLight.quadCoeff"] = pLight.mQuadCoeff;
+        //prog["spLight.position"] = sLight.mPosition;
+        //prog["spLight.direction"] = sLight.mDirection;
+        //prog["spLight.ambient"] = sLight.mAmbient;
+        //prog["spLight.diffuse"] = sLight.mDiffuse;
+        //prog["spLight.specular"] = sLight.mSpecular;
+        //prog["spLight.constCoeff"] = sLight.mConstCoeff;
+        //prog["spLight.linCoeff"] = sLight.mLinCoeff;
+        //prog["spLight.quadCoeff"] = sLight.mQuadCoeff;
+        //prog["spLight.cutOff"] = glm::cos(sLight.mCutOff);
+        //prog["spLight.outerCutOff"] = glm::cos(sLight.mOuterCutOff);
 
-        prog["dirLight.direction"] = dirLight.mDirection;
-        prog["dirLight.ambient"] = dirLight.mAmbient;
-        prog["dirLight.diffuse"] = dirLight.mDiffuse;
-        prog["dirLight.specular"] = dirLight.mSpecular;
-        prog["pLight.position"] = pLight.mPosition;
-        prog["pLight.ambient"] = pLight.mAmbient;
-        prog["pLight.diffuse"] = pLight.mDiffuse;
-        prog["pLight.specular"] = pLight.mSpecular;
-        prog["pLight.constCoeff"] = pLight.mConstCoeff;
-        prog["pLight.linCoeff"] = pLight.mLinCoeff;
-        prog["pLight.quadCoeff"] = pLight.mQuadCoeff;
-        prog["spLight.position"] = sLight.mPosition;
-        prog["spLight.direction"] = sLight.mDirection;
-        prog["spLight.ambient"] = sLight.mAmbient;
-        prog["spLight.diffuse"] = sLight.mDiffuse;
-        prog["spLight.specular"] = sLight.mSpecular;
-        prog["spLight.constCoeff"] = sLight.mConstCoeff;
-        prog["spLight.linCoeff"] = sLight.mLinCoeff;
-        prog["spLight.quadCoeff"] = sLight.mQuadCoeff;
-        prog["spLight.cutOff"] = glm::cos(sLight.mCutOff);
-        prog["spLight.outerCutOff"] = glm::cos(sLight.mOuterCutOff);
+        //prog["SpotLightOn"] = mSpotLightOn;
 
-        prog["SpotLightOn"] = mSpotLightOn;
+        ////model.draw(prog);
+        //cubemesh.draw(prog);
 
-        //model.draw(prog);
-        cubemesh.draw(prog);
+        //meshSorter.sort(mCamera.pos());
+        //for (auto const& mesh : meshSorter.meshes())
+        //{
+        //    prog["model"] = glm::translate(scaleMat, mesh.first);
+        //    mesh.second->draw(prog);
+        //}
 
-        meshSorter.sort(mCamera.pos());
-        for (auto const& mesh : meshSorter.meshes())
-        {
-            prog["model"] = glm::translate(scaleMat, mesh.first);
-            mesh.second->draw(prog);
-        }
-
-        frameBuffer.unbind();
-        
-        // Rendering
-        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        quadProg.use();
-        quadProg["offset"] = glm::vec2(1.0f / 400.0f, 1.0f / 400.0f);// glm::vec2(1 / static_cast<float>(mWinSize.x), 1 / static_cast<float>(mWinSize.y));
-        /*quadProg["kernel"] = glm::mat3x3(
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  9.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f
-            );*/
-        quadProg["kernel"] = glm::mat3x3(
-            0.0f, 1.0f, 2.0f,
-            3.0f, -4.0f, 5.0f,
-            6.0f, -7.0f, -8.0f
-            ) / 32.0f;
-        glBindVertexArray(quadVAO);
-        texture.active(GL_TEXTURE0);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-        glDisableVertexAttribArray(0);
-
+        //frameBuffer.unbind();
+        //
+        //// Rendering
+        //glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //
+        //quadProg.use();
+        //quadProg["offset"] = glm::vec2(1.0f / 400.0f, 1.0f / 400.0f);// glm::vec2(1 / static_cast<float>(mWinSize.x), 1 / static_cast<float>(mWinSize.y));
+        ///*quadProg["kernel"] = glm::mat3x3(
+        //    -1.0f, -1.0f, -1.0f,
+        //    -1.0f,  9.0f, -1.0f,
+        //    -1.0f, -1.0f, -1.0f
+        //    );*/
+        //quadProg["kernel"] = glm::mat3x3(
+        //    0.0f, 1.0f, 2.0f,
+        //    3.0f, -4.0f, 5.0f,
+        //    6.0f, -7.0f, -8.0f
+        //    ) / 32.0f;
+        //glBindVertexArray(quadVAO);
+        //texture.active(GL_TEXTURE0);
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        //glBindVertexArray(0);
+        //glDisableVertexAttribArray(0);
+        //
         glfwSwapBuffers(mWindow);
     }
 }
@@ -497,30 +420,4 @@ void App::runFragmentDemo(std::string const& demoName)
 
         glfwSwapBuffers(mWindow);
     }
-}
-
-void App::moveCamera(float dt)
-{
-    GLfloat cameraSpeed = 5.0f * dt;
-    auto camPos = mCamera.pos();
-    if (isPressed(GLFW_KEY_W))
-        camPos += cameraSpeed * mCamera.front();
-    if (isPressed(GLFW_KEY_S))
-        camPos -= cameraSpeed * mCamera.front();
-    if (isPressed(GLFW_KEY_A))
-        camPos -= glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (isPressed(GLFW_KEY_D))
-        camPos += glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (isPressed(GLFW_KEY_SPACE))
-        camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    if (isPressed(GLFW_KEY_LEFT_SHIFT) || isPressed(GLFW_KEY_RIGHT_SHIFT))
-        camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    mCamera.pos(camPos);
-    mCamera.front(mPitch, mYaw);
-}
-
-
-App& APP()
-{
-    return App::inst();
 }

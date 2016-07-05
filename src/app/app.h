@@ -2,26 +2,20 @@
 #include <vector>
 #include <glm/vec2.hpp>
 #include "camera/camera.h"
+#include "util/singleton.h"
 
 struct GLFWwindow;
 
 struct App
+    : public Singleton<App>
 {
-    static void create();
-    static void destroy();
-    static App& inst();
-
     ~App();
-    
+
     bool init();
     bool shouldClose() const;
-    
-    void resize(int width, int height);
-    
-    void mouse(glm::vec2 const& pos);
-    void scroll(float xDiff, float yDiff);
-    void touchDown(int button);
-    void touchUp(int button);
+
+    void resize(glm::ivec2 const& size);
+
     void keyDown(int key);
     void keyUp(int key);
     bool isPressed(int key);
@@ -32,7 +26,7 @@ struct App
 
 private:
     App();
-    void moveCamera(float dt);
+    FRIEND_SINGLETON(App);
 
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
@@ -40,11 +34,7 @@ private:
     bool mMouseVisible{ true };
     bool mSpotLightOn{ false };
     glm::vec2 mMPos;
-
-    float mYaw{ 0.0f };
-    float mPitch{ 0.0f };
-    Camera mCamera;
 };
 
 
-App& APP();
+INST_GET(App, APP);

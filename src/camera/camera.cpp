@@ -4,37 +4,9 @@
 #include "camera.h"
 
 
-Camera::Camera(float width, float height)
-    : mSize(width, height)
-    , mNear(0.1f)
-    , mFar(7.0f)
-    , mFov(45.0f)
-    , mPos(0.0f, 0.0f, 5.0f)
-    , mFront(0.0f, 0.0f, -1.0f)
-    , mUp(0.0f, 1.0f, 0.0f)
+glm::vec2 const& Camera::size() const
 {
-}
-
-Camera::Camera(int width, int height)
-    : mSize(static_cast<float>(width), static_cast<float>(height))
-    , mNear(0.1f)
-    , mFar(7.0f)
-    , mFov(45.0f)
-    , mPos(0.0f, 0.0f, 5.0f)
-    , mFront(0.0f, 0.0f, -1.0f)
-    , mUp(0.0f, 1.0f, 0.0f)
-{
-}
-
-Camera::Camera(size_t width, size_t height)
-    : mSize(static_cast<float>(width), static_cast<float>(height))
-    , mNear(0.1f)
-    , mFar(7.0f)
-    , mFov(45.0f)
-    , mPos(0.0f, 0.0f, 5.0f)
-    , mFront(0.0f, 0.0f, -1.0f)
-    , mUp(0.0f, 1.0f, 0.0f)
-{
+    return mSize;
 }
 
 float Camera::near() const
@@ -50,6 +22,11 @@ float Camera::far() const
 float Camera::fov() const
 {
     return mFov;
+}
+
+void Camera::size(glm::vec2 const& sz)
+{
+    mSize = sz;
 }
 
 void Camera::near(float val)
@@ -89,6 +66,11 @@ glm::vec3 const& Camera::up() const
     return mUp;
 }
 
+float Camera::speed() const
+{
+    return mSpeed;
+}
+
 void Camera::pos(glm::vec3 const& v)
 {
     mPos = v;
@@ -118,8 +100,23 @@ void Camera::up(glm::vec3 const& v)
     mUp = glm::normalize(v);
 }
 
+void Camera::speed(float speed)
+{
+    mSpeed = speed;
+}
+
 glm::mat4 Camera::view() const
 {
     return glm::lookAt(mPos, mPos + mFront, mUp);
 }
 
+void Camera::setDefault()
+{
+    mNear = 0.1f;
+    mFar = 120.0f;
+    mFov = 45.0f;
+    mPos = glm::vec3(0.0f, 0.0f, 5.0f);
+    mFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    mUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    mSpeed = 5.0f;
+}

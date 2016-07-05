@@ -2,6 +2,8 @@
 set(SOURCE_FILES_APP
 ${SourcePath}/app/app.h
 ${SourcePath}/app/app.cpp
+${SourcePath}/app/scene.h
+${SourcePath}/app/scene.cpp
 )
 
 set(SOURCE_FILES_BUFFERS
@@ -17,6 +19,8 @@ ${SourcePath}/buffers/texture.cpp
 set(SOURCE_FILES_CAMERA
 ${SourcePath}/camera/camera.h
 ${SourcePath}/camera/camera.cpp
+${SourcePath}/camera/camera_updater.h
+${SourcePath}/camera/camera_updater.cpp
 )
 
 set(SOURCE_FILES_DATA
@@ -37,6 +41,11 @@ ${SourcePath}/data/quad.h
 ${SourcePath}/data/quad.cpp
 ${SourcePath}/data/triangle.h
 ${SourcePath}/data/triangle.cpp
+)
+
+set(SOURCE_FILES_INPUT
+${SourcePath}/input/mouse.h
+${SourcePath}/input/mouse.cpp
 )
 
 set(SOURCE_FILES_SHADERS
@@ -78,6 +87,7 @@ ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
 ${SourcePath}/util/ref_counter.h
 ${SourcePath}/util/ref_counter.cpp
+${SourcePath}/util/singleton.h
 ${SourcePath}/util/soil_image.h
 ${SourcePath}/util/soil_image.cpp
 )
@@ -100,6 +110,7 @@ source_group(app FILES ${SOURCE_FILES_APP})
 source_group(buffers  FILES  ${SOURCE_FILES_BUFFERS})
 source_group(camera FILES ${SOURCE_FILES_CAMERA})
 source_group(data FILES ${SOURCE_FILES_DATA})
+source_group(input FILES ${SOURCE_FILES_INPUT})
 source_group(shaders  FILES  ${SOURCE_FILES_SHADERS})
 source_group(shaders_src  FILES  ${SOURCE_FILES_SHADERS_SOURCE})
 source_group(util  FILES  ${SOURCE_FILES_UTIL})
@@ -113,6 +124,7 @@ ${SOURCE_FILES_APP}
 ${SOURCE_FILES_BUFFERS}
 ${SOURCE_FILES_CAMERA}
 ${SOURCE_FILES_DATA}
+${SOURCE_FILES_INPUT}
 ${SOURCE_FILES_SHADERS}
 ${SOURCE_FILES_SHADERS_SOURCE}
 #${SOURCE_FILES_GLFW}
