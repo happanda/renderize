@@ -45,6 +45,8 @@ ${SourcePath}/data/triangle.cpp
 
 set(SOURCE_FILES_INPUT
 ${SourcePath}/input/input.h
+${SourcePath}/input/keyboard.h
+${SourcePath}/input/keyboard.cpp
 ${SourcePath}/input/mouse.h
 ${SourcePath}/input/mouse.cpp
 )

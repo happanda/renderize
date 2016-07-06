@@ -4,6 +4,7 @@
 #include "app/app.h"
 #include "camera.h"
 #include "input/mouse.h"
+#include "input/keyboard.h"
 
 
 MainCameraUpdater::MainCameraUpdater(Camera& camera)
@@ -17,18 +18,18 @@ void MainCameraUpdater::update(float dt)
 {
     float cameraSpeed = mCamera.speed() * dt;
     auto camPos = mCamera.pos();
-    auto& app = APP();
-    if (app.isPressed(GLFW_KEY_W))
+    auto& kbd = KBRD();
+    if (kbd.isPressed(GLFW_KEY_W))
         camPos += cameraSpeed * mCamera.front();
-    if (app.isPressed(GLFW_KEY_S))
+    if (kbd.isPressed(GLFW_KEY_S))
         camPos -= cameraSpeed * mCamera.front();
-    if (app.isPressed(GLFW_KEY_A))
+    if (kbd.isPressed(GLFW_KEY_A))
         camPos -= glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (app.isPressed(GLFW_KEY_D))
+    if (kbd.isPressed(GLFW_KEY_D))
         camPos += glm::normalize(glm::cross(mCamera.front(), mCamera.up())) * cameraSpeed;
-    if (app.isPressed(GLFW_KEY_SPACE))
+    if (kbd.isPressed(GLFW_KEY_SPACE))
         camPos += glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
-    if (app.isPressed(GLFW_KEY_LEFT_SHIFT) || app.isPressed(GLFW_KEY_RIGHT_SHIFT))
+    if (kbd.isPressed(GLFW_KEY_LEFT_SHIFT) || kbd.isPressed(GLFW_KEY_RIGHT_SHIFT))
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     mCamera.pos(camPos);
     mCamera.front(mPitch, mYaw);

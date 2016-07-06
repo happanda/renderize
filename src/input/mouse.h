@@ -7,7 +7,7 @@
 
 struct GLFWwindow;
 
-enum class MouseButton
+enum class MouseButton : char
 {
     Left,
     Right,
@@ -36,12 +36,13 @@ struct Mouse
 
 private:
     Mouse(GLFWwindow* window);
-    FRIEND_SINGLETON(Mouse)
 
+    GLFWwindow* mWindow{ nullptr };
     float mSensitivity;
     glm::vec2 mPos;
-
     bool mVisible;
+
+    FRIEND_SINGLETON(Mouse)
 };
 
 INST_GET(Mouse, MOUSE)

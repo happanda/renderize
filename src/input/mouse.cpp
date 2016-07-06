@@ -22,12 +22,14 @@ namespace
 
 
 Mouse::Mouse(GLFWwindow* window)
-    : mSensitivity(0.08f)
+    : mWindow(window)
+    , mSensitivity(0.08f)
     , mVisible(true)
 {
-    glfwSetCursorPosCallback(window, mouseCallback);
-    glfwSetScrollCallback(window, scrollCallback);
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetInputMode(mWindow, GLFW_CURSOR, mVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(mWindow, mouseCallback);
+    glfwSetScrollCallback(mWindow, scrollCallback);
+    glfwSetMouseButtonCallback(mWindow, mouseButtonCallback);
 }
 
 void Mouse::sensitivity(float sens)
@@ -85,6 +87,7 @@ void Mouse::button(int button, int action, int /*modifiers*/)
 void Mouse::visible(bool vis)
 {
     mVisible = vis;
+    glfwSetInputMode(mWindow, GLFW_CURSOR, mVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 }
 
 bool Mouse::visible() const

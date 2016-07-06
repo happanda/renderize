@@ -17,6 +17,7 @@
 #include "data/model.h"
 #include "data/quad.h"
 #include "input/mouse.h"
+#include "input/keyboard.h"
 #include "shaders/program.h"
 #include "util/checked_call.h"
 #include "util/date.h"
@@ -24,23 +25,13 @@
 
 glm::mat3x3 sKernel;
 
+using namespace std::placeholders;
+
 namespace
 {
     void glfwErrorReporting(int errCode, char const* msg)
     {
         APP().onGLFWError(errCode, msg);
-    }
-
-    void keyCallback(GLFWwindow* window, int key, int scancode, int action, int modifiers)
-    {
-        if (action == GLFW_PRESS)
-            APP().keyDown(key);
-        else if (action == GLFW_RELEASE)
-            APP().keyUp(key);
-    }
-
-    void charCallback(GLFWwindow* window, unsigned int symb)
-    {
     }
 
     void windowSizeCallback(GLFWwindow* window, int sizeX, int sizeY)
@@ -53,7 +44,6 @@ namespace
 App::App()
     : mWinSize(800, 800)
     , mWindow(nullptr)
-    , mKeys(GLFW_KEY_LAST, false)
 {
 }
 
@@ -89,14 +79,9 @@ bool App::init()
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     glEnable(GL_DEPTH_TEST);
     
-    // Initialize some GLFW callbacks
-    glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-    glfwSetKeyCallback(mWindow, keyCallback);
     Mouse::create(mWindow);
-    //glfwSetCursorPosCallback(mWindow, mouseCallback);
-    //glfwSetScrollCallback(mWindow, scrollCallback);
-    //glfwSetMouseButtonCallback(mWindow, mouseButtonCallback);
-    glfwSetCharCallback(mWindow, charCallback);
+    Keyboard::create(mWindow);
+    KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
     return true;
 }
@@ -113,33 +98,18 @@ void App::resize(glm::ivec2 const& size)
     glViewport(0, 0, mWinSize.x, mWinSize.y);
 }
 
-void App::keyDown(int key)
+void App::onKey(int key, KeyAction action, int mods)
 {
-    mKeys[key] = true;
     if (key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(mWindow, GL_TRUE);
     else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT)
     {
-        mMouseVisible = !mMouseVisible;
-        glfwSetInputMode(mWindow, GLFW_CURSOR, mMouseVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+        MOUSE().visible(!MOUSE().visible());
     }
     else if (key == GLFW_KEY_F)
     {
         mSpotLightOn = !mSpotLightOn;
     }
-    else if (key == GLFW_KEY_R)
-    {
-    }
-}
-
-void App::keyUp(int key)
-{
-    mKeys[key] = false;
-}
-
-bool App::isPressed(int key)
-{
-    return mKeys[key];
 }
 
 void App::onGLFWError(int errCode, char const* msg)
