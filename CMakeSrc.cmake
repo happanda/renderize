@@ -44,6 +44,7 @@ ${SourcePath}/data/triangle.cpp
 )
 
 set(SOURCE_FILES_INPUT
+${SourcePath}/input/input.h
 ${SourcePath}/input/mouse.h
 ${SourcePath}/input/mouse.cpp
 )
@@ -87,6 +88,7 @@ ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
 ${SourcePath}/util/ref_counter.h
 ${SourcePath}/util/ref_counter.cpp
+${SourcePath}/util/signal.h
 ${SourcePath}/util/singleton.h
 ${SourcePath}/util/soil_image.h
 ${SourcePath}/util/soil_image.cpp

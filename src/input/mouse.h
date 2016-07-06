@@ -1,9 +1,18 @@
 #pragma once
 #include <glm/vec2.hpp>
+#include "input/input.h"
+#include "util/signal.h"
 #include "util/singleton.h"
 
 
 struct GLFWwindow;
+
+enum class MouseButton
+{
+    Left,
+    Right,
+    Middle
+};
 
 struct Mouse
     : public Singleton<Mouse>
@@ -21,12 +30,17 @@ struct Mouse
     void visible(bool vis);
     bool visible() const;
 
+    signal<void(glm::vec2 const&)> sgnMove;
+    signal<void(glm::vec2 const&)> sgnScroll;
+    signal<void(glm::vec2 const&, MouseButton, KeyAction)> sgnButton;
+
 private:
     Mouse(GLFWwindow* window);
     FRIEND_SINGLETON(Mouse)
 
     float mSensitivity;
     glm::vec2 mPos;
+
     bool mVisible;
 };
 

@@ -53,7 +53,7 @@ void Mouse::pos(glm::vec2 const& vec)
     glm::vec2 diff = vec - lastPos;
     lastPos = vec;
     diff *= mSensitivity;
-    // TODO: signal diff
+    sgnMove(diff);
     mPos = vec;
 }
 
@@ -64,12 +64,22 @@ glm::vec2 const& Mouse::pos() const
 
 void Mouse::scroll(glm::vec2 const& diff)
 {
-    // TODO: signal scroll
+    sgnScroll(diff);
 }
 
-void Mouse::button(int button, int action, int modifiers)
+void Mouse::button(int button, int action, int /*modifiers*/)
 {
-    // TODO: signal button
+    MouseButton mb;
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+        mb = MouseButton::Left;
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        mb = MouseButton::Right;
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+        mb = MouseButton::Middle;
+    else
+        return;
+    KeyAction ka = (action == GLFW_PRESS) ? KeyAction::Pressed : KeyAction::Released;
+    sgnButton(mPos, mb, ka);
 }
 
 void Mouse::visible(bool vis)

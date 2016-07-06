@@ -3,21 +3,15 @@
 #include "camera_updater.h"
 #include "app/app.h"
 #include "camera.h"
+#include "input/mouse.h"
 
 
 MainCameraUpdater::MainCameraUpdater(Camera& camera)
     : mCamera(camera)
+    , mMouseMoveConn(MOUSE().sgnMove.connect([this](glm::vec2 const& diff){ onMouseMove(diff); }))
+    , mMouseScrollConn(MOUSE().sgnScroll.connect([this](glm::vec2 const& diff){ onMouseScroll(diff); }))
 {
 }
-
-// TODO: on mouse events
-// on moving:
-// mYaw += xDiff;
-// mPitch = glm::clamp(mPitch - yDiff, -89.0f, 89.0f);
-
-// on scrolling:
-// mCamera.fov(mCamera.fov() - static_cast<float>(yDiff));
-
 
 void MainCameraUpdater::update(float dt)
 {
@@ -38,4 +32,15 @@ void MainCameraUpdater::update(float dt)
         camPos -= glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)) * cameraSpeed;
     mCamera.pos(camPos);
     mCamera.front(mPitch, mYaw);
+}
+
+void MainCameraUpdater::onMouseMove(glm::vec2 const& diff)
+{
+    mYaw += diff.x;
+    mPitch = glm::clamp(mPitch - diff.y, -89.0f, 89.0f);
+}
+
+void MainCameraUpdater::onMouseScroll(glm::vec2 const& diff)
+{
+    mCamera.fov(mCamera.fov() - static_cast<float>(diff.y));
 }

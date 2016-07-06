@@ -64,6 +64,10 @@ include_directories(${AssimpPath}/include)
 target_link_libraries(Renderize debug ${AssimpPath}/lib/assimpd.lib)
 target_link_libraries(Renderize optimized ${AssimpPath}/lib/assimp.lib)
 
+### NOD ###
+set(NodPath ${ExtPath}/nod-0.3.1)
+include_directories(${NodPath})
+
 
 
 ### Copying stuff ###
