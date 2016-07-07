@@ -19,6 +19,7 @@ struct Texture;
 
 struct Mesh
 {
+    Mesh();
     Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures);
     ~Mesh();
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/vec2.hpp>
+#include "app/scene.h"
 #include "camera/camera.h"
 #include "input/input.h"
 #include "util/singleton.h"
@@ -30,7 +31,8 @@ private:
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
     bool mSpotLightOn{ false };
-    glm::vec2 mMPos;
+
+    Scene mScene;
 };
 
 

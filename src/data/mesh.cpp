@@ -3,6 +3,13 @@
 #include "shaders/program.h"
 
 
+Mesh::Mesh()
+    : mVAO(0)
+    , mVBO(0)
+    , mEBO(0)
+{
+}
+
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<TexturePtr> textures)
     : mVertices(std::move(vertices))
     , mIndices(std::move(indices))
