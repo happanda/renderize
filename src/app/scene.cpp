@@ -29,19 +29,18 @@ void Scene::draw()
     int idx = 0;
     for (auto& lgh : mDirLights)
     {
-        lgh->assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
     }
     for (auto& lgh : mPointLights)
     {
-        lgh->assign(mProg, "pLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProg, "pLight[" + std::to_string(idx++) + "]");
     }
     idx = 0;
     for (auto& lgh : mSpotLights)
     {
-        SpotLight* sl = static_cast<SpotLight*>(lgh.get());
-        sl->position(mCamera.pos());
-        sl->direction(mCamera.front());
-        lgh->assign(mProg, "spLight[" + std::to_string(idx++) + "]");
+        lgh.position(mCamera.pos());
+        lgh.direction(mCamera.front());
+        lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
     }
 
     mProg["SpotLightOn"] = false;// mSpotLightOn;
@@ -58,17 +57,17 @@ void Scene::draw()
 
 }
 
-void Scene::addDirectional(LightPtr light)
+void Scene::add(DirLight light)
 {
     mDirLights.emplace_back(light);
 }
 
-void Scene::addPoint(LightPtr light)
+void Scene::add(PointLight light)
 {
     mPointLights.emplace_back(light);
 }
 
-void Scene::addSpot(LightPtr light)
+void Scene::add(SpotLight light)
 {
     mSpotLights.emplace_back(light);
 }
