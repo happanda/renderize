@@ -172,6 +172,8 @@ void App::run()
             continue;
         lastTime = curTime;
 
+        mScene.update(dt);
+
         // Rendering
         frameBuffer.bind();
         mScene.draw();

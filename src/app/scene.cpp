@@ -90,6 +90,7 @@ void Scene::init()
 
 void Scene::update(float dt)
 {
+    mCamUpdater->update(dt);
 }
 
 void Scene::draw()
