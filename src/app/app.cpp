@@ -78,6 +78,8 @@ bool App::init()
     Keyboard::create(mWindow);
     KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
+
+    mScene.init();
     return true;
 }
 
@@ -97,15 +99,18 @@ void App::resize(glm::ivec2 const& size)
 
 void App::onKey(int key, KeyAction action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE)
-        glfwSetWindowShouldClose(mWindow, GL_TRUE);
-    else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT)
+    if (action == KeyAction::Pressed)
     {
-        MOUSE().visible(!MOUSE().visible());
-    }
-    else if (key == GLFW_KEY_F)
-    {
-        mSpotLightOn = !mSpotLightOn;
+        if (key == GLFW_KEY_ESCAPE)
+            glfwSetWindowShouldClose(mWindow, GL_TRUE);
+        else if (key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT)
+        {
+            MOUSE().visible(!MOUSE().visible());
+        }
+        else if (key == GLFW_KEY_F)
+        {
+            mSpotLightOn = !mSpotLightOn;
+        }
     }
 }
 
@@ -184,10 +189,10 @@ void App::run()
         -1.0f, -1.0f, -1.0f
         );*/
         quadProg["kernel"] = glm::mat3x3(
-            0.0f, 1.0f, 2.0f,
-            3.0f, -4.0f, 5.0f,
-            6.0f, -7.0f, -8.0f
-            ) / 32.0f;
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f
+            );
         glBindVertexArray(quadVAO);
         texture.active(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
