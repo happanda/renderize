@@ -30,9 +30,9 @@ struct Scene
             .ambient({ 0.1f, 0.1f, 0.1f })
             .diffuse({ 0.1f, 0.9f, 0.1f })
             .specular({ 0.5f, 0.5f, 0.5f })
-            .constCoeff(mPLight.mConstCoeff)
-            .linCoeff(mPLight.mLinCoeff)
-            .quadCoeff(mPLight.mQuadCoeff)
+            .constCoeff(mPLight.constCoeff())
+            .linCoeff(mPLight.linCoeff())
+            .quadCoeff(mPLight.quadCoeff())
             .cutOff(0.05f)
             .outerCutOff(0.2f))
 

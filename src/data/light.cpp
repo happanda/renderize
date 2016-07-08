@@ -7,50 +7,15 @@ DirLight& DirLight::direction(glm::vec3 const& dir)
     return *this;
 }
 
-DirLight& DirLight::ambient(glm::vec3 const& amb)
+glm::vec3 const& DirLight::direction() const
 {
-    mAmbient = amb;
-    return *this;
+    return mDirection;
 }
 
-DirLight& DirLight::diffuse(glm::vec3 const& dif)
-{
-    mDiffuse = dif;
-    return *this;
-}
-
-DirLight& DirLight::specular(glm::vec3 const& spec)
-{
-    mSpecular = spec;
-    return *this;
-}
-
-
-PointLight::~PointLight()
-{
-}
 
 PointLight& PointLight::position(glm::vec3 const& pos)
 {
     mPosition = pos;
-    return *this;
-}
-
-PointLight& PointLight::ambient(glm::vec3 const& amb)
-{
-    mAmbient = amb;
-    return *this;
-}
-
-PointLight& PointLight::diffuse(glm::vec3 const& dif)
-{
-    mDiffuse = dif;
-    return *this;
-}
-
-PointLight& PointLight::specular(glm::vec3 const& spec)
-{
-    mSpecular = spec;
     return *this;
 }
 
@@ -72,35 +37,31 @@ PointLight& PointLight::quadCoeff(float coef)
     return *this;
 }
 
+glm::vec3 const& PointLight::position() const
+{
+    return mPosition;
+}
+
+float PointLight::constCoeff() const
+{
+    return mConstCoeff;
+}
+
+float PointLight::linCoeff() const
+{
+    return mLinCoeff;
+}
+
+float PointLight::quadCoeff() const
+{
+    return mQuadCoeff;
+}
+
 
 
 SpotLight& SpotLight::position(glm::vec3 const& pos)
 {
     mPosition = pos;
-    return *this;
-}
-
-SpotLight& SpotLight::ambient(glm::vec3 const& amb)
-{
-    mAmbient = amb;
-    return *this;
-}
-
-SpotLight& SpotLight::diffuse(glm::vec3 const& dif)
-{
-    mDiffuse = dif;
-    return *this;
-}
-
-SpotLight& SpotLight::specular(glm::vec3 const& spec)
-{
-    mSpecular = spec;
-    return *this;
-}
-
-SpotLight& SpotLight::direction(glm::vec3 const& dir)
-{
-    mDirection = dir;
     return *this;
 }
 
@@ -122,6 +83,12 @@ SpotLight& SpotLight::quadCoeff(float coef)
     return *this;
 }
 
+SpotLight& SpotLight::direction(glm::vec3 const& dir)
+{
+    mDirection = dir;
+    return *this;
+}
+
 SpotLight& SpotLight::cutOff(float val)
 {
     mCutOff = val;
@@ -132,4 +99,39 @@ SpotLight& SpotLight::outerCutOff(float val)
 {
     mOuterCutOff = val;
     return *this;
+}
+
+glm::vec3 const& SpotLight::position() const
+{
+    return mPosition;
+}
+
+float SpotLight::constCoeff() const
+{
+    return mConstCoeff;
+}
+
+float SpotLight::linCoeff() const
+{
+    return mLinCoeff;
+}
+
+float SpotLight::quadCoeff() const
+{
+    return mQuadCoeff;
+}
+
+glm::vec3 const& SpotLight::direction() const
+{
+    return mDirection;
+}
+
+float SpotLight::cutOff() const
+{
+    return mCutOff;
+}
+
+float SpotLight::outerCutOff() const
+{
+    return mOuterCutOff;
 }

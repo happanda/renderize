@@ -2,55 +2,114 @@
 #include <glm/vec3.hpp>
 
 
-struct DirLight
+template <class DerivedLight>
+struct Light
 {
-    glm::vec3 mDirection;
+    //No need in virtual destructor here, no dynamica allocations
+    //virtual ~Light()
+    //{
+    //}
+
+    DerivedLight& ambient(glm::vec3 const& amb)
+    {
+        mAmbient = amb;
+        return static_cast<DerivedLight&>(*this);
+    }
+
+    DerivedLight& diffuse(glm::vec3 const& diff)
+    {
+        mDiffuse = diff;
+        return static_cast<DerivedLight&>(*this);
+    }
+
+    DerivedLight& specular(glm::vec3 const& spec)
+    {
+        mSpecular = spec;
+        return static_cast<DerivedLight&>(*this);
+    }
+
+    glm::vec3 const& ambient() const
+    {
+        return mAmbient;
+    }
+
+    glm::vec3 const& diffuse() const
+    {
+        return mDiffuse;
+    }
+
+    glm::vec3 const& specular() const
+    {
+        return mSpecular;
+    }
+
+private:
     glm::vec3 mAmbient;
     glm::vec3 mDiffuse;
     glm::vec3 mSpecular;
-
-    DirLight& direction(glm::vec3 const& dir);
-    DirLight& ambient(glm::vec3 const& amb);
-    DirLight& diffuse(glm::vec3 const& dif);
-    DirLight& specular(glm::vec3 const& spec);
 };
 
-struct PointLight
-{
-    virtual ~PointLight();
 
+struct DirLight
+    : public Light<DirLight>
+{
+    DirLight& direction(glm::vec3 const& dir);
+    glm::vec3 const& direction() const;
+
+private:
+    glm::vec3 mDirection;
+};
+
+
+struct PointLight
+    : public Light<PointLight>
+{
+    PointLight& position(glm::vec3 const& pos);
+    PointLight& constCoeff(float coef);
+    PointLight& linCoeff(float coef);
+    PointLight& quadCoeff(float coef);
+
+    glm::vec3 const& position() const;
+    float constCoeff() const;
+    float linCoeff() const;
+    float quadCoeff() const;
+
+private:
     glm::vec3 mPosition;
-    glm::vec3 mAmbient;
-    glm::vec3 mDiffuse;
-    glm::vec3 mSpecular;
+    float mConstCoeff;
+    float mLinCoeff;
+    float mQuadCoeff;
+};
+
+
+struct SpotLight
+    : public Light<SpotLight>
+{
+    SpotLight& position(glm::vec3 const& pos);
+    SpotLight& constCoeff(float coef);
+    SpotLight& linCoeff(float coef);
+    SpotLight& quadCoeff(float coef);
+
+    SpotLight& direction(glm::vec3 const& dir);
+    SpotLight& cutOff(float val);
+    SpotLight& outerCutOff(float val);
+
+    glm::vec3 const& position() const;
+    float constCoeff() const;
+    float linCoeff() const;
+    float quadCoeff() const;
+
+    glm::vec3 const& direction() const;
+    float cutOff() const;
+    float outerCutOff() const;
+
+private:
+    glm::vec3 mPosition;
     float mConstCoeff;
     float mLinCoeff;
     float mQuadCoeff;
 
-    virtual PointLight& position(glm::vec3 const& pos);
-    virtual PointLight& ambient(glm::vec3 const& amb);
-    virtual PointLight& diffuse(glm::vec3 const& dif);
-    virtual PointLight& specular(glm::vec3 const& spec);
-    virtual PointLight& constCoeff(float coef);
-    virtual PointLight& linCoeff(float coef);
-    virtual PointLight& quadCoeff(float coef);
-};
-
-struct SpotLight : public PointLight
-{
     glm::vec3 mDirection;
     float mCutOff;
     float mOuterCutOff;
-
-    SpotLight& position(glm::vec3 const& pos) override;
-    SpotLight& ambient(glm::vec3 const& amb) override;
-    SpotLight& diffuse(glm::vec3 const& dif) override;
-    SpotLight& specular(glm::vec3 const& spec) override;
-    SpotLight& direction(glm::vec3 const& dir);
-
-    SpotLight& constCoeff(float coef) override;
-    SpotLight& linCoeff(float coef) override;
-    SpotLight& quadCoeff(float coef) override;
-    SpotLight& cutOff(float val);
-    SpotLight& outerCutOff(float val);
 };
