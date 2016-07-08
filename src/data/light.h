@@ -1,7 +1,11 @@
 #pragma once
+#include <string>
 #include <glm/vec3.hpp>
 
 
+struct Program;
+
+    /// Base class for light sources
 template <class DerivedLight>
 struct Light
 {
@@ -43,6 +47,8 @@ struct Light
         return mSpecular;
     }
 
+    virtual void assign(Program& prog, std::string const& name) = 0;
+
 private:
     glm::vec3 mAmbient;
     glm::vec3 mDiffuse;
@@ -50,17 +56,21 @@ private:
 };
 
 
+    /// Directional light (the sun)
 struct DirLight
     : public Light<DirLight>
 {
     DirLight& direction(glm::vec3 const& dir);
     glm::vec3 const& direction() const;
 
+    void assign(Program& prog, std::string const& name) override;
+
 private:
     glm::vec3 mDirection;
 };
 
 
+    /// Point light (a lamp)
 struct PointLight
     : public Light<PointLight>
 {
@@ -74,6 +84,8 @@ struct PointLight
     float linCoeff() const;
     float quadCoeff() const;
 
+    void assign(Program& prog, std::string const& name) override;
+
 private:
     glm::vec3 mPosition;
     float mConstCoeff;
@@ -82,6 +94,7 @@ private:
 };
 
 
+    /// Spot light (flash light)
 struct SpotLight
     : public Light<SpotLight>
 {
@@ -102,6 +115,8 @@ struct SpotLight
     glm::vec3 const& direction() const;
     float cutOff() const;
     float outerCutOff() const;
+
+    void assign(Program& prog, std::string const& name) override;
 
 private:
     glm::vec3 mPosition;

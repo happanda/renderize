@@ -1,4 +1,5 @@
 #include "light.h"
+#include "shaders/program.h"
 
 
 DirLight& DirLight::direction(glm::vec3 const& dir)
@@ -11,6 +12,15 @@ glm::vec3 const& DirLight::direction() const
 {
     return mDirection;
 }
+
+void DirLight::assign(Program& prog, std::string const& name)
+{
+    prog[name + ".direction"] = direction();
+    prog[name + ".ambient"] = ambient();
+    prog[name + ".diffuse"] = diffuse();
+    prog[name + ".specular"] = specular();
+}
+
 
 
 PointLight& PointLight::position(glm::vec3 const& pos)
@@ -57,6 +67,16 @@ float PointLight::quadCoeff() const
     return mQuadCoeff;
 }
 
+void PointLight::assign(Program& prog, std::string const& name)
+{
+    prog[name + ".position"] = position();
+    prog[name + ".ambient"] = ambient();
+    prog[name + ".diffuse"] = diffuse();
+    prog[name + ".specular"] = specular();
+    prog[name + ".constCoeff"] = constCoeff();
+    prog[name + ".linCoeff"] = linCoeff();
+    prog[name + ".quadCoeff"] = quadCoeff();
+}
 
 
 SpotLight& SpotLight::position(glm::vec3 const& pos)
@@ -134,4 +154,18 @@ float SpotLight::cutOff() const
 float SpotLight::outerCutOff() const
 {
     return mOuterCutOff;
+}
+
+void SpotLight::assign(Program& prog, std::string const& name)
+{
+    prog[name + ".position"] = position();
+    prog[name + ".direction"] = direction();
+    prog[name + ".ambient"] = ambient();
+    prog[name + ".diffuse"] = diffuse();
+    prog[name + ".specular"] = specular();
+    prog[name + ".constCoeff"] = constCoeff();
+    prog[name + ".linCoeff"] = linCoeff();
+    prog[name + ".quadCoeff"] = quadCoeff();
+    prog[name + ".cutOff"] = glm::cos(cutOff());
+    prog[name + ".outerCutOff"] = glm::cos(outerCutOff());
 }

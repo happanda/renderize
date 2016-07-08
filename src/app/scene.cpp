@@ -29,27 +29,9 @@ void Scene::draw()
     mProg["projection"] = mCamera.projection();
     mProg["viewerPos"] = mCamera.pos();
 
-    mProg["dirLight.direction"] = mDirLight.direction();
-    mProg["dirLight.ambient"] = mDirLight.ambient();
-    mProg["dirLight.diffuse"] = mDirLight.diffuse();
-    mProg["dirLight.specular"] = mDirLight.specular();
-    mProg["pLight.position"] = mPLight.position();
-    mProg["pLight.ambient"] = mPLight.ambient();
-    mProg["pLight.diffuse"] = mPLight.diffuse();
-    mProg["pLight.specular"] = mPLight.specular();
-    mProg["pLight.constCoeff"] = mPLight.constCoeff();
-    mProg["pLight.linCoeff"] = mPLight.linCoeff();
-    mProg["pLight.quadCoeff"] = mPLight.quadCoeff();
-    mProg["spLight.position"] = mSLight.position();
-    mProg["spLight.direction"] = mSLight.direction();
-    mProg["spLight.ambient"] = mSLight.ambient();
-    mProg["spLight.diffuse"] = mSLight.diffuse();
-    mProg["spLight.specular"] = mSLight.specular();
-    mProg["spLight.constCoeff"] = mSLight.constCoeff();
-    mProg["spLight.linCoeff"] = mSLight.linCoeff();
-    mProg["spLight.quadCoeff"] = mSLight.quadCoeff();
-    mProg["spLight.cutOff"] = glm::cos(mSLight.cutOff());
-    mProg["spLight.outerCutOff"] = glm::cos(mSLight.outerCutOff());
+    mDirLight.assign(mProg, "dirLight");
+    mPLight.assign(mProg, "pLight");
+    mSLight.assign(mProg, "spLight");
 
     mProg["SpotLightOn"] = false;// mSpotLightOn;
 
