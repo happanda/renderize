@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <glm/vec3.hpp>
 
@@ -6,14 +7,24 @@
 struct Program;
 
     /// Base class for light sources
-template <class DerivedLight>
-struct Light
+struct LightBase
 {
     //No need in virtual destructor here, no dynamica allocations
     //virtual ~Light()
     //{
     //}
 
+    virtual void assign(Program& prog, std::string const& name) = 0;
+};
+
+typedef std::shared_ptr<LightBase> LightPtr;
+
+
+    /// Base templated class for light sources with some usefull parameters
+template <class DerivedLight>
+struct Light
+    : public LightBase
+{
     DerivedLight& ambient(glm::vec3 const& amb)
     {
         mAmbient = amb;
@@ -46,8 +57,6 @@ struct Light
     {
         return mSpecular;
     }
-
-    virtual void assign(Program& prog, std::string const& name) = 0;
 
 private:
     glm::vec3 mAmbient;

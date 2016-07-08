@@ -4,6 +4,8 @@
 #include <glm/vec3.hpp>
 
 
+struct Program;
+
 struct Camera
 {
     template <class Number, glm::precision P = glm::defaultp>
@@ -37,6 +39,8 @@ struct Camera
     void speed(float speed);
 
     glm::mat4 view() const;
+
+    void assign(Program& prog);
 
 private:
     void setDefault();

@@ -14,24 +14,35 @@ void Scene::update(float dt)
 
 void Scene::draw()
 {
-    mSLight.position(mCamera.pos());
-    mSLight.direction(mCamera.front());
-    
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     mProg.use();
+
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
     mProg["model"] = glm::translate(scaleMat, transVec);
-    mProg["view"] = mCamera.view();
-    mProg["projection"] = mCamera.projection();
-    mProg["viewerPos"] = mCamera.pos();
 
-    mDirLight.assign(mProg, "dirLight");
-    mPLight.assign(mProg, "pLight");
-    mSLight.assign(mProg, "spLight");
+    mCamera.assign(mProg);
+
+    int idx = 0;
+    for (auto& lgh : mDirLights)
+    {
+        lgh->assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
+    }
+    for (auto& lgh : mPointLights)
+    {
+        lgh->assign(mProg, "pLight[" + std::to_string(idx++) + "]");
+    }
+    idx = 0;
+    for (auto& lgh : mSpotLights)
+    {
+        SpotLight* sl = static_cast<SpotLight*>(lgh.get());
+        sl->position(mCamera.pos());
+        sl->direction(mCamera.front());
+        lgh->assign(mProg, "spLight[" + std::to_string(idx++) + "]");
+    }
 
     mProg["SpotLightOn"] = false;// mSpotLightOn;
 
@@ -45,6 +56,21 @@ void Scene::draw()
         mesh.second->draw(mProg);
     }
 
+}
+
+void Scene::addDirectional(LightPtr light)
+{
+    mDirLights.emplace_back(light);
+}
+
+void Scene::addPoint(LightPtr light)
+{
+    mPointLights.emplace_back(light);
+}
+
+void Scene::addSpot(LightPtr light)
+{
+    mSpotLights.emplace_back(light);
 }
 
 void Scene::init()

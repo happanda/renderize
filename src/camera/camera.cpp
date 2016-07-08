@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.h"
+#include "shaders/program.h"
 
 
 glm::vec2 const& Camera::size() const
@@ -108,6 +109,13 @@ void Camera::speed(float speed)
 glm::mat4 Camera::view() const
 {
     return glm::lookAt(mPos, mPos + mFront, mUp);
+}
+
+void Camera::assign(Program& prog)
+{
+    prog["view"] = view();
+    prog["projection"] = projection();
+    prog["viewerPos"] = pos();
 }
 
 void Camera::setDefault()
