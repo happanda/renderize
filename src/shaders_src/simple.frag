@@ -1,5 +1,9 @@
 #version 330 core
 
+#define NumDirLights 3
+#define NumPointLights 3
+#define NumSpotLights 3
+
 struct Material
 {
     sampler2D  texDiff1;
@@ -46,9 +50,9 @@ in vec2 TexCoords;
 out vec4 color;
 
 uniform Material material;
-uniform DirLight dirLight;
-uniform PointLight pLight;
-uniform SpotLight spLight;
+uniform DirLight[NumDirLights] dirLight;
+uniform PointLight[NumPointLights] pLight;
+uniform SpotLight[NumSpotLights] spLight;
 uniform vec3 viewerPos;
 
 vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -59,10 +63,30 @@ void main()
 {
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
-    color = compDirLight(dirLight, normal, viewDir);
-        //+ compPointLight(pLight, normal, FragPos, viewDir);
+
+    vec4 dirLightTotal;
+    for (int i = 0; i < NumDirLights; ++i)
+    {
+        dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
+    }
+
+    vec4 pointLightTotal;
+    for (int i = 0; i < NumPointLights; ++i)
+    {
+        //pointLightTotal += compPointLight(pLight[i], normal, FragPos, viewDir);
+    }
+
+    color = dirLightTotal + pointLightTotal;
+
     if (SpotLightOn)
-        color += compSpotLight(spLight, normal, FragPos, viewDir);
+    {
+        vec4 spotLightTotal;
+        for (int i = 0; i < NumSpotLights; ++i)
+        {
+            spotLightTotal += compSpotLight(spLight[i], normal, FragPos, viewDir);
+        }
+        color += spotLightTotal;
+    }
 }
 
 
