@@ -10,6 +10,7 @@
 #include "app.h"
 #include "buffers/frame_buffer.h"
 #include "buffers/render_buffer.h"
+#include "buffers/render_target.h"
 #include "buffers/texture.h"
 #include "input/mouse.h"
 #include "input/keyboard.h"
@@ -80,6 +81,7 @@ bool App::init()
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
     mScene.init();
+    mRTarget.reset(new RenderTarget(mWinSize));
     return true;
 }
 
@@ -93,8 +95,10 @@ bool App::shouldClose() const
 void App::resize(glm::ivec2 const& size)
 {
     mWinSize = size;
+    glfwMakeContextCurrent(mWindow);
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     mScene.resize(mWinSize);
+    mRTarget->size(mWinSize);
 }
 
 void App::onKey(int key, KeyAction action, int mods)
@@ -121,17 +125,6 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
-    FrameBuffer frameBuffer;
-    Texture texture;
-    RenderBuffer renderBuffer;
-    texture.create(mWinSize.x, mWinSize.y, InternalFormat::Color);
-    frameBuffer.attach(texture);
-    renderBuffer.create(mWinSize.x, mWinSize.y, InternalFormat::Depth);
-    frameBuffer.attach(renderBuffer);
-    CHECK(frameBuffer.isComplete(), "Error: FrameBuffer is not complete", );
-    frameBuffer.unbind();
-
-
     Program quadProg = createProgram("shaders/asis.vert", "shaders/post_kernel3x3.frag");
     CHECK(quadProg, "Error creating quad shader program", return;);
 
@@ -175,14 +168,14 @@ void App::run()
         mScene.update(dt);
 
         // Rendering
-        frameBuffer.bind();
+        mRTarget->fb().bind();
         mScene.draw();
-        frameBuffer.unbind();
+        mRTarget->fb().unbind();
 
         // Rendering
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         quadProg.use();
         quadProg["offset"] = glm::vec2(1.0f / 400.0f, 1.0f / 400.0f);// glm::vec2(1 / static_cast<float>(mWinSize.x), 1 / static_cast<float>(mWinSize.y));
         /*quadProg["kernel"] = glm::mat3x3(
@@ -196,7 +189,7 @@ void App::run()
             0.0f, 0.0f, 0.0f
             );
         glBindVertexArray(quadVAO);
-        texture.active(GL_TEXTURE0);
+        mRTarget->tex().active(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);

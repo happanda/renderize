@@ -50,6 +50,8 @@ void FrameBuffer::attach(Texture& tex)
         break;
     }
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
+    tex.unbind();
+    unbind();
 }
 
 void FrameBuffer::attach(RenderBuffer& rb)
@@ -73,6 +75,8 @@ void FrameBuffer::attach(RenderBuffer& rb)
         break;
     }
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rb);
+    rb.unbind();
+    unbind();
 }
 
 bool FrameBuffer::isComplete() const

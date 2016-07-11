@@ -12,6 +12,8 @@ ${SourcePath}/buffers/frame_buffer.cpp
 ${SourcePath}/buffers/fwd.h
 ${SourcePath}/buffers/render_buffer.h
 ${SourcePath}/buffers/render_buffer.cpp
+${SourcePath}/buffers/render_target.h
+${SourcePath}/buffers/render_target.cpp
 ${SourcePath}/buffers/texture.h
 ${SourcePath}/buffers/texture.cpp
 )

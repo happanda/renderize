@@ -32,13 +32,13 @@ void Camera::size(glm::vec2 const& sz)
 
 void Camera::near(float val)
 {
-    // TODO: maybe clamp by mNear?
+    // TODO: maybe clamp by mFar?
     mNear = glm::clamp(val, 0.0f, std::numeric_limits<float>::max());
 }
 
 void Camera::far(float val)
 {
-    // TODO: maybe clamp by mFar?
+    // TODO: maybe clamp by mNear?
     mFar = glm::clamp(val, 0.0f, std::numeric_limits<float>::max());
 }
 

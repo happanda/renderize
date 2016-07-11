@@ -33,6 +33,7 @@ private:
     bool mSpotLightOn{ false };
 
     Scene mScene;
+    RenderTargetPtr mRTarget;
 };
 
 
