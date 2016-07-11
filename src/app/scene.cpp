@@ -13,17 +13,17 @@ void Scene::init()
     mCamUpdater.reset(new MainCameraUpdater(mCamera));
 
     DirLight dl = DirLight()
-        .direction({ 1.0f, 1.0f, -1.0f })
+        .direction({ 1.0f, 1.0f, 1.0f })
         .ambient({ 0.4f, 0.4f, 0.4f })
-        .diffuse({ 0.8f, 0.8f, 0.8f })
+        .diffuse({ 0.1f, 0.5f, 0.1f })
         .specular({ 0.4f, 0.4f, 0.4f });
     mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
-        .position({ -1.0f, -1.0f, 0.0f })
+        .position({ 0.0f, 5.0f, 0.0f })
         .ambient({ 0.1f, 0.1f, 0.1f })
-        .diffuse({ 0.3f, 0.02f, 0.02f })
-        .specular({ 0.5f, 0.1f, 0.1f })
+        .diffuse({ 0.5f, 0.5f, 0.5f })
+        .specular({ 0.1f, 0.1f, 0.7f })
         .constCoeff(1.0f)
         .linCoeff(0.09f)
         .quadCoeff(0.05f);
@@ -74,14 +74,14 @@ void Scene::init()
     quadTexs[0]->genMipMap();
     quadTexs[0]->setType(TexType::Normal);
     mQuadmesh = quadMesh(quadTexs);
-    //quadmesh.noBlending();
+    //mQuadmesh.noBlending();
     mQuadmesh.blending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     mQuadmesh.noCulling();
 
     glm::vec3 const quad1pos(0.0f, 0.0f, 2.0f);
     glm::vec3 const quad2pos(0.0f, 0.0f, 3.0f);
-    glm::vec3 const quad3pos(0.0f, 0.0f, -4.0f);
-    glm::vec3 const quad4pos(0.0f, 0.0f, -5.0f);
+    glm::vec3 const quad3pos(0.0f, 0.0f, -2.0f);
+    glm::vec3 const quad4pos(0.0f, 0.0f, -3.0f);
     mMeshSorter.addMesh(quad1pos, &mQuadmesh);
     mMeshSorter.addMesh(quad2pos, &mQuadmesh);
     mMeshSorter.addMesh(quad3pos, &mQuadmesh);
@@ -100,6 +100,7 @@ void Scene::draw()
     glEnable(GL_DEPTH_TEST);
 
     mProg.use();
+    mProg["DirLightOn"] = true;
 
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -124,11 +125,14 @@ void Scene::draw()
         lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
     }
 
+    mProg["PointLightOn"] = true;
     mProg["SpotLightOn"] = false;// mSpotLightOn;
 
     //model.draw(mProg);
     mCubemesh.draw(mProg);
 
+    mProg["PointLightOn"] = false;
+    mProg["SpotLightOn"] = false;
     mMeshSorter.sort(mCamera.pos());
     for (auto const& mesh : mMeshSorter.meshes())
     {

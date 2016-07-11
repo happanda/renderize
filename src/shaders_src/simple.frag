@@ -40,6 +40,8 @@ struct SpotLight
     float cutOff;
     float outerCutOff;
 };
+uniform bool DirLightOn;
+uniform bool PointLightOn;
 uniform bool SpotLightOn;
 
 
@@ -61,29 +63,36 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
+    color = vec4(0.0);
     vec3 normal = normalize(Normal);
     vec3 viewDir = normalize(viewerPos - FragPos);
 
-    vec4 dirLightTotal;
-    for (int i = 0; i < NumDirLights; ++i)
+    if (DirLightOn)
     {
-        dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
+        vec4 dirLightTotal = vec4(0.0);
+        for (int i = 0; i < NumDirLights; ++i)
+        {
+            dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
+        }
+        color += dirLightTotal;
     }
 
-    vec4 pointLightTotal;
-    for (int i = 0; i < NumPointLights; ++i)
+    if (PointLightOn)
     {
-        //pointLightTotal += compPointLight(pLight[i], normal, FragPos, viewDir);
+        vec4 pointLightTotal = vec4(0.0);
+        for (int i = 0; i < NumPointLights; ++i)
+        {
+            pointLightTotal += compPointLight(pLight[i], normal, FragPos, viewDir);
+        }
+        color += pointLightTotal;
     }
-
-    color = dirLightTotal + pointLightTotal;
 
     if (SpotLightOn)
     {
-        vec4 spotLightTotal;
+        vec4 spotLightTotal = vec4(0.0);
         for (int i = 0; i < NumSpotLights; ++i)
         {
-            spotLightTotal += compSpotLight(spLight[i], normal, FragPos, viewDir);
+            //spotLightTotal += compSpotLight(spLight[i], normal, FragPos, viewDir);
         }
         color += spotLightTotal;
     }
@@ -120,7 +129,7 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float distance = length(light.position - fragPos);
     float attenuation = 1.0f / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
 
-    return (ambient + diffuse + specular) * attenuation;
+    return (ambient + diffuse + specular);// *attenuation;
 }
 
 vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
