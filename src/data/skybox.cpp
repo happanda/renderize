@@ -67,7 +67,10 @@ void Skybox::draw(Camera const& camera)
 
     glDepthMask(GL_FALSE);
     mProg.use();
-    camera.assign(mProg);
+    mProg["view"] = glm::mat4(glm::mat3(camera.view()));
+    mProg["projection"] = camera.projection();
+    mProg["viewerPos"] = camera.pos();
+    //camera.assign(mProg);
     glBindVertexArray(mVAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, mTex);
     glDrawArrays(GL_TRIANGLES, 0, 36);
