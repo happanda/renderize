@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include "scene.h"
+#include "camera/camera.h"
 #include "data/cube.h"
 #include "data/model.h"
 #include "data/quad.h"
@@ -10,8 +11,6 @@
 
 void Scene::init()
 {
-    mCamUpdater.reset(new MainCameraUpdater(mCamera));
-
     DirLight dl = DirLight()
         .direction({ 1.0f, 1.0f, 1.0f })
         .ambient({ 0.4f, 0.4f, 0.4f })
@@ -90,12 +89,11 @@ void Scene::init()
 
 void Scene::update(float dt)
 {
-    mCamUpdater->update(dt);
 }
 
-void Scene::draw()
+void Scene::draw(Camera& camera, glm::vec4 const& color)
 {
-    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -106,7 +104,7 @@ void Scene::draw()
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
     mProg["model"] = glm::translate(scaleMat, transVec);
 
-    mCamera.assign(mProg);
+    camera.assign(mProg);
 
     int idx = 0;
     for (auto& lgh : mDirLights)
@@ -120,8 +118,8 @@ void Scene::draw()
     idx = 0;
     for (auto& lgh : mSpotLights)
     {
-        lgh.position(mCamera.pos());
-        lgh.direction(mCamera.front());
+        lgh.position(camera.pos());
+        lgh.direction(camera.front());
         lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
     }
 
@@ -133,7 +131,7 @@ void Scene::draw()
 
     mProg["PointLightOn"] = false;
     mProg["SpotLightOn"] = false;
-    mMeshSorter.sort(mCamera.pos());
+    mMeshSorter.sort(camera.pos());
     for (auto const& mesh : mMeshSorter.meshes())
     {
         mProg["model"] = glm::translate(scaleMat, mesh.first);
@@ -159,6 +157,5 @@ void Scene::add(SpotLight light)
 
 void Scene::resize(glm::vec2 const& sz)
 {
-    mCamera.size(sz);
 }
 

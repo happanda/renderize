@@ -40,6 +40,8 @@ App::App()
     : mWinSize(800, 800)
     , mWindow(nullptr)
     , mScene(mWinSize)
+    , mCamera(mWinSize)
+    , mCameraBack(mWinSize)
 {
 }
 
@@ -81,7 +83,9 @@ bool App::init()
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
     mScene.init();
+    mCamUpdater.reset(new MainCameraUpdater(mCamera));
     mRTarget.reset(new RenderTarget(mWinSize));
+    mRTargetBack.reset(new RenderTarget(mWinSize));
     return true;
 }
 
@@ -98,7 +102,10 @@ void App::resize(glm::ivec2 const& size)
     glfwMakeContextCurrent(mWindow);
     glViewport(0, 0, mWinSize.x, mWinSize.y);
     mScene.resize(mWinSize);
+    mCamera.size(mWinSize);
+    mCameraBack.size(mWinSize);
     mRTarget->size(mWinSize);
+    mRTargetBack->size(mWinSize);
 }
 
 void App::onKey(int key, KeyAction action, int mods)
@@ -125,30 +132,55 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
-    Program quadProg = createProgram("shaders/asis.vert", "shaders/post_kernel3x3.frag");
+    Program quadProg = createProgram("shaders/asis.vert", "shaders/asis.frag");
     CHECK(quadProg, "Error creating quad shader program", return;);
 
-    GLfloat quadVertices[] = {
-        // Positions   // TexCoords
-        -1.0f, 1.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-
-        -1.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-        1.0f, 1.0f, 1.0f, 1.0f
-    };
     GLuint quadVAO, quadVBO;
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
-    glBindVertexArray(0);
+    {
+        GLfloat quadVertices[] = {
+            // Positions   // TexCoords
+            -1.0f, 1.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, 1.0f, 0.0f,
+
+            -1.0f, 1.0f, 0.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f
+        };
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+        glBindVertexArray(0);
+    }
+    GLuint quadVAOback, quadVBOback;
+    {
+        GLfloat quadVertices[] = {
+            // Positions   // TexCoords
+            -0.4f, 1.0f, 0.0f, 1.0f,
+            -0.4f, 0.6f, 0.0f, 0.0f,
+             0.4f, 0.6f, 1.0f, 0.0f,
+
+            -0.4f, 1.0f, 0.0f, 1.0f,
+             0.4f, 0.6f, 1.0f, 0.0f,
+             0.4f, 1.0f, 1.0f, 1.0f
+        };
+        glGenVertexArrays(1, &quadVAOback);
+        glGenBuffers(1, &quadVBOback);
+        glBindVertexArray(quadVAOback);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBOback);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+        glBindVertexArray(0);
+    }
 
 
     float lastTime = static_cast<float>(glfwGetTime());
@@ -166,30 +198,34 @@ void App::run()
         lastTime = curTime;
 
         mScene.update(dt);
+        mCamUpdater->update(dt);
+        mCameraBack = mCamera;
+        mCameraBack.front(-mCamera.front());
 
         // Rendering
         mRTarget->fb().bind();
-        mScene.draw();
+        mScene.draw(mCamera);
         mRTarget->fb().unbind();
+
+        mRTargetBack->fb().bind();
+        mScene.draw(mCameraBack, glm::vec4(1.0f));
+        mRTargetBack->fb().unbind();
 
         // Rendering
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+        glDisable(GL_DEPTH_TEST);
+
         quadProg.use();
-        quadProg["offset"] = glm::vec2(1.0f / 400.0f, 1.0f / 400.0f);// glm::vec2(1 / static_cast<float>(mWinSize.x), 1 / static_cast<float>(mWinSize.y));
-        /*quadProg["kernel"] = glm::mat3x3(
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  9.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f
-        );*/
-        quadProg["kernel"] = glm::mat3x3(
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f
-            );
         glBindVertexArray(quadVAO);
         mRTarget->tex().active(GL_TEXTURE0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        glDisableVertexAttribArray(0);
+
+        quadProg.use();
+        glBindVertexArray(quadVAOback);
+        mRTargetBack->tex().active(GL_TEXTURE0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);

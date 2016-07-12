@@ -2,6 +2,7 @@
 #include <glm/vec2.hpp>
 #include "app/scene.h"
 #include "camera/camera.h"
+#include "camera/camera_updater.h"
 #include "input/input.h"
 #include "util/singleton.h"
 
@@ -31,9 +32,13 @@ private:
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
     bool mSpotLightOn{ false };
-
+        
     Scene mScene;
+    Camera mCamera;
+    Camera mCameraBack;
+    std::shared_ptr<MainCameraUpdater> mCamUpdater;
     RenderTargetPtr mRTarget;
+    RenderTargetPtr mRTargetBack;
 };
 
 

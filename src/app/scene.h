@@ -1,17 +1,16 @@
 #pragma once
-#include "camera/camera.h"
-#include "camera/camera_updater.h"
 #include "data/light.h"
 #include "data/mesh.h"
 #include "data/mesh_sorter.h"
 #include "shaders/program.h"
 
 
+struct Camera;
+
 struct Scene
 {
     template <class Number>
     Scene(glm::tvec2<Number> const& size)
-        : mCamera(size)
     {
     }
 
@@ -24,7 +23,7 @@ struct Scene
     }
 
     void update(float dt);
-    void draw();
+    void draw(Camera& camera, glm::vec4 const& color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
     void add(DirLight light);
     void add(PointLight light);
@@ -32,10 +31,7 @@ struct Scene
 
 private:
     void resize(glm::vec2 const& size);
-
-    Camera mCamera;
-    std::shared_ptr<MainCameraUpdater> mCamUpdater;
-    
+        
     Mesh mQuadmesh;
     MeshSorter mMeshSorter;
 
