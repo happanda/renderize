@@ -25,6 +25,6 @@ struct RenderBuffer
 private:
     void free();
 
-    GLuint mRBO;
-    GLint mInternalFormat;
+    GLuint mRBO{ 0 };
+    GLint mInternalFormat{ 0 };
 };

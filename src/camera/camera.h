@@ -40,7 +40,7 @@ struct Camera
 
     glm::mat4 view() const;
 
-    void assign(Program& prog);
+    void assign(Program& prog) const;
 
 private:
     void setDefault();

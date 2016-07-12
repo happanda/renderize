@@ -41,6 +41,8 @@ ${SourcePath}/data/point.h
 ${SourcePath}/data/point.cpp
 ${SourcePath}/data/quad.h
 ${SourcePath}/data/quad.cpp
+${SourcePath}/data/skybox.h
+${SourcePath}/data/skybox.cpp
 ${SourcePath}/data/triangle.h
 ${SourcePath}/data/triangle.cpp
 )
@@ -80,6 +82,8 @@ ${SourcePath}/shaders_src/mondria.frag
 ${SourcePath}/shaders_src/post_kernel3x3.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
+${SourcePath}/shaders_src/skybox.vert
+${SourcePath}/shaders_src/skybox.frag
 ${SourcePath}/shaders_src/solid_color.frag
 ${SourcePath}/shaders_src/tex_noise.frag
 ${SourcePath}/shaders_src/universe.frag

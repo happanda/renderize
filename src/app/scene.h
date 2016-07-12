@@ -2,6 +2,7 @@
 #include "data/light.h"
 #include "data/mesh.h"
 #include "data/mesh_sorter.h"
+#include "data/skybox.h"
 #include "shaders/program.h"
 
 
@@ -42,4 +43,6 @@ private:
     Program mProg;
 
     Mesh mCubemesh;
+
+    Skybox mSkybox;
 };

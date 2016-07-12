@@ -111,7 +111,7 @@ glm::mat4 Camera::view() const
     return glm::lookAt(mPos, mPos + mFront, mUp);
 }
 
-void Camera::assign(Program& prog)
+void Camera::assign(Program& prog) const
 {
     prog["view"] = view();
     prog["projection"] = projection();
@@ -121,7 +121,7 @@ void Camera::assign(Program& prog)
 void Camera::setDefault()
 {
     mNear = 0.1f;
-    mFar = 120.0f;
+    mFar = 500.0f;
     mFov = 45.0f;
     mPos = glm::vec3(0.0f, 0.0f, 5.0f);
     mFront = glm::vec3(0.0f, 0.0f, -1.0f);

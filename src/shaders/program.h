@@ -28,9 +28,9 @@ struct Program
     Uniform operator[](std::string const& uniName) const;
     Uniform operator[](char const* uniName) const;
 
-private:
     void free();
 
+private:
     GLenum mProg;
 };
 

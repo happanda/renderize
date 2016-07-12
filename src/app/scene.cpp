@@ -85,6 +85,15 @@ void Scene::init()
     mMeshSorter.addMesh(quad2pos, &mQuadmesh);
     mMeshSorter.addMesh(quad3pos, &mQuadmesh);
     mMeshSorter.addMesh(quad4pos, &mQuadmesh);
+
+    SoilCubemapImage imgs;
+    imgs[0].load("../tex/skybox/right.jpg");
+    imgs[1].load("../tex/skybox/left.jpg");
+    imgs[2].load("../tex/skybox/top.jpg");
+    imgs[3].load("../tex/skybox/bottom.jpg");
+    imgs[4].load("../tex/skybox/back.jpg");
+    imgs[5].load("../tex/skybox/front.jpg");
+    mSkybox.create(imgs);
 }
 
 void Scene::update(float dt)
@@ -96,6 +105,8 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+
+    mSkybox.draw(camera);
 
     mProg.use();
     mProg["DirLightOn"] = true;

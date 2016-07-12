@@ -28,5 +28,5 @@ struct FrameBuffer
 private:
     void free();
 
-    GLuint mFBO;
+    GLuint mFBO{ 0 };
 };

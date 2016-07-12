@@ -182,7 +182,6 @@ void App::run()
         glBindVertexArray(0);
     }
 
-
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
     float const dT{ 0.0125f };

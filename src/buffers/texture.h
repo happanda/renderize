@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <memory>
 #include <string>
 #include <GL/glew.h>
@@ -14,6 +15,7 @@ enum class TexType
 };
 
 struct SoilImage;
+typedef std::array<SoilImage, 6> SoilCubemapImage;
 
 struct Texture
 {
@@ -26,6 +28,7 @@ struct Texture
 
     void create(GLsizei width, GLsizei height, InternalFormat fmt);
     void create(SoilImage const& image);
+    void createCubemap(SoilCubemapImage const& imgs);
 
     void setFilter(GLenum filter, GLint type);
     void setWrap(GLenum axis, GLint type);
@@ -42,10 +45,11 @@ struct Texture
     void active(GLenum textureSlot) const;
     void unactive(GLenum textureSlot) const;
 
-private:
     void free();
 
-    GLuint mTex;
-    GLint mInternalFormat;
-    TexType mType;
+private:
+    GLuint mTex{ 0 };
+    GLenum mTarget{ 0 };
+    GLint mInternalFormat{ 0 };
+    TexType mType{ TexType::Normal };
 };

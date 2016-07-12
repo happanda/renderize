@@ -7,6 +7,7 @@ using std::swap;
 
 Texture::Texture()
     : mTex(0)
+    , mTarget(0)
     , mInternalFormat(0)
     , mType(TexType::Normal)
 {
@@ -19,10 +20,12 @@ Texture::~Texture()
 
 Texture::Texture(Texture&& rhs)
     : mTex(0)
+    , mTarget(0)
     , mInternalFormat(0)
     , mType(TexType::Normal)
 {
     swap(mTex, rhs.mTex);
+    swap(mTarget, rhs.mTarget);
     swap(mInternalFormat, rhs.mInternalFormat);
     swap(mType, rhs.mType);
 }
@@ -31,6 +34,8 @@ Texture const& Texture::operator=(Texture&& rhs)
 {
     free();
     swap(mTex, rhs.mTex);
+    swap(mTarget, rhs.mTarget);
+    swap(mInternalFormat, rhs.mInternalFormat);
     swap(mType, rhs.mType);
     return *this;
 }
@@ -38,6 +43,7 @@ Texture const& Texture::operator=(Texture&& rhs)
 void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
 {
     free();
+    mTarget = GL_TEXTURE_2D;
 
     glGenTextures(1, &mTex);
     bind();
@@ -61,18 +67,43 @@ void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
             format = GL_DEPTH_STENCIL;
             break;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, mInternalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(mTarget, 0, mInternalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     unbind();
 }
 
 void Texture::create(SoilImage const& image)
 {
+    free();
+    mTarget = GL_TEXTURE_2D;
     glGenTextures(1, &mTex);
     bind();
     mInternalFormat = GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
+    glTexImage2D(mTarget, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
+    glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    unbind();
+}
+
+void Texture::createCubemap(SoilCubemapImage const& imgs)
+{
+    free();
+    mTarget = GL_TEXTURE_CUBE_MAP;
+    glGenTextures(1, &mTex);
+    bind();
+    mInternalFormat = GL_RGBA;
+    for (SoilCubemapImage::size_type i = 0; i < imgs.size(); ++i)
+    {
+        auto const& img = imgs[i];
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, img.width(), img.height(),
+            0, mInternalFormat, GL_UNSIGNED_BYTE, img.data());
+    }
+    glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     unbind();
 }
 
@@ -81,7 +112,7 @@ void Texture::setFilter(GLenum filter, GLint type)
     if (!mTex)
         return;
     bind();
-    glTexParameteri(GL_TEXTURE_2D, filter, type);
+    glTexParameteri(mTarget, filter, type);
     unbind();
 }
 
@@ -90,7 +121,7 @@ void Texture::setWrap(GLenum axis, GLint type)
     if (!mTex)
         return;
     bind();
-    glTexParameteri(GL_TEXTURE_2D, axis, type);
+    glTexParameteri(mTarget, axis, type);
     unbind();
 }
 
@@ -99,7 +130,7 @@ void Texture::genMipMap()
     if (!mTex)
         return;
     bind();
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(mTarget);
     unbind();
 }
 
@@ -125,12 +156,12 @@ TexType Texture::type() const
 
 void Texture::bind() const
 {
-    glBindTexture(GL_TEXTURE_2D, mTex);
+    glBindTexture(mTarget, mTex);
 }
 
 void Texture::unbind() const
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(mTarget, 0);
 }
 
 void Texture::active(GLenum textureSlot) const
@@ -151,6 +182,7 @@ void Texture::free()
     {
         glDeleteTextures(1, &mTex);
         mTex = 0;
+        mTarget = 0;
         mInternalFormat = 0;
         mType = TexType::Normal;
     }

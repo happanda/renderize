@@ -47,6 +47,51 @@ std::array<GLfloat, sNumVertices> sVertices = {
      0.5f, 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f
 };
 
+std::array<GLfloat, sNumSkyboxVertices> sSkyboxVertices = {
+    // Positions          
+    -1.0f,  1.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+
+    -1.0f, -1.0f,  1.0f,
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f, -1.0f,
+    -1.0f,  1.0f,  1.0f,
+    -1.0f, -1.0f,  1.0f,
+
+    1.0f, -1.0f, -1.0f,
+    1.0f, -1.0f,  1.0f,
+    1.0f,  1.0f,  1.0f,
+    1.0f,  1.0f,  1.0f,
+    1.0f,  1.0f, -1.0f,
+    1.0f, -1.0f, -1.0f,
+
+    -1.0f, -1.0f, 1.0f,
+    -1.0f,  1.0f, 1.0f,
+     1.0f,  1.0f, 1.0f,
+     1.0f,  1.0f, 1.0f,
+     1.0f, -1.0f, 1.0f,
+    -1.0f, -1.0f, 1.0f,
+
+    -1.0f, 1.0f, -1.0f,
+     1.0f, 1.0f, -1.0f,
+     1.0f, 1.0f,  1.0f,
+     1.0f, 1.0f,  1.0f,
+    -1.0f, 1.0f,  1.0f,
+    -1.0f, 1.0f, -1.0f,
+
+    -1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f, -1.0f,
+     1.0f, -1.0f, -1.0f,
+    -1.0f, -1.0f,  1.0f,
+     1.0f, -1.0f,  1.0f
+};
+
 std::vector<glm::vec3> getCube(float sideLen, size_t vertsOnSide)
 {
     float const hs = sideLen / 2.0f;

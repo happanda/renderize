@@ -40,7 +40,7 @@ struct Mesh
 private:
     void initMesh();
 
-    GLuint mVAO, mVBO, mEBO;
+    GLuint mVAO{ 0 }, mVBO{ 0 }, mEBO{ 0 };
 
     std::vector<Vertex>  mVertices;
     std::vector<GLuint>  mIndices;
