@@ -118,8 +118,11 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mReflectProg["model"] = glm::translate(scaleMat, transVec);
     mSkybox.tex().active(GL_TEXTURE0);
     mReflectProg["skyboxTexture"] = 0;
+    mReflectProg["reflectOrRefract"] = true;
     camera.assign(mReflectProg);
     mCubemesh.draw(mReflectProg);
+    mReflectProg["reflectOrRefract"] = false;
+    mReflectProg["refractRatio"] = 1.0f / 1.309f;
     mModel->draw(mReflectProg);
 
     
