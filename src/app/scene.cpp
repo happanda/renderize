@@ -46,9 +46,9 @@ void Scene::init()
     CHECK(mReflectProg, "Error creating shader program", return;);
 
     /// NANOSUIT
-    //Model model("nanosuit/nanosuit.obj");
-    //model.noBlending();
-    //model.culling(GL_BACK);
+    mModel.reset(new Model("nanosuit/nanosuit.obj"));
+    mModel->noBlending();
+    mModel->culling(GL_BACK);
 
     /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -120,6 +120,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mReflectProg["skyboxTexture"] = 0;
     camera.assign(mReflectProg);
     mCubemesh.draw(mReflectProg);
+    mModel->draw(mReflectProg);
 
     
     mProg.use();

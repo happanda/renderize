@@ -7,6 +7,7 @@
 
 
 struct Camera;
+struct Model;
 
 struct Scene
 {
@@ -43,6 +44,7 @@ private:
     Program mProg;
     Program mReflectProg;
 
+    std::shared_ptr<Model> mModel;
     Mesh mCubemesh;
 
     Skybox mSkybox;
