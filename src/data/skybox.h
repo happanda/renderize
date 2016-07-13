@@ -16,7 +16,10 @@ struct Skybox
     Skybox const& operator=(Skybox const&) = delete;
 
     void create(SoilCubemapImage const& imgs);
-    void draw(Camera const& camera);
+        /// draw before the scene, works with transparent objects
+    void drawFirst(Camera const& camera);
+        // draw after the scene, doesn't work with transparent objects
+    void drawLast(Camera const& camera);
 
 private:
     void free();

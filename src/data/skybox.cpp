@@ -47,36 +47,54 @@ void Skybox::create(SoilCubemapImage const& imgs)
     mProg = createProgram("shaders/skybox.vert", "shaders/skybox.frag");
     CHECK(mProg, "Error creating skybox shader program", );
 
-    auto vertices = sSkyboxVertices;
-    std::for_each(vertices.begin(), vertices.end(), [](GLfloat& num){ num *= 100.0f; });
-
     glGenVertexArrays(1, &mVAO);
     glGenBuffers(1, &mVBO);
     glBindVertexArray(mVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sSkyboxVertices.size() * sizeof(GLfloat), sSkyboxVertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
     glBindVertexArray(0);
 }
 
-void Skybox::draw(Camera const& camera)
+void Skybox::drawFirst(Camera const& camera)
 {
     GLboolean priorDepthMask = GL_TRUE;
     glGetBooleanv(GL_DEPTH_WRITEMASK, &priorDepthMask);
 
     glDepthMask(GL_FALSE);
     mProg.use();
+    mProg["postScene"] = false;
     mProg["view"] = glm::mat4(glm::mat3(camera.view()));
     mProg["projection"] = camera.projection();
-    mProg["viewerPos"] = camera.pos();
-    //camera.assign(mProg);
+    mProg["skyboxTexture"] = 0;
     glBindVertexArray(mVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mTex);
+    mTex.active(GL_TEXTURE0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+    mTex.unactive(GL_TEXTURE0);
 
     glDepthMask(priorDepthMask);
+}
+
+void Skybox::drawLast(Camera const& camera)
+{
+    GLint priorDepthFunc = GL_LESS;
+    glGetIntegerv(GL_DEPTH_FUNC, &priorDepthFunc);
+
+    glDepthFunc(GL_LEQUAL);
+    mProg.use();
+    mProg["postScene"] = true;
+    mProg["view"] = glm::mat4(glm::mat3(camera.view()));
+    mProg["projection"] = camera.projection();
+    mProg["skyboxTexture"] = 0;
+    glBindVertexArray(mVAO);
+    mTex.active(GL_TEXTURE0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    mTex.unactive(GL_TEXTURE0);
+
+    glDepthFunc(priorDepthFunc);
 }
 
 void Skybox::free()

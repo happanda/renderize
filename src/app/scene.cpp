@@ -106,7 +106,8 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    mSkybox.draw(camera);
+    if (!mMeshSorter.meshes().empty())
+        mSkybox.drawFirst(camera);
 
     mProg.use();
     mProg["DirLightOn"] = true;
@@ -149,6 +150,8 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
         mesh.second->draw(mProg);
     }
 
+    if (mMeshSorter.meshes().empty())
+        mSkybox.drawLast(camera);
 }
 
 void Scene::add(DirLight light)
