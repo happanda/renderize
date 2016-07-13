@@ -97,6 +97,11 @@ void Skybox::drawLast(Camera const& camera)
     glDepthFunc(priorDepthFunc);
 }
 
+Texture& Skybox::tex()
+{
+    return mTex;
+}
+
 void Skybox::free()
 {
     if (mVBO)

@@ -42,6 +42,9 @@ void Scene::init()
     mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
 
+    mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
+    CHECK(mReflectProg, "Error creating shader program", return;);
+
     /// NANOSUIT
     //Model model("nanosuit/nanosuit.obj");
     //model.noBlending();
@@ -109,13 +112,19 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     if (!mMeshSorter.meshes().empty())
         mSkybox.drawFirst(camera);
 
-    mProg.use();
-    mProg["DirLightOn"] = true;
-
+    mReflectProg.use();
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
-    mProg["model"] = glm::translate(scaleMat, transVec);
+    mReflectProg["model"] = glm::translate(scaleMat, transVec);
+    mSkybox.tex().active(GL_TEXTURE0);
+    mReflectProg["skyboxTexture"] = 0;
+    camera.assign(mReflectProg);
+    mCubemesh.draw(mReflectProg);
 
+    
+    mProg.use();
+    mProg["DirLightOn"] = true;
+    mProg["model"] = glm::translate(scaleMat, transVec);
     camera.assign(mProg);
 
     int idx = 0;
@@ -135,12 +144,6 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
         lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
     }
 
-    mProg["PointLightOn"] = true;
-    mProg["SpotLightOn"] = false;// mSpotLightOn;
-
-    //model.draw(mProg);
-    mCubemesh.draw(mProg);
-
     mProg["PointLightOn"] = false;
     mProg["SpotLightOn"] = false;
     mMeshSorter.sort(camera.pos());
@@ -149,7 +152,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
         mProg["model"] = glm::translate(scaleMat, mesh.first);
         mesh.second->draw(mProg);
     }
-
+    
     if (mMeshSorter.meshes().empty())
         mSkybox.drawLast(camera);
 }

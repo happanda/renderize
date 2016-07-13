@@ -88,6 +88,8 @@ ${SourcePath}/shaders_src/solid_color.frag
 ${SourcePath}/shaders_src/tex_noise.frag
 ${SourcePath}/shaders_src/universe.frag
 ${SourcePath}/shaders_src/visual.frag
+${SourcePath}/shaders_src/world_mapped.vert
+${SourcePath}/shaders_src/world_mapped.frag
 )
 
 set(SOURCE_FILES_UTIL

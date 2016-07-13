@@ -21,6 +21,8 @@ struct Skybox
         // draw after the scene, doesn't work with transparent objects
     void drawLast(Camera const& camera);
 
+    Texture& tex();
+
 private:
     void free();
 

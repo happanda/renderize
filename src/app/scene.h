@@ -41,6 +41,7 @@ private:
     std::list<SpotLight> mSpotLights;
 
     Program mProg;
+    Program mReflectProg;
 
     Mesh mCubemesh;
 
