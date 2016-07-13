@@ -13,7 +13,7 @@ void Scene::init()
 {
     DirLight dl = DirLight()
         .direction({ 1.0f, 1.0f, 1.0f })
-        .ambient({ 0.4f, 0.4f, 0.4f })
+        .ambient({ 0.6f, 0.6f, 0.6f })
         .diffuse({ 0.1f, 0.5f, 0.1f })
         .specular({ 0.4f, 0.4f, 0.4f });
     mDirLights.emplace_back(dl);
@@ -47,7 +47,7 @@ void Scene::init()
 
     /// NANOSUIT
     mModel.reset(new Model);
-    mModel->loadModel("nanosuit/nanosuit.obj");
+    mModel->load("nanosuit/nanosuit.obj");
     mModel->noBlending();
     mModel->culling(GL_BACK);
 
@@ -113,24 +113,19 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     if (!mMeshSorter.meshes().empty())
         mSkybox.drawFirst(camera);
 
-    mReflectProg.use();
+    mProg.use();
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
-    mReflectProg["model"] = glm::translate(scaleMat, transVec);
-    mSkybox.tex().active(GL_TEXTURE0);
-    mReflectProg["skyboxTexture"] = 0;
-    mReflectProg["reflectOrRefract"] = true;
-    camera.assign(mReflectProg);
-    mCubemesh.draw(mReflectProg);
-    mReflectProg["reflectOrRefract"] = false;
-    mReflectProg["refractRatio"] = 1.0f / 1.309f;
-    mModel->draw(mReflectProg);
-
-    
-    mProg.use();
-    mProg["DirLightOn"] = true;
     mProg["model"] = glm::translate(scaleMat, transVec);
+
+    mSkybox.tex().active(GL_TEXTURE0);
+    mProg["skyboxTexture"] = 0;
+
+    mProg["DirLightOn"] = true;
     camera.assign(mProg);
+
+    mCubemesh.draw(mProg);
+    mModel->draw(mProg);
 
     int idx = 0;
     for (auto& lgh : mDirLights)

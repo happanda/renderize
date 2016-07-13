@@ -27,7 +27,7 @@ struct Model
 
     void draw(Program const& prog) const;
 
-    void loadModel(std::string const& path);
+    void load(std::string const& path);
     void free();
 
 private:

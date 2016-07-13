@@ -155,8 +155,10 @@ void Mesh::draw(Program const& prog) const
     GLuint normTexN = 1;
     GLuint diffTexN = 1;
     GLuint specTexN = 1;
+    GLuint reflTexN = 1;
 
     //prog.use();
+    bool texReflAssigned = false;
     for (GLint i = 0; i < static_cast<GLint>(mTextures.size()); ++i)
     {
         std::string paramName = "material.";
@@ -171,10 +173,15 @@ void Mesh::draw(Program const& prog) const
         case TexType::Specular:
             paramName.append("texSpec" + std::to_string(specTexN++));
             break;
+        case TexType::Reflection:
+            paramName.append("texRefl" + std::to_string(reflTexN++));
+            texReflAssigned = true;
+            break;
         }
         prog[paramName] = i;
         mTextures[i]->active(GL_TEXTURE0 + i);
     }
+    prog["texReflAssigned"] = texReflAssigned;
 
     GLboolean priorBlending = GL_FALSE;
     glGetBooleanv(GL_BLEND, &priorBlending);

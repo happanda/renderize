@@ -11,7 +11,8 @@ enum class TexType
 {
     Normal,
     Diffuse,
-    Specular
+    Specular,
+    Reflection
 };
 
 struct SoilImage;

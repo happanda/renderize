@@ -8,6 +8,7 @@ struct Material
 {
     sampler2D  texDiff1;
     sampler2D  texSpec1;
+    sampler2D  texRefl1;
 };
 
 struct DirLight
@@ -52,14 +53,17 @@ in vec2 TexCoords;
 out vec4 color;
 
 uniform Material material;
+uniform bool texReflAssigned;
 uniform DirLight[NumDirLights] dirLight;
 uniform PointLight[NumPointLights] pLight;
 uniform SpotLight[NumSpotLights] spLight;
 uniform vec3 viewerPos;
+uniform samplerCube skyboxTexture;
 
 vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec4 compReflection(vec3 viewDir, vec3 normal);
 
 void main()
 {
@@ -96,6 +100,9 @@ void main()
         }
         color += spotLightTotal;
     }
+
+    if (texReflAssigned)
+        color += compReflection(viewDir, normal);
 }
 
 
@@ -158,4 +165,16 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     }
     else
         return vec4(vec3(0.0f), 0.0f);
+}
+
+vec4 compReflection(vec3 viewDir, vec3 normal)
+{
+    float reflIntens = texture(material.texRefl1, TexCoords).r;
+    if (reflIntens > 0.1)
+    {
+        vec3 R = reflect(-viewDir, normalize(normal));
+        return texture(skyboxTexture, R) * reflIntens;
+    }
+    else
+        return vec4(0.0);
 }

@@ -67,7 +67,7 @@ void Model::culling(GLenum mode)
         mesh.culling(mode);
 }
 
-void Model::loadModel(std::string const& path)
+void Model::load(std::string const& path)
 {
     Assimp::Importer importer;
     aiScene const* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -138,6 +138,10 @@ Mesh Model::processMesh(aiMesh* mesh, aiScene const* scene)
 
         std::vector<TexturePtr> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TexType::Specular);
         textures.insert(textures.cend(), specMaps.cbegin(), specMaps.cend());
+
+        // TODO: AMBIENT is used cause Assimp doesn't work properly with reflective?
+        std::vector<TexturePtr> reflMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, TexType::Reflection);
+        textures.insert(textures.cend(), reflMaps.cbegin(), reflMaps.cend());
     }
 
     return Mesh(vertices, indices, textures);
