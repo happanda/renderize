@@ -37,6 +37,8 @@ struct Mesh
 
     void draw(Program const& prog) const;
 
+    void free();
+
 private:
     void initMesh();
 

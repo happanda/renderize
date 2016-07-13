@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 #include <assimp/Importer.hpp>
 #include <assimp/mesh.h>
 #include <assimp/postprocess.h>
@@ -7,24 +8,32 @@
 #include "shaders/program.h"
 #include "util/soil_image.h"
 
+using std::swap;
 
-Model::Model(std::string const& path)
+
+Model::Model()
 {
-    loadModel(path);
+}
+
+Model::~Model()
+{
+    free();
 }
 
 Model::Model(Model&& rhs)
-    : mMeshes(std::move(rhs.mMeshes))
-    , mDir(std::move(rhs.mDir))
-    , mLoadedTextures(std::move(rhs.mLoadedTextures))
 {
+    free();
+    swap(mMeshes, rhs.mMeshes);
+    swap(mDir, rhs.mDir);
+    swap(mLoadedTextures, rhs.mLoadedTextures);
 }
 
 Model const& Model::operator=(Model&& rhs)
 {
-    mMeshes = std::move(rhs.mMeshes);
-    mDir = std::move(rhs.mDir);
-    mLoadedTextures = std::move(rhs.mLoadedTextures);
+    free();
+    swap(mMeshes, rhs.mMeshes);
+    swap(mDir, rhs.mDir);
+    swap(mLoadedTextures, rhs.mLoadedTextures);
     return *this;
 }
 
@@ -70,6 +79,13 @@ void Model::loadModel(std::string const& path)
     }
     mDir = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
+}
+
+void Model::free()
+{
+    mMeshes.clear();
+    mDir.clear();
+    mLoadedTextures.clear();
 }
 
 void Model::processNode(aiNode* node, aiScene const* scene)

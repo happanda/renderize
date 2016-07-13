@@ -46,7 +46,8 @@ void Scene::init()
     CHECK(mReflectProg, "Error creating shader program", return;);
 
     /// NANOSUIT
-    mModel.reset(new Model("nanosuit/nanosuit.obj"));
+    mModel.reset(new Model);
+    mModel->loadModel("nanosuit/nanosuit.obj");
     mModel->noBlending();
     mModel->culling(GL_BACK);
 

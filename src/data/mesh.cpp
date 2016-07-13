@@ -1,6 +1,9 @@
 #include <string>
+#include <utility>
 #include "mesh.h"
 #include "shaders/program.h"
+
+using std::swap;
 
 
 Mesh::Mesh()
@@ -23,34 +26,43 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vecto
 
 Mesh::~Mesh()
 {
-    if (mEBO)
-        glDeleteBuffers(1, &mEBO);
-    if (mVBO)
-        glDeleteBuffers(1, &mVBO);
-    if (mVAO)
-        glDeleteVertexArrays(1, &mVAO);
+    free();
 }
 
 Mesh::Mesh(Mesh&& rhs)
-    : mVAO(rhs.mVAO)
-    , mVBO(rhs.mVBO)
-    , mEBO(rhs.mEBO)
-    , mVertices(std::move(rhs.mVertices))
-    , mIndices(std::move(rhs.mIndices))
-    , mTextures(std::move(rhs.mTextures))
 {
-    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
+    free();
+    swap(mVAO, rhs.mVAO);
+    swap(mVBO, rhs.mVBO);
+    swap(mEBO, rhs.mEBO);
+    swap(mVertices, rhs.mVertices);
+    swap(mIndices, rhs.mIndices);
+    swap(mTextures, rhs.mTextures);
+    swap(mBlending, rhs.mBlending);
+    swap(mSfactorRGB, rhs.mSfactorRGB);
+    swap(mDfactorRGB, rhs.mDfactorRGB);
+    swap(mSfactorAlpha, rhs.mSfactorAlpha);
+    swap(mDfactorAlpha, rhs.mDfactorAlpha);
+    swap(mCulling, rhs.mCulling);
+    swap(mCullMode, rhs.mCullMode);
 }
 
 Mesh const& Mesh::operator=(Mesh&& rhs)
 {
-    mVAO = rhs.mVAO;
-    mVBO = rhs.mVBO;
-    mEBO = rhs.mEBO;
-    mVertices = std::move(rhs.mVertices);
-    mIndices = std::move(rhs.mIndices);
-    mTextures = std::move(rhs.mTextures);
-    rhs.mVAO = rhs.mVBO = rhs.mEBO = 0;
+    free();
+    swap(mVAO, rhs.mVAO);
+    swap(mVBO, rhs.mVBO);
+    swap(mEBO, rhs.mEBO);
+    swap(mVertices, rhs.mVertices);
+    swap(mIndices, rhs.mIndices);
+    swap(mTextures, rhs.mTextures);
+    swap(mBlending, rhs.mBlending);
+    swap(mSfactorRGB, rhs.mSfactorRGB);
+    swap(mDfactorRGB, rhs.mDfactorRGB);
+    swap(mSfactorAlpha, rhs.mSfactorAlpha);
+    swap(mDfactorAlpha, rhs.mDfactorAlpha);
+    swap(mCulling, rhs.mCulling);
+    swap(mCullMode, rhs.mCullMode);
     return *this;
 }
 
@@ -84,6 +96,26 @@ void Mesh::culling(GLenum mode)
 {
     mCulling = true;
     mCullMode = mode;
+}
+
+void Mesh::free()
+{
+    if (mEBO)
+        glDeleteBuffers(1, &mEBO);
+    if (mVBO)
+        glDeleteBuffers(1, &mVBO);
+    if (mVAO)
+        glDeleteVertexArrays(1, &mVAO);
+    mVertices.clear();
+    mIndices.clear();
+    mTextures.clear();
+    mBlending = Blending::None;
+    mSfactorRGB = 0;
+    mSfactorAlpha = 0;
+    mSfactorAlpha = 0;
+    mDfactorAlpha = 0;
+    mCulling = false;
+    mCullMode = 0;
 }
 
 void Mesh::initMesh()

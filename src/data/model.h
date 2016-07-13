@@ -11,8 +11,8 @@ struct aiScene;
 
 struct Model
 {
-    Model(std::string const& path);
-
+    Model();
+    ~Model();
     Model(Model&& rhs);
     Model const& operator=(Model&& rhs);
     Model(Model const&) = delete;
@@ -27,8 +27,10 @@ struct Model
 
     void draw(Program const& prog) const;
 
-private:
     void loadModel(std::string const& path);
+    void free();
+
+private:
     void processNode(aiNode* node, aiScene const* scene);
     Mesh processMesh(aiMesh* mesh, aiScene const* scene);
 
