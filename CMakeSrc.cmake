@@ -63,6 +63,10 @@ ${SourcePath}/shaders/shader.h
 ${SourcePath}/shaders/shader.cpp
 ${SourcePath}/shaders/uniform.h
 ${SourcePath}/shaders/uniform.cpp
+${SourcePath}/shaders/uniform_block.h
+${SourcePath}/shaders/uniform_block.cpp
+${SourcePath}/shaders/uniform_buffer.h
+${SourcePath}/shaders/uniform_buffer.cpp
 )
 
 set(SOURCE_FILES_SHADERS_SOURCE
