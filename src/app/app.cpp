@@ -217,14 +217,14 @@ void App::run()
 
         quadProg.use();
         glBindVertexArray(quadVAO);
-        mRTarget->tex().active(GL_TEXTURE0);
+        mRTarget->tex().active(0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);
 
         quadProg.use();
         glBindVertexArray(quadVAOback);
-        mRTargetBack->tex().active(GL_TEXTURE0);
+        mRTargetBack->tex().active(0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         glDisableVertexAttribArray(0);

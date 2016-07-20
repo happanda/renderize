@@ -69,10 +69,10 @@ void Skybox::drawFirst(Camera const& camera)
     mProg["projection"] = camera.projection();
     mProg["skyboxTexture"] = 0;
     glBindVertexArray(mVAO);
-    mTex.active(GL_TEXTURE0);
+    mTex.active(0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-    mTex.unactive(GL_TEXTURE0);
+    mTex.unactive(0);
 
     glDepthMask(priorDepthMask);
 }
@@ -89,10 +89,10 @@ void Skybox::drawLast(Camera const& camera)
     mProg["projection"] = camera.projection();
     mProg["skyboxTexture"] = 0;
     glBindVertexArray(mVAO);
-    mTex.active(GL_TEXTURE0);
+    mTex.active(0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-    mTex.unactive(GL_TEXTURE0);
+    mTex.unactive(0);
 
     glDepthFunc(priorDepthFunc);
 }

@@ -8,7 +8,13 @@ in vec3 FragPos;
 in vec3 Normal;
 out vec4 color;
 
-uniform vec3 viewerPos;
+layout(shared) uniform camera
+{
+    mat4 projection;
+    mat4 view;
+    vec3 viewerPos;
+};
+
 uniform samplerCube skyboxTexture;
 uniform bool reflectOrRefract;
 uniform float refractRatio;

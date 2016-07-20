@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.h"
 #include "shaders/program.h"
+#include "shaders/uniform_buffer.h"
 
 
 glm::vec2 const& Camera::size() const
@@ -116,6 +117,13 @@ void Camera::assign(Program& prog) const
     prog["view"] = view();
     prog["projection"] = projection();
     prog["viewerPos"] = pos();
+}
+
+void Camera::assign(UniformBuffer& uBuf) const
+{
+    uBuf["view"] = view();
+    uBuf["projection"] = projection();
+    uBuf["viewerPos"] = pos();
 }
 
 void Camera::setDefault()

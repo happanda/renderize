@@ -52,12 +52,18 @@ in vec2 TexCoords;
 //layout (location = 0)
 out vec4 color;
 
+layout(shared) uniform camera
+{
+    mat4 projection;
+    mat4 view;
+    vec3 viewerPos;
+};
+
 uniform Material material;
 uniform bool texReflAssigned;
 uniform DirLight[NumDirLights] dirLight;
 uniform PointLight[NumPointLights] pLight;
 uniform SpotLight[NumSpotLights] spLight;
-uniform vec3 viewerPos;
 uniform samplerCube skyboxTexture;
 
 vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir);

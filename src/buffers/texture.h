@@ -17,6 +17,7 @@ enum class TexType
 
 struct SoilImage;
 typedef std::array<SoilImage, 6> SoilCubemapImage;
+struct Program;
 
 struct Texture
 {
@@ -43,8 +44,9 @@ struct Texture
 
     void bind() const;
     void unbind() const;
-    void active(GLenum textureSlot) const;
-    void unactive(GLenum textureSlot) const;
+    void active(int textureSlotNum) const;
+    void active(Program const& prog, std::string const& name, int textureSlotNum) const;
+    void unactive(int textureSlot) const;
 
     void free();
 

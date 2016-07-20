@@ -1,5 +1,6 @@
 #include <utility>
 #include "texture.h"
+#include "shaders/program.h"
 #include "util/soil_image.h"
 
 using std::swap;
@@ -164,15 +165,22 @@ void Texture::unbind() const
     glBindTexture(mTarget, 0);
 }
 
-void Texture::active(GLenum textureSlot) const
+void Texture::active(int textureSlotNum) const
 {
-    glActiveTexture(textureSlot);
+    glActiveTexture(GL_TEXTURE0 + textureSlotNum);
     bind();
 }
 
-void Texture::unactive(GLenum textureSlot) const
+void Texture::active(Program const& prog, std::string const& name, int textureSlotNum) const
 {
-    glActiveTexture(textureSlot);
+    glActiveTexture(GL_TEXTURE0 + textureSlotNum);
+    bind();
+    prog[name] = textureSlotNum;
+}
+
+void Texture::unactive(int textureSlotNum) const
+{
+    glActiveTexture(GL_TEXTURE0 + textureSlotNum);
     unbind();
 }
 

@@ -41,7 +41,7 @@ void Scene::init()
 
     mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
-    mUniBuf.init(mProg, { "projection", "view" });
+    mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
 
     mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
     CHECK(mReflectProg, "Error creating shader program", return;);
@@ -111,32 +111,25 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
+    camera.assign(mUniBuf);
+
     if (!mMeshSorter.meshes().empty())
         mSkybox.drawFirst(camera);
 
     mProg.use();
+    mSkybox.tex().active(mProg, "skyboxTexture", 0);
+    mProg["DirLightOn"] = true;
+
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
     auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
     mProg["model"] = glm::translate(scaleMat, transVec);
 
-    mSkybox.tex().active(GL_TEXTURE0);
-    mProg["skyboxTexture"] = 0;
-
-    mProg["DirLightOn"] = true;
-
-    camera.assign(mProg);
-    mUniBuf["projection"] = camera.projection();
-    mUniBuf["view"] = camera.view();
     mUniBuf.bind(mProg);
-
     mCubemesh.draw(mProg);
 
-
-    camera.assign(mReflectProg);
     mUniBuf.bind(mReflectProg);
     mReflectProg["model"] = glm::translate(scaleMat, transVec);
-    mSkybox.tex().active(GL_TEXTURE0);
-    mReflectProg["skyboxTexture"] = 0;
+    mSkybox.tex().active(mReflectProg, "skyboxTexture", 0);
     mReflectProg["reflectOrRefract"] = false;
     mReflectProg["refractRatio"] = 1.0f / 2.5f;
     mModel->draw(mReflectProg);

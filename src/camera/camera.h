@@ -5,6 +5,7 @@
 
 
 struct Program;
+struct UniformBuffer;
 
 struct Camera
 {
@@ -41,6 +42,7 @@ struct Camera
     glm::mat4 view() const;
 
     void assign(Program& prog) const;
+    void assign(UniformBuffer& uBuf) const;
 
 private:
     void setDefault();

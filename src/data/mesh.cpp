@@ -179,7 +179,7 @@ void Mesh::draw(Program const& prog) const
             break;
         }
         prog[paramName] = i;
-        mTextures[i]->active(GL_TEXTURE0 + i);
+        mTextures[i]->active(i);
     }
     prog["texReflAssigned"] = texReflAssigned;
 
@@ -218,7 +218,7 @@ void Mesh::draw(Program const& prog) const
 
     for (GLint i = 0; i < static_cast<GLint>(mTextures.size()); ++i)
     {
-        mTextures[i]->unactive(GL_TEXTURE0 + i);
+        mTextures[i]->unactive(i);
     }
 
     if (priorBlending)

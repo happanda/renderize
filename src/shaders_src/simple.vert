@@ -6,10 +6,11 @@ layout(location = 2) in vec2 texCoords;
 
 uniform mat4 model;
 
-layout(shared) uniform mats
+layout(shared) uniform camera
 {
     mat4 projection;
     mat4 view;
+    vec3 viewerPos;
 };
 
 out vec3 FragPos;

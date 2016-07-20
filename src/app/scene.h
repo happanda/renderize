@@ -14,7 +14,7 @@ struct Scene
 {
     template <class Number>
     Scene(glm::tvec2<Number> const& size)
-        : mUniBuf("mats")
+        : mUniBuf("camera")
     {
     }
 
