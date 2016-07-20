@@ -8,10 +8,19 @@ using std::cbegin;
 using std::cend;
 using std::swap;
 
+namespace
+{
+    GLint nextBindingPoint()
+    {
+        static GLint sBindingPoint = 0;
+        return sBindingPoint++;
+    }
+} // anonymous namespace
 
 UniformBuffer::UniformBuffer(std::string const& name)
     : mName(name)
-    , mBO(0)
+    , mUBO(0)
+    , mBP(nextBindingPoint())
 {
 }
 
@@ -22,16 +31,21 @@ UniformBuffer::~UniformBuffer()
 
 UniformBuffer::UniformBuffer(UniformBuffer&& rhs)
     : mName(std::move(rhs.mName))
-    , mBO(0)
+    , mUBO(0)
+    , mBP(0)
+    , mOffsets(std::move(rhs.mOffsets))
 {
-    swap(mBO, rhs.mBO);
+    swap(mUBO, rhs.mUBO);
+    swap(mBP, rhs.mBP);
 }
 
 UniformBuffer const& UniformBuffer::operator=(UniformBuffer&& rhs)
 {
     free();
-    mName = std::move(rhs.mName);
-    swap(mBO, rhs.mBO);
+    swap(mName, rhs.mName);
+    swap(mUBO, rhs.mUBO);
+    swap(mBP, rhs.mBP);
+    swap(mOffsets, rhs.mOffsets);
     return *this;
 }
 
@@ -45,11 +59,9 @@ bool UniformBuffer::init(Program const& prog, std::vector<std::string> const& pa
     }
     GLint blockSize;
     glGetActiveUniformBlockiv(prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-    mBuffer.resize(blockSize);
-    mBuffer.shrink_to_fit();
 
-    glGenBuffers(1, &mBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, mBO);
+    glGenBuffers(1, &mUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, mUBO);
     glBufferData(GL_UNIFORM_BUFFER, blockSize, nullptr, GL_DYNAMIC_DRAW);
 
     int const numParams = static_cast<int>(paramNames.size());
@@ -60,9 +72,9 @@ bool UniformBuffer::init(Program const& prog, std::vector<std::string> const& pa
             return static_cast<GLchar const*>(name.c_str());
         });
     std::vector<GLuint> indices(numParams, 0);
-    glGetUniformIndices(0, numParams, names.data(), indices.data());
+    glGetUniformIndices(prog, numParams, names.data(), indices.data());
     std::vector<GLint> offsets(numParams, 0);
-    glGetActiveUniformsiv(0, numParams, indices.data(), GL_UNIFORM_OFFSET, offsets.data());
+    glGetActiveUniformsiv(prog, numParams, indices.data(), GL_UNIFORM_OFFSET, offsets.data());
 
     int idx = 0;
     for (auto const& param : paramNames)
@@ -74,22 +86,22 @@ bool UniformBuffer::init(Program const& prog, std::vector<std::string> const& pa
 
 UniformBlock UniformBuffer::operator[](std::string const& uniName) const
 {
-    return UniformBlock(mBO, mOffsets.at(uniName));
+    return UniformBlock(mUBO, mOffsets.at(uniName));
 }
 
 UniformBlock UniformBuffer::operator[](char const* uniName) const
 {
-    return UniformBlock(mBO, mOffsets.at(uniName));
+    return UniformBlock(mUBO, mOffsets.at(uniName));
 }
 
 UniformBuffer::operator GLuint() const
 {
-    return mBO;
+    return mUBO;
 }
 
 void UniformBuffer::bind() const
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, mBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, mUBO);
 }
 
 void UniformBuffer::unbind() const
@@ -97,12 +109,21 @@ void UniformBuffer::unbind() const
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void UniformBuffer::bind(Program& prog) const
+{
+    GLuint blockIndex = glGetUniformBlockIndex(prog, mName.c_str());
+    glUniformBlockBinding(prog, blockIndex, mBP);
+    glBindBufferBase(GL_UNIFORM_BUFFER, mBP, mUBO);
+}
+
 void UniformBuffer::free()
 {
     mName.clear();
-    if (mBO)
+    if (mUBO)
     {
-        glDeleteBuffers(1, &mBO);
-        mBO = 0;
+        glDeleteBuffers(1, &mUBO);
+        mUBO = 0;
+        mBP = 0;
     }
+    mOffsets.clear();
 }

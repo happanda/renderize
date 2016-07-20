@@ -29,11 +29,13 @@ struct UniformBuffer
     void bind() const;
     void unbind() const;
 
+    void bind(Program& prog) const;
+
 private:
     void free();
 
     std::string mName;
-    GLuint mBO;
-    std::vector<GLubyte> mBuffer;
+    GLuint mUBO; /// uniform buffer object handler
+    GLuint mBP;  /// binding point (increasing linearly with every new UniformBuffer)
     std::map<std::string, int> mOffsets;
 };

@@ -41,6 +41,7 @@ void Scene::init()
 
     mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
+    mUniBuf.init(mProg, { "projection", "view" });
 
     mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
     CHECK(mReflectProg, "Error creating shader program", return;);
@@ -122,10 +123,23 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mProg["skyboxTexture"] = 0;
 
     mProg["DirLightOn"] = true;
+
     camera.assign(mProg);
+    mUniBuf["projection"] = camera.projection();
+    mUniBuf["view"] = camera.view();
+    mUniBuf.bind(mProg);
 
     mCubemesh.draw(mProg);
-    mModel->draw(mProg);
+
+
+    camera.assign(mReflectProg);
+    mUniBuf.bind(mReflectProg);
+    mReflectProg["model"] = glm::translate(scaleMat, transVec);
+    mSkybox.tex().active(GL_TEXTURE0);
+    mReflectProg["skyboxTexture"] = 0;
+    mReflectProg["reflectOrRefract"] = false;
+    mReflectProg["refractRatio"] = 1.0f / 2.5f;
+    mModel->draw(mReflectProg);
 
     int idx = 0;
     for (auto& lgh : mDirLights)

@@ -5,8 +5,12 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoords;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+
+layout(shared) uniform mats
+{
+    mat4 projection;
+    mat4 view;
+};
 
 out vec3 FragPos;
 out vec3 Normal;

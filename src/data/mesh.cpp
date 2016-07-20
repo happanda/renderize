@@ -157,7 +157,7 @@ void Mesh::draw(Program const& prog) const
     GLuint specTexN = 1;
     GLuint reflTexN = 1;
 
-    //prog.use();
+    prog.use();
     bool texReflAssigned = false;
     for (GLint i = 0; i < static_cast<GLint>(mTextures.size()); ++i)
     {

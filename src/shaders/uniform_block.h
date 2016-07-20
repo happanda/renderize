@@ -16,7 +16,7 @@ struct UniformBlock
     void operator=(T&& val)
     {
         bind();
-        assign(std::forward(val));
+        assign(std::forward<T>(val));
         unbind();
     }
 

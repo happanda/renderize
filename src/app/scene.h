@@ -4,6 +4,7 @@
 #include "data/mesh_sorter.h"
 #include "data/skybox.h"
 #include "shaders/program.h"
+#include "shaders/uniform_buffer.h"
 
 
 struct Camera;
@@ -13,6 +14,7 @@ struct Scene
 {
     template <class Number>
     Scene(glm::tvec2<Number> const& size)
+        : mUniBuf("mats")
     {
     }
 
@@ -40,6 +42,8 @@ private:
     std::list<DirLight> mDirLights;
     std::list<PointLight> mPointLights;
     std::list<SpotLight> mSpotLights;
+
+    UniformBuffer mUniBuf;
 
     Program mProg;
     Program mReflectProg;
