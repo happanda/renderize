@@ -35,3 +35,4 @@ private:
 };
 
 Program createProgram(std::string const& vertShaderPath, std::string const& fragShaderPath);
+Program createProgram(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath);

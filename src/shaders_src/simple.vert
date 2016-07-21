@@ -13,14 +13,17 @@ layout(shared) uniform camera
     vec3 viewerPos;
 };
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoords;
+out VS_OUT
+{
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoords;
+} vs_out;
 
 void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0);
-    Normal = mat3(model) * normal;
-    FragPos = (model * vec4(position, 1.0)).xyz;
-    TexCoords = texCoords;
+    vs_out.Normal = mat3(model) * normal;
+    vs_out.FragPos = (model * vec4(position, 1.0)).xyz;
+    vs_out.TexCoords = texCoords;
 }

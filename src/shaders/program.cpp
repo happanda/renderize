@@ -121,3 +121,37 @@ Program createProgram(std::string const& vertShaderPath, std::string const& frag
     }
     return prog;
 }
+
+Program createProgram(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
+{
+    Program prog;
+    prog.create();
+    if (static_cast<GLenum>(prog) == 0)
+        return Program();
+    // Shaders
+    Shader vertexShader, geomShader, fragShader;
+    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
+    {
+        std::cerr << vertexShader.lastError();
+        return Program();
+    }
+    if (!geomShader.compile(readAllText(geomShaderPath), GL_GEOMETRY_SHADER))
+    {
+        std::cerr << geomShader.lastError();
+        return Program();
+    }
+    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    {
+        std::cerr << fragShader.lastError();
+        return Program();
+    }
+    prog.attach(vertexShader);
+    prog.attach(geomShader);
+    prog.attach(fragShader);
+    if (!prog.link())
+    {
+        std::cerr << prog.lastError();
+        return Program();
+    }
+    return prog;
+}

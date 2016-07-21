@@ -39,7 +39,7 @@ void Scene::init()
         .outerCutOff(0.2f);
     mSpotLights.emplace_back(sl);
 
-    mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
+    mProg = createProgram("shaders/simple.vert", "shaders/asis.geom", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
     mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
 

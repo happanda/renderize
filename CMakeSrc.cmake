@@ -72,6 +72,7 @@ ${SourcePath}/shaders/uniform_buffer.cpp
 set(SOURCE_FILES_SHADERS_SOURCE
 ${SourcePath}/shaders_src/anaglyph.frag
 ${SourcePath}/shaders_src/asis.frag
+${SourcePath}/shaders_src/asis.geom
 ${SourcePath}/shaders_src/asis.vert
 ${SourcePath}/shaders_src/clock.frag
 ${SourcePath}/shaders_src/common.frag
