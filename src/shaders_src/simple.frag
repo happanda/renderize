@@ -77,7 +77,7 @@ vec4 compReflection(vec3 viewDir, vec3 normal);
 void main()
 {
     color = vec4(0.0);
-    vec3 normal = normalize(fs_in.Normal);
+    vec3 normal = fs_in.Normal;
     vec3 viewDir = normalize(viewerPos - fs_in.FragPos);
 
     if (DirLightOn)

@@ -15,9 +15,9 @@ void Scene::init()
 {
     DirLight dl = DirLight()
         .direction({ 0.0f, 0.0f, -1.0f })
-        //.ambient({ 0.6f, 0.6f, 0.6f })
-        //.diffuse({ 0.1f, 0.5f, 0.1f })
-        .specular({ 0.1f, 0.7f, 0.7f });
+        .ambient({ 0.6f, 0.6f, 0.6f })
+        .diffuse({ 0.1f, 0.5f, 0.1f })
+        .specular({ 0.7f, 0.7f, 0.1f });
     mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
@@ -136,13 +136,16 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mCubemesh.draw(mProg);
     mModel->draw(mProg);
 
-    mNormalShowProg.use();
-    mNormalShowProg["uColor"] = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
-    mNormalShowProg["NormalMagnitude"] = 0.4f;
-    mNormalShowProg["model"] = glm::translate(scaleMat, transVec);
-    mUniBuf.bind(mNormalShowProg);
-    mCubemesh.draw(mNormalShowProg);
-    mModel->draw(mNormalShowProg);
+    if (false)
+    {
+        mNormalShowProg.use();
+        mNormalShowProg["uColor"] = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+        mNormalShowProg["NormalMagnitude"] = 0.4f;
+        mNormalShowProg["model"] = glm::translate(scaleMat, transVec);
+        mUniBuf.bind(mNormalShowProg);
+        mCubemesh.draw(mNormalShowProg);
+        mModel->draw(mNormalShowProg);
+    }
 
     //mUniBuf.bind(mReflectProg);
     //mReflectProg["model"] = glm::translate(scaleMat, transVec);
