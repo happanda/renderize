@@ -41,9 +41,12 @@ void Scene::init()
         .outerCutOff(0.2f);
     mSpotLights.emplace_back(sl);
 
-    mProg = createProgram("shaders/simple.vert", "shaders/asis.geom", "shaders/simple.frag");
+    mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
     mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
+
+    mNormalShowProg = createProgram("shaders/normal_show.vert", "shaders/normal_show.geom", "shaders/normal_show.frag");
+    CHECK(mNormalShowProg, "Error creating shader program", return;);
 
     mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
     CHECK(mReflectProg, "Error creating shader program", return;);
@@ -119,7 +122,6 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
         mSkybox.drawFirst(camera);
 
     mProg.use();
-    mProg["iGlobalTime"] = static_cast<float>(glfwGetTime());
     mSkybox.tex().active(mProg, "skyboxTexture", 0);
     mProg["DirLightOn"] = true;
 
@@ -131,11 +133,19 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mCubemesh.draw(mProg);
     mModel->draw(mProg);
 
-    mUniBuf.bind(mReflectProg);
-    mReflectProg["model"] = glm::translate(scaleMat, transVec);
-    mSkybox.tex().active(mReflectProg, "skyboxTexture", 0);
-    mReflectProg["reflectOrRefract"] = false;
-    mReflectProg["refractRatio"] = 1.0f / 2.5f;
+    mNormalShowProg.use();
+    mNormalShowProg["uColor"] = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    mNormalShowProg["NormalMagnitude"] = 0.4f;
+    mNormalShowProg["model"] = glm::translate(scaleMat, transVec);
+    mUniBuf.bind(mNormalShowProg);
+    mCubemesh.draw(mNormalShowProg);
+    mModel->draw(mNormalShowProg);
+
+    //mUniBuf.bind(mReflectProg);
+    //mReflectProg["model"] = glm::translate(scaleMat, transVec);
+    //mSkybox.tex().active(mReflectProg, "skyboxTexture", 0);
+    //mReflectProg["reflectOrRefract"] = false;
+    //mReflectProg["refractRatio"] = 1.0f / 2.5f;
     //mModel->draw(mProg);
 
     int idx = 0;

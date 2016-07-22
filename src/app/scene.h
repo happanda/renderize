@@ -46,6 +46,7 @@ private:
     UniformBuffer mUniBuf;
 
     Program mProg;
+    Program mNormalShowProg;
     Program mReflectProg;
 
     std::shared_ptr<Model> mModel;

@@ -84,6 +84,9 @@ ${SourcePath}/shaders_src/fragment_demo.vert
 ${SourcePath}/shaders_src/lamp.frag
 ${SourcePath}/shaders_src/landscape.frag
 ${SourcePath}/shaders_src/mondria.frag
+${SourcePath}/shaders_src/normal_show.frag
+${SourcePath}/shaders_src/normal_show.geom
+${SourcePath}/shaders_src/normal_show.vert
 ${SourcePath}/shaders_src/post_kernel3x3.frag
 ${SourcePath}/shaders_src/simple.vert
 ${SourcePath}/shaders_src/simple.frag
