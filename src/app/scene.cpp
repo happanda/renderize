@@ -1,4 +1,6 @@
 #include <iostream>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "scene.h"
 #include "camera/camera.h"
@@ -117,6 +119,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
         mSkybox.drawFirst(camera);
 
     mProg.use();
+    mProg["iGlobalTime"] = static_cast<float>(glfwGetTime());
     mSkybox.tex().active(mProg, "skyboxTexture", 0);
     mProg["DirLightOn"] = true;
 
@@ -126,13 +129,14 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mUniBuf.bind(mProg);
     mCubemesh.draw(mProg);
+    mModel->draw(mProg);
 
     mUniBuf.bind(mReflectProg);
     mReflectProg["model"] = glm::translate(scaleMat, transVec);
     mSkybox.tex().active(mReflectProg, "skyboxTexture", 0);
     mReflectProg["reflectOrRefract"] = false;
     mReflectProg["refractRatio"] = 1.0f / 2.5f;
-    mModel->draw(mReflectProg);
+    //mModel->draw(mProg);
 
     int idx = 0;
     for (auto& lgh : mDirLights)
