@@ -14,16 +14,16 @@
 void Scene::init()
 {
     DirLight dl = DirLight()
-        .direction({ 1.0f, 1.0f, 1.0f })
-        .ambient({ 0.6f, 0.6f, 0.6f })
-        .diffuse({ 0.1f, 0.5f, 0.1f })
-        .specular({ 0.4f, 0.4f, 0.4f });
+        .direction({ 0.0f, 0.0f, -1.0f })
+        //.ambient({ 0.6f, 0.6f, 0.6f })
+        //.diffuse({ 0.1f, 0.5f, 0.1f })
+        .specular({ 0.1f, 0.7f, 0.7f });
     mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
         .position({ 0.0f, 5.0f, 0.0f })
-        .ambient({ 0.1f, 0.1f, 0.1f })
-        .diffuse({ 0.5f, 0.5f, 0.5f })
+        .ambient({ 0.0f, 0.0f, 0.0f })
+        .diffuse({ 0.7f, 0.7f, 0.7f })
         .specular({ 0.1f, 0.1f, 0.7f })
         .constCoeff(1.0f)
         .linCoeff(0.09f)
@@ -91,10 +91,10 @@ void Scene::init()
     glm::vec3 const quad2pos(0.0f, 0.0f, 3.0f);
     glm::vec3 const quad3pos(0.0f, 0.0f, -2.0f);
     glm::vec3 const quad4pos(0.0f, 0.0f, -3.0f);
-    mMeshSorter.addMesh(quad1pos, &mQuadmesh);
-    mMeshSorter.addMesh(quad2pos, &mQuadmesh);
-    mMeshSorter.addMesh(quad3pos, &mQuadmesh);
-    mMeshSorter.addMesh(quad4pos, &mQuadmesh);
+    //mMeshSorter.addMesh(quad1pos, &mQuadmesh);
+    //mMeshSorter.addMesh(quad2pos, &mQuadmesh);
+    //mMeshSorter.addMesh(quad3pos, &mQuadmesh);
+    //mMeshSorter.addMesh(quad4pos, &mQuadmesh);
 
     SoilCubemapImage imgs;
     imgs[0].load("../tex/skybox/right.jpg");
@@ -104,6 +104,9 @@ void Scene::init()
     imgs[4].load("../tex/skybox/back.jpg");
     imgs[5].load("../tex/skybox/front.jpg");
     mSkybox.create(imgs);
+
+    glLineWidth(2.0f);
+    glPointSize(2.0f);
 }
 
 void Scene::update(float dt)
@@ -134,7 +137,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mModel->draw(mProg);
 
     mNormalShowProg.use();
-    mNormalShowProg["uColor"] = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    mNormalShowProg["uColor"] = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
     mNormalShowProg["NormalMagnitude"] = 0.4f;
     mNormalShowProg["model"] = glm::translate(scaleMat, transVec);
     mUniBuf.bind(mNormalShowProg);
