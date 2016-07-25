@@ -39,6 +39,13 @@ struct Mesh
 
     void free();
 
+    GLuint vao() const;
+    GLuint vbo() const;
+    GLuint ebo() const;
+
+    std::vector<Vertex> const& vertices() const;
+    std::vector<GLuint> const& indices() const;
+
 private:
     void initMesh();
 

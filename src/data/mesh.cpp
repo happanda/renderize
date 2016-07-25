@@ -118,6 +118,31 @@ void Mesh::free()
     mCullMode = 0;
 }
 
+GLuint Mesh::vao() const
+{
+    return mVAO;
+}
+
+GLuint Mesh::vbo() const
+{
+    return mVBO;
+}
+
+GLuint Mesh::ebo() const
+{
+    return mEBO;
+}
+
+std::vector<Vertex> const& Mesh::vertices() const
+{
+    return mVertices;
+}
+
+std::vector<GLuint> const& Mesh::indices() const
+{
+    return mIndices;
+}
+
 void Mesh::initMesh()
 {
     bool indexed = !mIndices.empty();

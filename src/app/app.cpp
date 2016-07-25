@@ -82,6 +82,7 @@ bool App::init()
     KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
+    mCamera.pos(glm::vec3(0.0f, 6.0f, 70.0f));
     mScene.init();
     mCamUpdater.reset(new MainCameraUpdater(mCamera));
     mRTarget.reset(new RenderTarget(mWinSize));

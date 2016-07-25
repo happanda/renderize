@@ -88,6 +88,11 @@ void Model::free()
     mLoadedTextures.clear();
 }
 
+std::vector<Mesh> const& Model::meshes() const
+{
+    return mMeshes;
+}
+
 void Model::processNode(aiNode* node, aiScene const* scene)
 {
     for (unsigned i = 0; i < node->mNumMeshes; ++i)

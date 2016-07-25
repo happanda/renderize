@@ -89,6 +89,7 @@ ${SourcePath}/shaders_src/normal_show.geom
 ${SourcePath}/shaders_src/normal_show.vert
 ${SourcePath}/shaders_src/post_kernel3x3.frag
 ${SourcePath}/shaders_src/simple.vert
+${SourcePath}/shaders_src/simple_instanced.vert
 ${SourcePath}/shaders_src/simple.frag
 ${SourcePath}/shaders_src/skybox.vert
 ${SourcePath}/shaders_src/skybox.frag

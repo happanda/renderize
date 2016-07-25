@@ -30,6 +30,8 @@ struct Model
     void load(std::string const& path);
     void free();
 
+    std::vector<Mesh> const& meshes() const;
+
 private:
     void processNode(aiNode* node, aiScene const* scene);
     Mesh processMesh(aiMesh* mesh, aiScene const* scene);

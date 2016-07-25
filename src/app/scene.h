@@ -51,6 +51,10 @@ private:
 
     std::shared_ptr<Model> mModel;
     Mesh mCubemesh;
+    
+    std::shared_ptr<Model> mPlanet;
+    std::shared_ptr<Model> mAsteroid;
+    std::vector<glm::mat4> mAstPoss;
 
     Skybox mSkybox;
 };

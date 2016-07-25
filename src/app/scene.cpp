@@ -10,6 +10,7 @@
 #include "util/checked_call.h"
 #include "util/soil_image.h"
 
+int const sAsteroidCount = 1000;
 
 void Scene::init()
 {
@@ -17,7 +18,7 @@ void Scene::init()
         .direction({ 0.0f, 0.0f, -1.0f })
         .ambient({ 0.6f, 0.6f, 0.6f })
         .diffuse({ 0.1f, 0.5f, 0.1f })
-        .specular({ 0.7f, 0.7f, 0.1f });
+        .specular({ 0.5f, 0.5f, 0.5f });
     mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
@@ -40,8 +41,8 @@ void Scene::init()
         .cutOff(0.05f)
         .outerCutOff(0.2f);
     mSpotLights.emplace_back(sl);
-
-    mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
+    
+    mProg = createProgram("shaders/simple_instanced.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
     mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
 
@@ -56,6 +57,68 @@ void Scene::init()
     mModel->load("nanosuit/nanosuit.obj");
     mModel->noBlending();
     mModel->culling(GL_BACK);
+
+    /// PLANET AND ASTEROIDS
+    mPlanet.reset(new Model);
+    mPlanet->load("planet/planet.obj");
+    mPlanet->noBlending();
+    mPlanet->culling(GL_BACK);
+    mAsteroid.reset(new Model);
+    mAsteroid->load("asteroid/rock.obj");
+    mAsteroid->noBlending();
+    mAsteroid->culling(GL_BACK);
+    
+    mAstPoss.resize(sAsteroidCount);
+    float const radius = 30.0f;
+    float const offset = 2.5f;
+    for (int i = 0; i < sAsteroidCount; ++i)
+    {
+        glm::mat4& mat = mAstPoss[i];
+        float angle = static_cast<float>(i) / sAsteroidCount * 360.0f;
+        float disp = (std::rand() % static_cast<int>(2 * offset * 100)) / 100.0f - offset;
+        float x = std::sin(angle) * radius + disp;
+        disp = (std::rand() % static_cast<int>(2 * offset * 100)) / 100.0f - offset;
+        float y = disp * 0.4f;
+        disp = (std::rand() % static_cast<int>(2 * offset * 100)) / 100.0f - offset;
+        float z = std::cos(angle) * radius + disp;
+
+        mat = glm::translate(mat, glm::vec3(x, y, z));
+
+        float scale = (std::rand() % 20) / 100.0f + 0.05f;
+        mat = glm::scale(mat, glm::vec3(scale));
+
+        float rot = static_cast<float>(std::rand() % 360);
+        mat = glm::rotate(mat, rot, glm::vec3(0.4f, 0.6f, 0.8f));
+    }
+
+    auto const& astMeshes = mAsteroid->meshes();
+    for (auto const& astMesh : astMeshes)
+    {
+        GLuint vao = astMesh.vao();
+        GLuint buffer = 0;
+        glBindVertexArray(vao);
+        glGenBuffers(1, &buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, sAsteroidCount * sizeof(glm::mat4), mAstPoss.data(), GL_STATIC_DRAW);
+
+        GLsizei vec4size = sizeof(glm::vec4);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(vec4size));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(2 * vec4size));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(3 * vec4size));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
 
     /// CUBE
     std::vector<TexturePtr> crateTexs(2);
@@ -128,13 +191,28 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mSkybox.tex().active(mProg, "skyboxTexture", 0);
     mProg["DirLightOn"] = true;
 
-    auto scaleMat = glm::scale(glm::mat4(), glm::vec3(1.0f));
-    auto transVec = glm::vec3(0.0f, 0.0f, 0.0f);
+    auto scaleMat = glm::scale(glm::mat4(), glm::vec3(3.0f));
+    auto transVec = glm::vec3(0.0f, -1.0f, 0.0f);
     mProg["model"] = glm::translate(scaleMat, transVec);
 
     mUniBuf.bind(mProg);
-    mCubemesh.draw(mProg);
-    mModel->draw(mProg);
+    //mCubemesh.draw(mProg);
+    //mModel->draw(mProg);
+    mPlanet->draw(mProg);
+
+    auto const& astMeshes = mAsteroid->meshes();
+    for (auto const& astMesh : astMeshes)
+    {
+        glBindVertexArray(astMesh.vao());
+        glDrawElementsInstanced(GL_TRIANGLES, astMesh.indices().size(), GL_UNSIGNED_INT, 0, sAsteroidCount);
+        glBindVertexArray(0);
+    }
+
+    //for (int i = 0; i < sAsteroidCount; ++i)
+    //{
+    //    mProg["model"] = mAstPoss[i];
+    //    mAsteroid->draw(mProg);
+    //}
 
     if (false)
     {
