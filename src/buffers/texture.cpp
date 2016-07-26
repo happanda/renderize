@@ -11,6 +11,7 @@ Texture::Texture()
     , mTarget(0)
     , mInternalFormat(0)
     , mType(TexType::Normal)
+    , mNumSamples(0)
 {
 }
 
@@ -24,11 +25,13 @@ Texture::Texture(Texture&& rhs)
     , mTarget(0)
     , mInternalFormat(0)
     , mType(TexType::Normal)
+    , mNumSamples(0)
 {
     swap(mTex, rhs.mTex);
     swap(mTarget, rhs.mTarget);
     swap(mInternalFormat, rhs.mInternalFormat);
     swap(mType, rhs.mType);
+    swap(mNumSamples, rhs.mNumSamples);
 }
 
 Texture const& Texture::operator=(Texture&& rhs)
@@ -38,6 +41,7 @@ Texture const& Texture::operator=(Texture&& rhs)
     swap(mTarget, rhs.mTarget);
     swap(mInternalFormat, rhs.mInternalFormat);
     swap(mType, rhs.mType);
+    swap(mNumSamples, rhs.mNumSamples);
     return *this;
 }
 
@@ -69,6 +73,40 @@ void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
             break;
     }
     glTexImage2D(mTarget, 0, mInternalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    unbind();
+}
+
+void Texture::createMulti(GLsizei width, GLsizei height, InternalFormat fmt, std::uint8_t samples)
+{
+    free();
+    mTarget = GL_TEXTURE_2D_MULTISAMPLE;
+    mNumSamples = samples;
+
+    glGenTextures(1, &mTex);
+    bind();
+    GLenum format = 0;
+    switch (fmt)
+    {
+    case InternalFormat::Color:
+        mInternalFormat = GL_RGBA;
+        format = GL_RGBA;
+        break;
+    case InternalFormat::Depth:
+        mInternalFormat = GL_DEPTH_COMPONENT;
+        format = GL_DEPTH_COMPONENT;
+        break;
+    case InternalFormat::Stencil:
+        mInternalFormat = GL_STENCIL_INDEX;
+        format = GL_STENCIL_INDEX;
+        break;
+    case InternalFormat::DepthStencil:
+        mInternalFormat = GL_DEPTH_STENCIL;
+        format = GL_DEPTH_STENCIL;
+        break;
+    }
+    glTexImage2DMultisample(mTarget, static_cast<GLsizei>(samples), mInternalFormat, width, height, GL_TRUE);
     glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     unbind();
@@ -150,6 +188,16 @@ GLint Texture::internalFormat() const
     return mInternalFormat;
 }
 
+bool Texture::isMultiSample() const
+{
+    return mTarget == GL_TEXTURE_2D_MULTISAMPLE;
+}
+
+std::uint8_t Texture::multiSamples() const
+{
+    return mNumSamples;
+}
+
 TexType Texture::type() const
 {
     return mType;
@@ -193,5 +241,6 @@ void Texture::free()
         mTarget = 0;
         mInternalFormat = 0;
         mType = TexType::Normal;
+        mNumSamples = 0;
     }
 }

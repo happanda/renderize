@@ -49,7 +49,10 @@ void FrameBuffer::attach(Texture& tex)
         attachment = GL_DEPTH_STENCIL_ATTACHMENT;
         break;
     }
-    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
+    if (!tex.isMultiSample())
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
+    else
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D_MULTISAMPLE, tex, 0);
     tex.unbind();
     unbind();
 }

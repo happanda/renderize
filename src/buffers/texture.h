@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <GL/glew.h>
@@ -29,6 +30,7 @@ struct Texture
     Texture const& operator=(Texture const&) = delete;
 
     void create(GLsizei width, GLsizei height, InternalFormat fmt);
+    void createMulti(GLsizei width, GLsizei height, InternalFormat fmt, std::uint8_t samples);
     void create(SoilImage const& image);
     void createCubemap(SoilCubemapImage const& imgs);
 
@@ -40,6 +42,8 @@ struct Texture
 
     operator GLuint() const;
     GLint internalFormat() const;
+    bool isMultiSample() const;
+    std::uint8_t multiSamples() const;
     TexType type() const;
 
     void bind() const;
@@ -55,4 +59,5 @@ private:
     GLenum mTarget{ 0 };
     GLint mInternalFormat{ 0 };
     TexType mType{ TexType::Normal };
+    std::uint8_t mNumSamples; // should use glGetTexLevelParameter with TEXTURE_SAMPLES if possible
 };

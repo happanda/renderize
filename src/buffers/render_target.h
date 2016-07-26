@@ -7,9 +7,9 @@
 struct RenderTarget
 {
     template <class Number, glm::precision P = glm::defaultp>
-    RenderTarget(glm::tvec2<Number, P> const& sz)
+    RenderTarget(glm::tvec2<Number, P> const& sz, std::uint8_t multiSamples = 0)
     {
-        size(glm::ivec2(static_cast<int>(sz.x), static_cast<int>(sz.y)));
+        size(glm::ivec2(static_cast<int>(sz.x), static_cast<int>(sz.y)), multiSamples);
     }
     ~RenderTarget();
     
@@ -18,7 +18,7 @@ struct RenderTarget
     RenderTarget(RenderTarget const&) = delete;
     RenderTarget const& operator=(RenderTarget const&) = delete;
 
-    void size(glm::ivec2 const& size);
+    void size(glm::ivec2 const& size, std::uint8_t multiSamples = 0);
 
     FrameBuffer& fb();
     Texture& tex();

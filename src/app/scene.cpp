@@ -10,14 +10,20 @@
 #include "util/checked_call.h"
 #include "util/soil_image.h"
 
-int const sAsteroidCount = 3000;
+int const sAsteroidCount = 1000;
 
 void Scene::init()
 {
     DirLight dl = DirLight()
         .direction({ 0.0f, -1.0f, 0.0f })
         .ambient({ 0.6f, 0.6f, 0.6f })
-        .diffuse({ 0.1f, 0.9f, 0.1f })
+        .diffuse({ 0.1f, 0.1f, 0.7f })
+        .specular({ 0.5f, 0.5f, 0.5f });
+    mDirLights.emplace_back(dl);
+    dl = DirLight()
+        .direction({ 0.0f, 1.0f, 0.0f })
+        .ambient({ 0.6f, 0.6f, 0.6f })
+        .diffuse({ 0.9f, 0.1f, 0.1f })
         .specular({ 0.5f, 0.5f, 0.5f });
     mDirLights.emplace_back(dl);
 
@@ -146,6 +152,7 @@ void Scene::init()
 
     glLineWidth(2.0f);
     glPointSize(2.0f);
+    //glEnable(GL_MULTISAMPLE);
 }
 
 void Scene::update(float dt)
@@ -168,12 +175,12 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mSkybox.tex().active(mProg, "skyboxTexture", 0);
     mProg["DirLightOn"] = true;
-    mCubemesh.draw(mProg);
-    mModel->draw(mProg);
+    //mCubemesh.draw(mProg);
+    //mModel->draw(mProg);
 
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(3.0f));
     auto transVec = glm::vec3(0.0f, -1.0f, 0.0f);
-    mProg["model"] = glm::translate(scaleMat, transVec);
+    mProg["model"] = glm::translate(glm::rotate(scaleMat, static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f)), transVec);
     mPlanet->draw(mProg);
 
     mProgInstanced.use();
@@ -182,12 +189,6 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mProgInstanced["DirLightOn"] = true;
     mProgInstanced["model"] = glm::rotate(glm::mat4(), static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     mAsteroid->draw(mProgInstanced);
-
-    //for (int i = 0; i < sAsteroidCount; ++i)
-    //{
-    //    mProg["model"] = mAstPoss[i];
-    //    mAsteroid->draw(mProg);
-    //}
 
     if (false)
     {

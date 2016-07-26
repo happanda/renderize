@@ -24,15 +24,21 @@ RenderTarget const& RenderTarget::operator=(RenderTarget&& rhs)
     return *this;
 }
 
-void RenderTarget::size(glm::ivec2 const& sz)
+void RenderTarget::size(glm::ivec2 const& sz, std::uint8_t multiSamples)
 {
     if (!mFrameBuffer)
         mFrameBuffer.reset(new FrameBuffer);
     mTexture.reset(new Texture);
-    mTexture->create(sz.x, sz.y, InternalFormat::Color);
+    if (multiSamples == 0)
+        mTexture->create(sz.x, sz.y, InternalFormat::Color);
+    else
+        mTexture->createMulti(sz.x, sz.y, InternalFormat::Color, multiSamples);
     mFrameBuffer->attach(*mTexture);
     RenderBuffer renderBuffer;
-    renderBuffer.create(sz.x, sz.y, InternalFormat::Depth);
+    if (multiSamples == 0)
+        renderBuffer.create(sz.x, sz.y, InternalFormat::Depth);
+    else
+        renderBuffer.createMulti(sz.x, sz.y, InternalFormat::Depth, multiSamples);
     mFrameBuffer->attach(renderBuffer);
     CHECK(mFrameBuffer->isComplete(), "Error: FrameBuffer is not complete", );
     mFrameBuffer->unbind();

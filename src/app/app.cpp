@@ -63,6 +63,7 @@ bool App::init()
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     // Create a window
+    //glfwWindowHint(GLFW_SAMPLES, 4);
     mWindow = glfwCreateWindow(mWinSize.x, mWinSize.y, "Renderize", nullptr, nullptr);
     
     CHECK(mWindow, "Error creating window", return false);

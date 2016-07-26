@@ -23,7 +23,7 @@ out VS_OUT
 
 void main()
 {
-    mat4 modelMatrix = instModel;
+    mat4 modelMatrix = model * instModel;
 
     gl_Position = projection * view * modelMatrix * vec4(position, 1.0);
     mat3 normalMatrix = mat3(transpose(inverse(view * modelMatrix)));
