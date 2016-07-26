@@ -81,6 +81,12 @@ void Model::load(std::string const& path)
     processNode(scene->mRootNode, scene);
 }
 
+void Model::addInstancedModel(std::vector<glm::mat4> const& matrices)
+{
+    for (auto& mesh : mMeshes)
+        mesh.addInstancedModel(matrices);
+}
+
 void Model::free()
 {
     mMeshes.clear();

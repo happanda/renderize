@@ -28,6 +28,7 @@ struct Model
     void draw(Program const& prog) const;
 
     void load(std::string const& path);
+    void addInstancedModel(std::vector<glm::mat4> const& matrices);
     void free();
 
     std::vector<Mesh> const& meshes() const;

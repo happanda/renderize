@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <GL/glew.h>
+#include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include "buffers/texture.h"
@@ -37,6 +38,7 @@ struct Mesh
 
     void draw(Program const& prog) const;
 
+    void addInstancedModel(std::vector<glm::mat4> const& matrices);
     void free();
 
     GLuint vao() const;
@@ -49,7 +51,8 @@ struct Mesh
 private:
     void initMesh();
 
-    GLuint mVAO{ 0 }, mVBO{ 0 }, mEBO{ 0 };
+    GLuint mVAO{ 0 }, mVBO{ 0 }, mEBO{ 0 }, mInstVBO{ 0 };
+    int mInstCount{ 0 };
 
     std::vector<Vertex>  mVertices;
     std::vector<GLuint>  mIndices;

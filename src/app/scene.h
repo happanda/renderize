@@ -46,6 +46,7 @@ private:
     UniformBuffer mUniBuf;
 
     Program mProg;
+    Program mProgInstanced;
     Program mNormalShowProg;
     Program mReflectProg;
 

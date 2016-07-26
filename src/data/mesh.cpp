@@ -10,6 +10,8 @@ Mesh::Mesh()
     : mVAO(0)
     , mVBO(0)
     , mEBO(0)
+    , mInstVBO(0)
+    , mInstCount(0)
 {
 }
 
@@ -20,6 +22,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vecto
     , mVAO(0)
     , mVBO(0)
     , mEBO(0)
+    , mInstVBO(0)
+    , mInstCount(0)
 {
     initMesh();
 }
@@ -35,6 +39,8 @@ Mesh::Mesh(Mesh&& rhs)
     swap(mVAO, rhs.mVAO);
     swap(mVBO, rhs.mVBO);
     swap(mEBO, rhs.mEBO);
+    swap(mInstVBO, rhs.mInstVBO);
+    swap(mInstCount, rhs.mInstCount);
     swap(mVertices, rhs.mVertices);
     swap(mIndices, rhs.mIndices);
     swap(mTextures, rhs.mTextures);
@@ -53,6 +59,8 @@ Mesh const& Mesh::operator=(Mesh&& rhs)
     swap(mVAO, rhs.mVAO);
     swap(mVBO, rhs.mVBO);
     swap(mEBO, rhs.mEBO);
+    swap(mInstVBO, rhs.mInstVBO);
+    swap(mInstCount, rhs.mInstCount);
     swap(mVertices, rhs.mVertices);
     swap(mIndices, rhs.mIndices);
     swap(mTextures, rhs.mTextures);
@@ -98,14 +106,45 @@ void Mesh::culling(GLenum mode)
     mCullMode = mode;
 }
 
+void Mesh::addInstancedModel(std::vector<glm::mat4> const& matrices)
+{
+    mInstCount = matrices.size();
+    if (!mInstCount)
+        return;
+    glBindVertexArray(mVAO);
+    glGenBuffers(1, &mInstVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mInstVBO);
+    glBufferData(GL_ARRAY_BUFFER, matrices.size() * sizeof(glm::mat4), matrices.data(), GL_STATIC_DRAW);
+
+    GLsizei vec4size = sizeof(glm::vec4);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)0);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(vec4size));
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(2 * vec4size));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4size, (GLvoid*)(3 * vec4size));
+
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+
+    glBindVertexArray(0);
+}
+
 void Mesh::free()
 {
     if (mEBO)
         glDeleteBuffers(1, &mEBO);
     if (mVBO)
         glDeleteBuffers(1, &mVBO);
+    if (mInstVBO)
+        glDeleteBuffers(1, &mInstVBO);
     if (mVAO)
         glDeleteVertexArrays(1, &mVAO);
+    mInstCount = 0;
     mVertices.clear();
     mIndices.clear();
     mTextures.clear();
@@ -235,10 +274,20 @@ void Mesh::draw(Program const& prog) const
         glDisable(GL_CULL_FACE);
 
     glBindVertexArray(mVAO);
-    if (mIndices.empty())
-        glDrawArrays(GL_TRIANGLES, 0, mVertices.size());
+    if (!mInstCount)
+    {
+        if (mIndices.empty())
+            glDrawArrays(GL_TRIANGLES, 0, mVertices.size());
+        else
+            glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+    }
     else
-        glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
+    {
+        if (mIndices.empty())
+            glDrawArraysInstanced(GL_TRIANGLES, 0, mVertices.size(), mInstCount);
+        else
+            glDrawElementsInstanced(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0, mInstCount);
+    }
     glBindVertexArray(0);
 
     for (GLint i = 0; i < static_cast<GLint>(mTextures.size()); ++i)
