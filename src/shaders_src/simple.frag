@@ -101,7 +101,7 @@ void main()
         }
         color += pointLightTotal;
     }
-
+    
     if (SpotLightOn)
     {
         vec4 spotLightTotal = vec4(0.0);
@@ -113,7 +113,10 @@ void main()
     }
 
     if (texReflAssigned)
-        color += compReflection(viewDir, normal);
+    {
+        // TODO: WHY THE FUCK THIS CODE BREAKS MY SHADER WHEN IT ISN'T EVEN CALLED?!
+        //color += compReflection(viewDir, normal);
+    }
 }
 
 

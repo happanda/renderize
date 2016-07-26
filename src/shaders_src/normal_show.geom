@@ -26,7 +26,7 @@ void main()
         gl_Position = gl_in[i].gl_Position;
         geomColor = vec4(1.0);
         EmitVertex();
-        gl_Position = gl_in[i].gl_Position + gs_in[i].Normal * NormalMagnitude;
+        gl_Position = gl_in[i].gl_Position + vec4(gs_in[i].Normal * NormalMagnitude, 0.0);
         geomColor = vec4(gs_in[i].Normal, 1.0);
         EmitVertex();
         EndPrimitive();

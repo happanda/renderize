@@ -175,6 +175,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mSkybox.tex().active(mProg, "skyboxTexture", 0);
     mProg["DirLightOn"] = true;
+    //mProg["model"] = glm::mat4();
     //mCubemesh.draw(mProg);
     //mModel->draw(mProg);
 

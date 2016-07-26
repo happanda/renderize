@@ -31,7 +31,7 @@ private:
     template<>
     void assign(bool val)
     {
-        glUniform1i(mLoc, static_cast<GLint>(val));
+        glUniform1i(mLoc, static_cast<GLint>(val ? 1 : 0));
     }
 
     template<>
