@@ -58,8 +58,8 @@ void Scene::init()
     mNormalShowProg = createProgram("shaders/normal_show.vert", "shaders/normal_show.geom", "shaders/normal_show.frag");
     CHECK(mNormalShowProg, "Error creating shader program", return;);
 
-    //mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
-    //CHECK(mReflectProg, "Error creating shader program", return;);
+    mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
+    CHECK(mReflectProg, "Error creating shader program", return;);
 
     /// NANOSUIT
     mModel.reset(new Model);
@@ -173,7 +173,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mProg.use();
     mUniBuf.bind(mProg);
 
-    mSkybox.tex().active(mProg, "skyboxTexture", 0);
+    mSkybox.tex().active(mProg, "skyboxTexture", 4);
     mProg["DirLightOn"] = true;
     //mProg["model"] = glm::mat4();
     //mCubemesh.draw(mProg);
@@ -186,7 +186,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mProgInstanced.use();
     mUniBuf.bind(mProgInstanced);
-    mSkybox.tex().active(mProgInstanced, "skyboxTexture", 0);
+    mSkybox.tex().active(mProgInstanced, "skyboxTexture", 4);
     mProgInstanced["DirLightOn"] = true;
     mProgInstanced["model"] = glm::rotate(glm::mat4(), static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     mAsteroid->draw(mProgInstanced);

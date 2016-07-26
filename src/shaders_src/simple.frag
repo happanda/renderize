@@ -115,7 +115,7 @@ void main()
     if (texReflAssigned)
     {
         // TODO: WHY THE FUCK THIS CODE BREAKS MY SHADER WHEN IT ISN'T EVEN CALLED?!
-        //color += compReflection(viewDir, normal);
+        color += compReflection(viewDir, normal);
     }
 }
 
