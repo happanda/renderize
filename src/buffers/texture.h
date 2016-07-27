@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <GL/glew.h>
+#include <glm/vec2.hpp>
 #include "buffers/format.h"
 #include "buffers/fwd.h"
 
@@ -40,6 +41,7 @@ struct Texture
 
     void setType(TexType type);
 
+    glm::ivec2 const& size() const;
     operator GLuint() const;
     GLint internalFormat() const;
     bool isMultiSample() const;
@@ -55,6 +57,7 @@ struct Texture
     void free();
 
 private:
+    glm::ivec2 mSize;
     GLuint mTex{ 0 };
     GLenum mTarget{ 0 };
     GLint mInternalFormat{ 0 };

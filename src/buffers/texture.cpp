@@ -48,6 +48,7 @@ Texture const& Texture::operator=(Texture&& rhs)
 void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
 {
     free();
+    mSize = glm::ivec2(width, height);
     mTarget = GL_TEXTURE_2D;
 
     glGenTextures(1, &mTex);
@@ -81,6 +82,7 @@ void Texture::create(GLsizei width, GLsizei height, InternalFormat fmt)
 void Texture::createMulti(GLsizei width, GLsizei height, InternalFormat fmt, std::uint8_t samples)
 {
     free();
+    mSize = glm::ivec2(width, height);
     mTarget = GL_TEXTURE_2D_MULTISAMPLE;
     mNumSamples = samples;
 
@@ -115,6 +117,7 @@ void Texture::createMulti(GLsizei width, GLsizei height, InternalFormat fmt, std
 void Texture::create(SoilImage const& image)
 {
     free();
+    mSize = glm::ivec2(image.width(), image.height());
     mTarget = GL_TEXTURE_2D;
     glGenTextures(1, &mTex);
     bind();
@@ -128,6 +131,7 @@ void Texture::create(SoilImage const& image)
 void Texture::createCubemap(SoilCubemapImage const& imgs)
 {
     free();
+    mSize = glm::ivec2(imgs[0].width(), imgs[0].height());
     mTarget = GL_TEXTURE_CUBE_MAP;
     glGenTextures(1, &mTex);
     bind();
@@ -176,6 +180,11 @@ void Texture::genMipMap()
 void Texture::setType(TexType type)
 {
     mType = type;
+}
+
+glm::ivec2 const& Texture::size() const
+{
+    return mSize;
 }
 
 Texture::operator GLuint() const
@@ -236,6 +245,7 @@ void Texture::free()
 {
     if (mTex)
     {
+        mSize = glm::ivec2();
         glDeleteTextures(1, &mTex);
         mTex = 0;
         mTarget = 0;

@@ -37,7 +37,8 @@ namespace
 
 
 App::App()
-    : mWinSize(800, 800)
+    : mNumSamples(4)
+    , mWinSize(800, 800)
     , mWindow(nullptr)
     , mScene(mWinSize)
     , mCamera(mWinSize)
@@ -83,11 +84,11 @@ bool App::init()
     KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
-    mCamera.pos(glm::vec3(0.0f, 6.0f, 40.0f));
+    mCamera.pos(glm::vec3(0.0f, 3.0f, 40.0f));
     mScene.init();
     mCamUpdater.reset(new MainCameraUpdater(mCamera));
-    mRTarget.reset(new RenderTarget(mWinSize));
-    mRTargetBack.reset(new RenderTarget(mWinSize));
+    mRTarget.reset(new RenderTarget(mWinSize, mNumSamples));
+    mRTargetBack.reset(new RenderTarget(mWinSize, mNumSamples));
     return true;
 }
 
@@ -106,8 +107,8 @@ void App::resize(glm::ivec2 const& size)
     mScene.resize(mWinSize);
     mCamera.size(mWinSize);
     mCameraBack.size(mWinSize);
-    mRTarget->size(mWinSize);
-    mRTargetBack->size(mWinSize);
+    mRTarget->size(mWinSize, mNumSamples);
+    mRTargetBack->size(mWinSize, mNumSamples);
 }
 
 void App::onKey(int key, KeyAction action, int mods)
@@ -134,56 +135,6 @@ void App::onGLFWError(int errCode, char const* msg)
 
 void App::run()
 {
-    Program quadProg = createProgram("shaders/asis.vert", "shaders/asis.frag");
-    CHECK(quadProg, "Error creating quad shader program", return;);
-
-    GLuint quadVAO, quadVBO;
-    {
-        GLfloat quadVertices[] = {
-            // Positions   // TexCoords
-            -1.0f, 1.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f,
-            1.0f, -1.0f, 1.0f, 0.0f,
-
-            -1.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, -1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 1.0f, 1.0f
-        };
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
-        glBindVertexArray(0);
-    }
-    GLuint quadVAOback, quadVBOback;
-    {
-        GLfloat quadVertices[] = {
-            // Positions   // TexCoords
-            -1.0f, 1.0f, 0.0f, 1.0f,
-            -1.0f, 0.6f, 0.0f, 0.0f,
-            -0.6f, 0.6f, 1.0f, 0.0f,
-
-            -1.0f, 1.0f, 0.0f, 1.0f,
-            -0.6f, 0.6f, 1.0f, 0.0f,
-            -0.6f, 1.0f, 1.0f, 1.0f
-        };
-        glGenVertexArrays(1, &quadVAOback);
-        glGenBuffers(1, &quadVBOback);
-        glBindVertexArray(quadVAOback);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBOback);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
-        glBindVertexArray(0);
-    }
-
     float lastTime = static_cast<float>(glfwGetTime());
     float dt{ 0.0f };
     float const dT{ 0.0125f };
@@ -217,19 +168,8 @@ void App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        quadProg.use();
-        glBindVertexArray(quadVAO);
-        mRTarget->tex().active(0);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-        glDisableVertexAttribArray(0);
-
-        quadProg.use();
-        glBindVertexArray(quadVAOback);
-        mRTargetBack->tex().active(0);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-        glDisableVertexAttribArray(0);
+        mRTarget->draw(glm::ivec2(0, 0), mWinSize);
+        mRTargetBack->draw(glm::ivec2(0, 0), mWinSize / 8);
 
         glfwSwapBuffers(mWindow);
     }

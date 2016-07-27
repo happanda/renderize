@@ -99,6 +99,9 @@ ${SourcePath}/shaders_src/universe.frag
 ${SourcePath}/shaders_src/visual.frag
 ${SourcePath}/shaders_src/world_mapped.vert
 ${SourcePath}/shaders_src/world_mapped.frag
+
+${SourcePath}/shaders_src/render_target/rt.vert
+${SourcePath}/shaders_src/render_target/rt.frag
 )
 
 set(SOURCE_FILES_UTIL

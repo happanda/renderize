@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <glm/vec2.hpp>
 #include "app/scene.h"
 #include "camera/camera.h"
@@ -29,6 +30,7 @@ private:
     App();
     FRIEND_SINGLETON(App);
 
+    std::uint8_t mNumSamples; // multisampling parameter
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
     bool mSpotLightOn{ false };
