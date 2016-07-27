@@ -16,22 +16,22 @@ void Scene::init()
 {
     DirLight dl = DirLight()
         .direction({ 0.0f, -1.0f, 0.0f })
-        .ambient({ 0.6f, 0.6f, 0.6f })
-        .diffuse({ 0.1f, 0.1f, 0.7f })
+        .ambient({ 0.1f, 0.1f, 0.1f })
+        .diffuse({ 0.4f, 0.4f, 0.4f })
         .specular({ 0.5f, 0.5f, 0.5f });
     mDirLights.emplace_back(dl);
-    dl = DirLight()
-        .direction({ 0.0f, 1.0f, 0.0f })
-        .ambient({ 0.6f, 0.6f, 0.6f })
-        .diffuse({ 0.9f, 0.1f, 0.1f })
-        .specular({ 0.5f, 0.5f, 0.5f });
-    mDirLights.emplace_back(dl);
+    //dl = DirLight()
+    //    .direction({ 0.0f, 1.0f, 0.0f })
+    //    .ambient({ 0.6f, 0.6f, 0.6f })
+    //    .diffuse({ 0.9f, 0.1f, 0.1f })
+    //    .specular({ 0.5f, 0.5f, 0.5f });
+    //mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
-        .position({ 0.0f, 5.0f, 0.0f })
+        .position({ 0.0f, 0.0f, 20.0f })
         .ambient({ 0.0f, 0.0f, 0.0f })
-        .diffuse({ 0.7f, 0.7f, 0.7f })
-        .specular({ 0.1f, 0.1f, 0.7f })
+        .diffuse({ 0.1f, 0.7f, 0.1f })
+        .specular({ 0.9f, 0.9f, 0.9f })
         .constCoeff(1.0f)
         .linCoeff(0.09f)
         .quadCoeff(0.05f);
@@ -142,12 +142,12 @@ void Scene::init()
     //mMeshSorter.addMesh(quad4pos, &mQuadmesh);
 
     SoilCubemapImage imgs;
-    imgs[0].load("../tex/skybox/right.jpg");
-    imgs[1].load("../tex/skybox/left.jpg");
-    imgs[2].load("../tex/skybox/top.jpg");
-    imgs[3].load("../tex/skybox/bottom.jpg");
-    imgs[4].load("../tex/skybox/back.jpg");
-    imgs[5].load("../tex/skybox/front.jpg");
+    imgs[0].load("../tex/skybox/rt.png");
+    imgs[1].load("../tex/skybox/lf.png");
+    imgs[2].load("../tex/skybox/up.png");
+    imgs[3].load("../tex/skybox/dn.png");
+    imgs[4].load("../tex/skybox/bk.png");
+    imgs[5].load("../tex/skybox/ft.png");
     mSkybox.create(imgs);
 
     glLineWidth(2.0f);
@@ -175,21 +175,21 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mSkybox.tex().active(mProg, "skyboxTexture", 4);
     mProg["DirLightOn"] = true;
-    //mProg["model"] = glm::mat4();
-    //mCubemesh.draw(mProg);
+    mProg["model"] = glm::scale(glm::mat4(), glm::vec3(15.0f));
+    mCubemesh.draw(mProg);
     //mModel->draw(mProg);
 
     auto scaleMat = glm::scale(glm::mat4(), glm::vec3(3.0f));
     auto transVec = glm::vec3(0.0f, -1.0f, 0.0f);
-    mProg["model"] = glm::translate(glm::rotate(scaleMat, static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f)), transVec);
-    mPlanet->draw(mProg);
+    //mProg["model"] = glm::translate(glm::rotate(scaleMat, static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f)), transVec);
+    //mPlanet->draw(mProg);
 
-    mProgInstanced.use();
-    mUniBuf.bind(mProgInstanced);
-    mSkybox.tex().active(mProgInstanced, "skyboxTexture", 4);
-    mProgInstanced["DirLightOn"] = true;
-    mProgInstanced["model"] = glm::rotate(glm::mat4(), static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    mAsteroid->draw(mProgInstanced);
+    //mProgInstanced.use();
+    //mUniBuf.bind(mProgInstanced);
+    //mSkybox.tex().active(mProgInstanced, "skyboxTexture", 4);
+    //mProgInstanced["DirLightOn"] = true;
+    //mProgInstanced["model"] = glm::rotate(glm::mat4(), static_cast<float>(glfwGetTime()) / 25.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    //mAsteroid->draw(mProgInstanced);
 
     if (false)
     {

@@ -150,7 +150,7 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float distance = length(light.position - fragPos);
     float attenuation = 1.0f / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
 
-    return (ambient + diffuse + specular);// *attenuation;
+    return (ambient + diffuse + specular);// * attenuation;
 }
 
 vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
