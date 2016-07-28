@@ -28,10 +28,10 @@ void Scene::init()
     //mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
-        .position({ 0.0f, 0.0f, 20.0f })
+        .position({ 0.0f, 0.0f, 30.0f })
         .ambient({ 0.0f, 0.0f, 0.0f })
-        .diffuse({ 0.1f, 0.7f, 0.1f })
-        .specular({ 0.9f, 0.9f, 0.9f })
+        .diffuse({ 1.0f, 1.0f, 1.0f })
+        .specular({ 0.0f, 0.0f, 0.0f })
         .constCoeff(1.0f)
         .linCoeff(0.09f)
         .quadCoeff(0.05f);
@@ -46,19 +46,19 @@ void Scene::init()
         .quadCoeff(pl.quadCoeff())
         .cutOff(0.05f)
         .outerCutOff(0.2f);
-    mSpotLights.emplace_back(sl);
+    //mSpotLights.emplace_back(sl);
     
-    mProg = createProgram("shaders/simple.vert", "shaders/simple.frag");
+    mProg = mProgManager.create("shaders/simple.vert", "shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
     mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
 
-    mProgInstanced = createProgram("shaders/simple_instanced.vert", "shaders/simple.frag");
+    mProgInstanced = mProgManager.create("shaders/simple_instanced.vert", "shaders/simple.frag");
     CHECK(mProgInstanced, "Error creating shader program", return;);
 
-    mNormalShowProg = createProgram("shaders/normal_show.vert", "shaders/normal_show.geom", "shaders/normal_show.frag");
+    mNormalShowProg = mProgManager.create("shaders/normal_show.vert", "shaders/normal_show.geom", "shaders/normal_show.frag");
     CHECK(mNormalShowProg, "Error creating shader program", return;);
 
-    mReflectProg = createProgram("shaders/world_mapped.vert", "shaders/world_mapped.frag");
+    mReflectProg = mProgManager.create("shaders/world_mapped.vert", "shaders/world_mapped.frag");
     CHECK(mReflectProg, "Error creating shader program", return;);
 
     /// NANOSUIT
@@ -157,6 +157,7 @@ void Scene::init()
 
 void Scene::update(float dt)
 {
+    mProgManager.checkChanges();
 }
 
 void Scene::draw(Camera& camera, glm::vec4 const& color)
@@ -172,6 +173,32 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mProg.use();
     mUniBuf.bind(mProg);
+
+    int idx = 0;
+    for (auto& lgh : mDirLights)
+    {
+        lgh.assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProgInstanced, "dirLight[" + std::to_string(idx++) + "]");
+    }
+    idx = 0;
+    for (auto& lgh : mPointLights)
+    {
+        lgh.assign(mProg, "pLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProgInstanced, "pLight[" + std::to_string(idx++) + "]");
+    }
+    idx = 0;
+    for (auto& lgh : mSpotLights)
+    {
+        lgh.position(camera.pos());
+        lgh.direction(camera.front());
+        lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProgInstanced, "spLight[" + std::to_string(idx++) + "]");
+    }
+
+    mProg["PointLightOn"] = true;
+    mProg["SpotLightOn"] = false;
+    mProgInstanced["PointLightOn"] = false;
+    mProgInstanced["SpotLightOn"] = false;
 
     mSkybox.tex().active(mProg, "skyboxTexture", 4);
     mProg["DirLightOn"] = true;
@@ -209,30 +236,6 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     //mReflectProg["refractRatio"] = 1.0f / 2.5f;
     //mModel->draw(mProg);
 
-    int idx = 0;
-    for (auto& lgh : mDirLights)
-    {
-        lgh.assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "dirLight[" + std::to_string(idx++) + "]");
-    }
-    for (auto& lgh : mPointLights)
-    {
-        lgh.assign(mProg, "pLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "pLight[" + std::to_string(idx++) + "]");
-    }
-    idx = 0;
-    for (auto& lgh : mSpotLights)
-    {
-        lgh.position(camera.pos());
-        lgh.direction(camera.front());
-        lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "spLight[" + std::to_string(idx++) + "]");
-    }
-
-    mProg["PointLightOn"] = false;
-    mProg["SpotLightOn"] = false;
-    mProgInstanced["PointLightOn"] = false;
-    mProgInstanced["SpotLightOn"] = false;
     mMeshSorter.sort(camera.pos());
     for (auto const& mesh : mMeshSorter.meshes())
     {

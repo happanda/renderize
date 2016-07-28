@@ -15,6 +15,7 @@
 #include "input/mouse.h"
 #include "input/keyboard.h"
 #include "shaders/program.h"
+#include "shaders/program_manager.h"
 #include "util/checked_call.h"
 #include "util/date.h"
 
@@ -84,7 +85,7 @@ bool App::init()
     KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
-    mCamera.pos(glm::vec3(0.0f, 0.0f, 20.0f));
+    mCamera.pos(glm::vec3(0.0f, 0.0f, 30.0f));
     mScene.init();
     mCamUpdater.reset(new MainCameraUpdater(mCamera));
     mRTarget.reset(new RenderTarget(mWinSize, mNumSamples));
@@ -201,7 +202,8 @@ void App::runFragmentDemo(std::string const& demoName)
     }
 
 
-    Program prog = createProgram("shaders/fragment_demo.vert", "shaders/" + demoName + ".frag");
+    ProgramManager progManager;
+    Program prog = progManager.create("shaders/fragment_demo.vert", "shaders/" + demoName + ".frag");
     CHECK(prog, "Error creating shader program", return;);
 
 

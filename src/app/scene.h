@@ -4,6 +4,7 @@
 #include "data/mesh_sorter.h"
 #include "data/skybox.h"
 #include "shaders/program.h"
+#include "shaders/program_manager.h"
 #include "shaders/uniform_buffer.h"
 
 
@@ -45,6 +46,7 @@ private:
 
     UniformBuffer mUniBuf;
 
+    ProgramManager mProgManager;
     Program mProg;
     Program mProgInstanced;
     Program mNormalShowProg;

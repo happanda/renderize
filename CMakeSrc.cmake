@@ -59,6 +59,8 @@ set(SOURCE_FILES_SHADERS
 ${SourcePath}/shaders/fwd.h
 ${SourcePath}/shaders/program.h
 ${SourcePath}/shaders/program.cpp
+${SourcePath}/shaders/program_manager.h
+${SourcePath}/shaders/program_manager.cpp
 ${SourcePath}/shaders/shader.h
 ${SourcePath}/shaders/shader.cpp
 ${SourcePath}/shaders/uniform.h

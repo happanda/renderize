@@ -1,6 +1,11 @@
 #include "ref_counter.h"
 
 
+size_t RefCounted::hash() const
+{
+    return static_cast<size_t>(mRefCounter - static_cast<std::uint32_t*>(0));
+}
+
 RefCounted::RefCounted()
     : mRefCounter(new std::uint32_t)
 {

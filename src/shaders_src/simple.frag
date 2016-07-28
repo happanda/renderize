@@ -79,18 +79,18 @@ void main()
     //color = texture(material.texDiff1, fs_in.TexCoords);
     //return;
     color = vec4(0.0);
-    vec3 normal = fs_in.Normal;
+    vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewerPos - fs_in.FragPos);
 
-    if (DirLightOn)
-    {
-        vec4 dirLightTotal = vec4(0.0);
-        for (int i = 0; i < NumDirLights; ++i)
-        {
-            dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
-        }
-        color += dirLightTotal;
-    }
+    //if (DirLightOn)
+    //{
+    //    vec4 dirLightTotal = vec4(0.0);
+    //    for (int i = 0; i < NumDirLights; ++i)
+    //    {
+    //        dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
+    //    }
+    //    color += dirLightTotal;
+    //}
     
     if (PointLightOn)
     {
@@ -141,8 +141,8 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0f);
-    vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
-    
+    vec4 diffuse = vec4(light.diffuse, 1.0);// diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
+    return diffuse;
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 128.0);// TODO: material.shininess);
     vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);

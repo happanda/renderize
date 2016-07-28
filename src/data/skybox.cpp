@@ -44,7 +44,7 @@ void Skybox::create(SoilCubemapImage const& imgs)
 {
     mTex.createCubemap(imgs);
 
-    mProg = createProgram("shaders/skybox.vert", "shaders/skybox.frag");
+    mProg.create("shaders/skybox.vert", "shaders/skybox.frag");
     CHECK(mProg, "Error creating skybox shader program", );
 
     glGenVertexArrays(1, &mVAO);

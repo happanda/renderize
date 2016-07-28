@@ -29,10 +29,62 @@ Program const& Program::operator=(Program const& rhs)
     return *this;
 }
 
-bool Program::create()
+bool Program::create(std::string const& vertShaderPath, std::string const& fragShaderPath)
 {
-    mProg = glCreateProgram();
-    return mProg != 0;
+    if (!create())
+        return false;
+    // Shaders
+    Shader vertexShader, fragShader;
+    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
+    {
+        std::cerr << vertexShader.lastError();
+        return false;
+    }
+    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    {
+        std::cerr << fragShader.lastError();
+        return false;
+    }
+    attach(vertexShader);
+    attach(fragShader);
+    if (!link())
+    {
+        std::cerr << lastError();
+        return false;
+    }
+    return true;
+}
+
+bool Program::create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
+{
+    if (!create())
+        return false;
+    // Shaders
+    Shader vertexShader, geomShader, fragShader;
+    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
+    {
+        std::cerr << vertexShader.lastError();
+        return false;
+    }
+    if (!geomShader.compile(readAllText(geomShaderPath), GL_GEOMETRY_SHADER))
+    {
+        std::cerr << geomShader.lastError();
+        return false;
+    }
+    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    {
+        std::cerr << fragShader.lastError();
+        return false;
+    }
+    attach(vertexShader);
+    attach(geomShader);
+    attach(fragShader);
+    if (!link())
+    {
+        std::cerr << lastError();
+        return false;
+    }
+    return true;
 }
 
 void Program::attach(Shader const& sh)
@@ -94,64 +146,9 @@ void Program::free()
     }
 }
 
-Program createProgram(std::string const& vertShaderPath, std::string const& fragShaderPath)
+bool Program::create()
 {
-    Program prog;
-    prog.create();
-    if (static_cast<GLenum>(prog) == 0)
-        return Program();
-    // Shaders
-    Shader vertexShader, fragShader;
-    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
-    {
-        std::cerr << vertexShader.lastError();
-        return Program();
-    }
-    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
-    {
-        std::cerr << fragShader.lastError();
-        return Program();
-    }
-    prog.attach(vertexShader);
-    prog.attach(fragShader);
-    if (!prog.link())
-    {
-        std::cerr << prog.lastError();
-        return Program();
-    }
-    return prog;
-}
-
-Program createProgram(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
-{
-    Program prog;
-    prog.create();
-    if (static_cast<GLenum>(prog) == 0)
-        return Program();
-    // Shaders
-    Shader vertexShader, geomShader, fragShader;
-    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
-    {
-        std::cerr << vertexShader.lastError();
-        return Program();
-    }
-    if (!geomShader.compile(readAllText(geomShaderPath), GL_GEOMETRY_SHADER))
-    {
-        std::cerr << geomShader.lastError();
-        return Program();
-    }
-    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
-    {
-        std::cerr << fragShader.lastError();
-        return Program();
-    }
-    prog.attach(vertexShader);
-    prog.attach(geomShader);
-    prog.attach(fragShader);
-    if (!prog.link())
-    {
-        std::cerr << prog.lastError();
-        return Program();
-    }
-    return prog;
+    free();
+    mProg = glCreateProgram();
+    return mProg != 0;
 }

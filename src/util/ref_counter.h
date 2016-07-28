@@ -4,6 +4,8 @@
 
 struct RefCounted
 {
+    size_t hash() const;
+
 protected:
     mutable std::uint32_t* mRefCounter;
 
