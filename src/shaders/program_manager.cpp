@@ -93,7 +93,12 @@ struct ProgramManager::impl
                 if (sf.geomMod == 0)
                     pr.first.create(sf.vertPath, sf.fragPath);
                 else
+                {
                     pr.first.create(sf.vertPath, sf.geomPath, sf.fragPath);
+                    sf.geomMod = lastModifyTime(sf.geomPath);
+                }
+                sf.vertMod = lastModifyTime(sf.vertPath);
+                sf.fragMod = lastModifyTime(sf.fragPath);
             }
         }
     }

@@ -12,7 +12,8 @@ Program::Program()
 
 Program::~Program()
 {
-    free();
+    if (lastInstance())
+        free();
 }
 
 Program::Program(Program const& rhs)
@@ -139,7 +140,7 @@ Uniform Program::operator[](char const* uniName) const
 
 void Program::free()
 {
-    if (mProg && lastInstance())
+    if (mProg)
     {
         glDeleteProgram(mProg);
         mProg = 0;
