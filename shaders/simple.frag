@@ -1,8 +1,8 @@
 #version 330 core
 
-#define NumDirLights 3
-#define NumPointLights 3
-#define NumSpotLights 3
+#define MaxDirLights 3
+#define MaxPointLights 3
+#define MaxSpotLights 3
 
 struct Material
 {
@@ -64,9 +64,12 @@ layout(shared) uniform camera
 
 uniform Material material;
 uniform bool texReflAssigned;
-uniform DirLight[NumDirLights] dirLight;
-uniform PointLight[NumPointLights] pLight;
-uniform SpotLight[NumSpotLights] spLight;
+uniform DirLight[MaxDirLights] dirLight;
+uniform PointLight[MaxPointLights] pLight;
+uniform SpotLight[MaxSpotLights] spLight;
+uniform uint numDirLights;
+uniform uint numPointLights;
+uniform uint numSpotLights;
 uniform samplerCube skyboxTexture;
 
 vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -76,26 +79,29 @@ vec4 compReflection(vec3 viewDir, vec3 normal);
 
 void main()
 {
-    color = texture(material.texDiff1, fs_in.TexCoords);
-    return;
     color = vec4(0.0);
     vec3 normal = normalize(fs_in.Normal);
     vec3 viewDir = normalize(viewerPos - fs_in.FragPos);
+    
+    //color = compPointLight(pLight[1], normal, fs_in.FragPos, viewDir);
+    //return;
+    //color = texture(material.texDiff1, fs_in.TexCoords);
+    //return;
 
-    //if (DirLightOn)
-    //{
-    //    vec4 dirLightTotal = vec4(0.0);
-    //    for (int i = 0; i < NumDirLights; ++i)
-    //    {
-    //        dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
-    //    }
-    //    color += dirLightTotal;
-    //}
+    if (DirLightOn)
+    {
+        vec4 dirLightTotal = vec4(0.0);
+        for (uint i = 0u; i < numDirLights; ++i)
+        {
+            dirLightTotal += compDirLight(dirLight[i], normal, viewDir);
+        }
+        color += dirLightTotal;
+    }
     
     if (PointLightOn)
     {
         vec4 pointLightTotal = vec4(0.0);
-        for (int i = 0; i < NumPointLights; ++i)
+        for (uint i = 0u; i < numPointLights; ++i)
         {
             pointLightTotal += compPointLight(pLight[i], normal, fs_in.FragPos, viewDir);
         }
@@ -105,7 +111,7 @@ void main()
     if (SpotLightOn)
     {
         vec4 spotLightTotal = vec4(0.0);
-        for (int i = 0; i < NumSpotLights; ++i)
+        for (uint i = 0u; i < numSpotLights; ++i)
         {
             //spotLightTotal += compSpotLight(spLight[i], normal, fs_in.FragPos, viewDir);
         }
@@ -142,15 +148,14 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(normal, lightDir), 0.0f);
     vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
-    return diffuse;
+    
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 128.0);// TODO: material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);// TODO: material.shininess);
     vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
     
     float distance = length(light.position - fragPos);
-    float attenuation = 1.0f / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
-
-    return (ambient + diffuse + specular);// * attenuation;
+    float attenuation = 1.0 / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)

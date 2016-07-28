@@ -29,9 +29,18 @@ void Scene::init()
 
     PointLight pl = PointLight()
         .position({ 0.0f, 0.0f, 30.0f })
-        .ambient({ 0.0f, 0.0f, 0.0f })
+        .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 1.0f, 1.0f, 1.0f })
-        .specular({ 0.0f, 0.0f, 0.0f })
+        .specular({ 0.0f, 0.0f, 0.8f })
+        .constCoeff(1.0f)
+        .linCoeff(0.09f)
+        .quadCoeff(0.5f);
+    mPointLights.emplace_back(pl);
+    pl = PointLight()
+        .position({ 0.0f, 0.0f, -30.0f })
+        .ambient({ 0.3f, 0.3f, 0.3f })
+        .diffuse({ 1.0f, 1.0f, 1.0f })
+        .specular({ 0.8f, 0.0f, 0.0f })
         .constCoeff(1.0f)
         .linCoeff(0.09f)
         .quadCoeff(0.05f);
@@ -174,25 +183,31 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     mProg.use();
     mUniBuf.bind(mProg);
 
+    mProg["numDirLights"] = mDirLights.size();
+    mProg["numPointLights"] = mPointLights.size();
+    mProg["numSpotLights"] = mSpotLights.size();
     int idx = 0;
     for (auto& lgh : mDirLights)
     {
-        lgh.assign(mProg, "dirLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "dirLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProg, "dirLight[" + std::to_string(idx) + "]");
+        lgh.assign(mProgInstanced, "dirLight[" + std::to_string(idx) + "]");
+        ++idx;
     }
     idx = 0;
     for (auto& lgh : mPointLights)
     {
-        lgh.assign(mProg, "pLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "pLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProg, "pLight[" + std::to_string(idx) + "]");
+        lgh.assign(mProgInstanced, "pLight[" + std::to_string(idx) + "]");
+        ++idx;
     }
     idx = 0;
     for (auto& lgh : mSpotLights)
     {
         lgh.position(camera.pos());
         lgh.direction(camera.front());
-        lgh.assign(mProg, "spLight[" + std::to_string(idx++) + "]");
-        lgh.assign(mProgInstanced, "spLight[" + std::to_string(idx++) + "]");
+        lgh.assign(mProg, "spLight[" + std::to_string(idx) + "]");
+        lgh.assign(mProgInstanced, "spLight[" + std::to_string(idx) + "]");
+        ++idx;
     }
 
     mProg["PointLightOn"] = true;
