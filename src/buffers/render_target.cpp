@@ -37,7 +37,7 @@ RenderTarget const& RenderTarget::operator=(RenderTarget&& rhs)
 
 void RenderTarget::init(bool multisampled)
 {
-    mRTprog.create("shaders/render_target/rt.vert", "shaders/render_target/rt.frag");
+    mRTprog.create("../shaders/render_target/rt.vert", "../shaders/render_target/rt.frag");
     CHECK(mRTprog, "Error creating render target shader program", return;);
 
     if (!multisampled)

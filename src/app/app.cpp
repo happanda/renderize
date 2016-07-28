@@ -203,7 +203,7 @@ void App::runFragmentDemo(std::string const& demoName)
 
 
     ProgramManager progManager;
-    Program prog = progManager.create("shaders/fragment_demo.vert", "shaders/" + demoName + ".frag");
+    Program prog = progManager.create("../shaders/fragment_demo.vert", "../shaders/" + demoName + ".frag");
     CHECK(prog, "Error creating shader program", return;);
 
 

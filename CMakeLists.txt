@@ -76,13 +76,13 @@ add_custom_command(TARGET Renderize PRE_BUILD
 add_custom_command(TARGET Renderize PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders)
 
-add_custom_target(CopyShaderFiles)
-foreach(ShaderFile ${SOURCE_FILES_SHADERS_SOURCE})
-    get_filename_component(ShaderFileName ${ShaderFile} NAME)
-    add_custom_command(TARGET CopyShaderFiles PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${ShaderFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/${ShaderFileName})
-endforeach()
-add_dependencies(Renderize CopyShaderFiles)
+#add_custom_target(CopyShaderFiles)
+#foreach(ShaderFile ${SOURCE_FILES_SHADERS_SOURCE})
+#    get_filename_component(ShaderFileName ${ShaderFile} NAME)
+#    add_custom_command(TARGET CopyShaderFiles PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#        ${ShaderFile} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/${ShaderFileName})
+#endforeach()
+#add_dependencies(Renderize CopyShaderFiles)
 
 add_custom_target(CopyDlls)
 foreach(DllFile ${ATBPath}/lib/AntTweakBar.dll)

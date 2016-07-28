@@ -127,7 +127,7 @@ vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(normal, lightDir), 0.0f);
     vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
-    
+
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 128.0);// TODO: material.shininess);
     vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);

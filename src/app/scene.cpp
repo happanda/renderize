@@ -48,17 +48,17 @@ void Scene::init()
         .outerCutOff(0.2f);
     //mSpotLights.emplace_back(sl);
     
-    mProg = mProgManager.create("shaders/simple.vert", "shaders/simple.frag");
+    mProg = mProgManager.create("../shaders/simple.vert", "../shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
     mUniBuf.init(mProg, { "projection", "view", "viewerPos" });
 
-    mProgInstanced = mProgManager.create("shaders/simple_instanced.vert", "shaders/simple.frag");
+    mProgInstanced = mProgManager.create("../shaders/simple_instanced.vert", "../shaders/simple.frag");
     CHECK(mProgInstanced, "Error creating shader program", return;);
 
-    mNormalShowProg = mProgManager.create("shaders/normal_show.vert", "shaders/normal_show.geom", "shaders/normal_show.frag");
+    mNormalShowProg = mProgManager.create("../shaders/normal_show.vert", "../shaders/normal_show.geom", "../shaders/normal_show.frag");
     CHECK(mNormalShowProg, "Error creating shader program", return;);
 
-    mReflectProg = mProgManager.create("shaders/world_mapped.vert", "shaders/world_mapped.frag");
+    mReflectProg = mProgManager.create("../shaders/world_mapped.vert", "../shaders/world_mapped.frag");
     CHECK(mReflectProg, "Error creating shader program", return;);
 
     /// NANOSUIT
