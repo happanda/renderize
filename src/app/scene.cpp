@@ -26,20 +26,20 @@ void Scene::init()
         .position({ 0.0f, 0.0f, 3.0f })
         .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 0.0f, 0.0f, 0.0f })
-        .specular({ 1.0f, 1.0f, 1.0f })
+        .specular({ 0.5f, 0.5f, 0.5f })
         .constCoeff(1.0f)
         .linCoeff(0.045f)
         .quadCoeff(0.0075f);
-    //mPointLights.emplace_back(pl);
+    mPointLights.emplace_back(pl);
     pl = PointLight()
         .position({ 0.0f, 0.0f, -3.0f })
         .ambient({ 0.3f, 0.3f, 0.3f })
-        .diffuse({ 1.0f, 1.0f, 1.0f })
-        .specular({ 0.8f, 0.8f, 0.8f })
+        .diffuse({ 0.0f, 0.0f, 0.0f })
+        .specular({ 0.5f, 0.5f, 0.5f })
         .constCoeff(1.0f)
         .linCoeff(0.045f)
         .quadCoeff(0.0075f);
-    //mPointLights.emplace_back(pl);
+    mPointLights.emplace_back(pl);
 
     SpotLight sl = SpotLight()
         .ambient({ 0.2f, 0.2f, 0.2f })

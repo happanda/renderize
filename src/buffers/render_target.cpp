@@ -92,6 +92,7 @@ void RenderTarget::draw(glm::ivec2 const& low_left, glm::ivec2 const& size)
 {
     if (mRTvao)
     {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         mRTprog.use();
         glBindVertexArray(mRTvao);
         mTexture->active(0);
