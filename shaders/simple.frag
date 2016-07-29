@@ -133,12 +133,12 @@ vec4 compDirLight(DirLight light, vec3 normal, vec3 viewDir)
     float diff = max(dot(normal, -lightDir), 0.0);
     vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
     
-    vec3 reflectDir = reflect(lightDir, normal);
-    
+    // Blinn-Phong model specular component
+    vec3 halfWay = normalize(-lightDir + viewDir);
     float spec = 0.0;
     if (dot(normal, -lightDir) >= 0.0)
-        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
+        spec = pow(max(dot(halfWay, normal), 0.0), material.shininess);
+    vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
     
     return ambient + diffuse + specular;
 }
@@ -152,11 +152,12 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float diff = max(dot(normal, -lightDir), 0.0);
     vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
     
-    vec3 reflectDir = reflect(lightDir, normal);
+    // Blinn-Phong model specular component
+    vec3 halfWay = normalize(-lightDir + viewDir);
     float spec = 0.0;
-    if (dot(normal, -lightDir) >= 0.0)
-        spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
+    //if (dot(normal, -lightDir) >= 0.0)
+        spec = pow(max(dot(halfWay, normal), 0.0), material.shininess);
+    vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texDiff1/*texSpec1*/, fs_in.TexCoords);
     
     float distance = length(lpos - fragPos);
     float attenuation = 1.0 / (light.constCoeff + light.linCoeff * distance + light.quadCoeff * distance * distance);
@@ -176,12 +177,14 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         vec4 ambient = vec4(light.ambient, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
         
         float diff = max(dot(normal, -lightDir), 0.0);
+        
         vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
         
-        vec3 reflectDir = reflect(lightDir, normal);
+        // Blinn-Phong model specular component
+        vec3 halfWay = normalize(-lightDir + viewDir);
         float spec = 0.0;
         if (dot(normal, -lightDir) >= 0.0)
-            spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+            spec = pow(max(dot(halfWay, normal), 0.0), material.shininess);
         vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
         
         float distance = length(light.position - fragPos);
