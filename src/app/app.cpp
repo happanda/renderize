@@ -78,7 +78,9 @@ bool App::init()
         std::cerr << glewGetErrorString(glewCode) << std::endl; return false);
 
     glViewport(0, 0, mWinSize.x, mWinSize.y);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
     
     Mouse::create(mWindow);
     Keyboard::create(mWindow);

@@ -24,18 +24,18 @@ void Scene::init()
 
     PointLight pl = PointLight()
         .position({ 0.0f, 0.0f, 3.0f })
-        .ambient({ 0.3f, 0.3f, 0.3f })
-        .diffuse({ 0.0f, 0.0f, 0.0f })
-        .specular({ 0.5f, 0.5f, 0.5f })
+        .ambient({ 0.03f, 0.01f, 0.01f })
+        .diffuse({ 0.3f, 0.1f, 0.1f })
+        .specular({ 0.4f, 0.1f, 0.1f })
         .constCoeff(1.0f)
         .linCoeff(0.045f)
         .quadCoeff(0.0075f);
     mPointLights.emplace_back(pl);
     pl = PointLight()
         .position({ 0.0f, 0.0f, -3.0f })
-        .ambient({ 0.3f, 0.3f, 0.3f })
-        .diffuse({ 0.0f, 0.0f, 0.0f })
-        .specular({ 0.5f, 0.5f, 0.5f })
+        .ambient({ 0.01f, 0.01f, 0.03f })
+        .diffuse({ 0.1f, 0.1f, 0.3f })
+        .specular({ 0.1f, 0.1f, 0.4f })
         .constCoeff(1.0f)
         .linCoeff(0.045f)
         .quadCoeff(0.0075f);
@@ -177,8 +177,8 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mProg.use();
     mUniBuf.bind(mProg);
-    mProg["material.shininess"] = 0.6f; // TODO: use from the models loaded
-    mProgInstanced["material.shininess"] = 0.6f;
+    mProg["material.shininess"] = 0.0f; // TODO: use from the models loaded
+    mProgInstanced["material.shininess"] = 0.0f;
 
     mProg["numDirLights"] = mDirLights.size();
     mProg["numPointLights"] = mPointLights.size();

@@ -121,8 +121,8 @@ void Texture::create(SoilImage const& image)
     mTarget = GL_TEXTURE_2D;
     glGenTextures(1, &mTex);
     bind();
-    mInternalFormat = GL_RGBA;
-    glTexImage2D(mTarget, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
+    mInternalFormat = GL_SRGB_ALPHA;
+    glTexImage2D(mTarget, 0, mInternalFormat, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
     glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     unbind();
@@ -135,12 +135,12 @@ void Texture::createCubemap(SoilCubemapImage const& imgs)
     mTarget = GL_TEXTURE_CUBE_MAP;
     glGenTextures(1, &mTex);
     bind();
-    mInternalFormat = GL_RGBA;
+    mInternalFormat = GL_SRGB_ALPHA;
     for (SoilCubemapImage::size_type i = 0; i < imgs.size(); ++i)
     {
         auto const& img = imgs[i];
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mInternalFormat, img.width(), img.height(),
-            0, mInternalFormat, GL_UNSIGNED_BYTE, img.data());
+            0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
     }
     glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

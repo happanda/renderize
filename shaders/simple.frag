@@ -155,7 +155,7 @@ vec4 compPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // Blinn-Phong model specular component
     vec3 halfWay = normalize(-lightDir + viewDir);
     float spec = 0.0;
-    //if (dot(normal, -lightDir) >= 0.0)
+    if (dot(normal, -lightDir) >= 0.0)
         spec = pow(max(dot(halfWay, normal), 0.0), material.shininess);
     vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
     
