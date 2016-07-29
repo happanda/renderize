@@ -15,36 +15,30 @@ int const sAsteroidCount = 1000;
 void Scene::init()
 {
     DirLight dl = DirLight()
-        .direction({ 0.0f, -1.0f, 0.0f })
-        .ambient({ 0.1f, 0.1f, 0.1f })
+        .direction({ 0.0f, 0.0f, -1.0f })
+        .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 0.4f, 0.4f, 0.4f })
         .specular({ 0.5f, 0.5f, 0.5f });
-    mDirLights.emplace_back(dl);
-    //dl = DirLight()
-    //    .direction({ 0.0f, 1.0f, 0.0f })
-    //    .ambient({ 0.6f, 0.6f, 0.6f })
-    //    .diffuse({ 0.9f, 0.1f, 0.1f })
-    //    .specular({ 0.5f, 0.5f, 0.5f });
     //mDirLights.emplace_back(dl);
 
     PointLight pl = PointLight()
-        .position({ 0.0f, 0.0f, 30.0f })
+        .position({ 0.0f, 0.0f, 3.0f })
         .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 1.0f, 1.0f, 1.0f })
-        .specular({ 0.0f, 0.0f, 0.8f })
+        .specular({ 0.5f, 0.5f, 0.5f })
         .constCoeff(1.0f)
-        .linCoeff(0.09f)
-        .quadCoeff(0.5f);
-    mPointLights.emplace_back(pl);
+        .linCoeff(0.045f)
+        .quadCoeff(0.0075f);
+    //mPointLights.emplace_back(pl);
     pl = PointLight()
-        .position({ 0.0f, 0.0f, -30.0f })
+        .position({ 0.0f, 0.0f, -3.0f })
         .ambient({ 0.3f, 0.3f, 0.3f })
         .diffuse({ 1.0f, 1.0f, 1.0f })
-        .specular({ 0.8f, 0.0f, 0.0f })
+        .specular({ 0.8f, 0.8f, 0.8f })
         .constCoeff(1.0f)
-        .linCoeff(0.09f)
-        .quadCoeff(0.05f);
-    mPointLights.emplace_back(pl);
+        .linCoeff(0.045f)
+        .quadCoeff(0.0075f);
+    //mPointLights.emplace_back(pl);
 
     SpotLight sl = SpotLight()
         .ambient({ 0.1f, 0.1f, 0.1f })
@@ -55,7 +49,7 @@ void Scene::init()
         .quadCoeff(pl.quadCoeff())
         .cutOff(0.05f)
         .outerCutOff(0.2f);
-    //mSpotLights.emplace_back(sl);
+    mSpotLights.emplace_back(sl);
     
     mProg = mProgManager.create("../shaders/simple.vert", "../shaders/simple.frag");
     CHECK(mProg, "Error creating shader program", return;);
@@ -182,6 +176,8 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mProg.use();
     mUniBuf.bind(mProg);
+    mProg["material.shininess"] = 0.6f; // TODO: use from the models loaded
+    mProgInstanced["material.shininess"] = 0.6f;
 
     mProg["numDirLights"] = mDirLights.size();
     mProg["numPointLights"] = mPointLights.size();
@@ -217,7 +213,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
 
     mSkybox.tex().active(mProg, "skyboxTexture", 4);
     mProg["DirLightOn"] = true;
-    mProg["model"] = glm::scale(glm::mat4(), glm::vec3(15.0f));
+    mProg["model"] = glm::scale(glm::mat4(), glm::vec3(1.0f));
     mCubemesh.draw(mProg);
     //mModel->draw(mProg);
 

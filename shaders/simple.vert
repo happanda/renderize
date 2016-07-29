@@ -23,8 +23,8 @@ out VS_OUT
 void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0);
-    mat3 normalMatrix = mat3(transpose(inverse(view * model)));
-    vs_out.Normal = normalize((model * vec4(normal, 1.0)).xyz);
-    vs_out.FragPos = (model * vec4(position, 1.0)).xyz;
+    mat3 normalMatrix = mat3(transpose(inverse(model)));
+    vs_out.Normal = normalize(normalMatrix * normal);
+    vs_out.FragPos = vec3(model * vec4(position, 1.0));
     vs_out.TexCoords = texCoords;
 }

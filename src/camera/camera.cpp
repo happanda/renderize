@@ -134,5 +134,5 @@ void Camera::setDefault()
     mPos = glm::vec3(0.0f, 0.0f, 5.0f);
     mFront = glm::vec3(0.0f, 0.0f, -1.0f);
     mUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    mSpeed = 5.0f;
+    mSpeed = 3.0f;
 }
