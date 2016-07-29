@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "scene.h"
+#include "app/app.h"
 #include "camera/camera.h"
 #include "data/cube.h"
 #include "data/model.h"
@@ -41,9 +42,9 @@ void Scene::init()
     //mPointLights.emplace_back(pl);
 
     SpotLight sl = SpotLight()
-        .ambient({ 0.1f, 0.1f, 0.1f })
-        .diffuse({ 0.1f, 0.9f, 0.1f })
-        .specular({ 0.5f, 0.5f, 0.5f })
+        .ambient({ 0.2f, 0.2f, 0.2f })
+        .diffuse({ 0.5f, 0.4f, 0.9f })
+        .specular({ 0.6f, 0.6f, 0.7f })
         .constCoeff(pl.constCoeff())
         .linCoeff(pl.linCoeff())
         .quadCoeff(pl.quadCoeff())
@@ -207,7 +208,7 @@ void Scene::draw(Camera& camera, glm::vec4 const& color)
     }
 
     mProg["PointLightOn"] = true;
-    mProg["SpotLightOn"] = false;
+    mProg["SpotLightOn"] = APP().mSpotLightOn;
     mProgInstanced["PointLightOn"] = false;
     mProgInstanced["SpotLightOn"] = false;
 

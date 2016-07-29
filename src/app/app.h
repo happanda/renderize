@@ -26,6 +26,8 @@ struct App
     void run();
     void runFragmentDemo(std::string const& demoName);
 
+    bool mSpotLightOn{ false };
+
 private:
     App();
     FRIEND_SINGLETON(App);
@@ -33,7 +35,6 @@ private:
     std::uint8_t mNumSamples; // multisampling parameter
     glm::ivec2  mWinSize;
     GLFWwindow* mWindow{ nullptr };
-    bool mSpotLightOn{ false };
         
     Scene mScene;
     Camera mCamera;

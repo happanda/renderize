@@ -114,7 +114,7 @@ void main()
         vec4 spotLightTotal = vec4(0.0);
         for (uint i = 0u; i < numSpotLights; ++i)
         {
-            //spotLightTotal += compSpotLight(spLight[i], normal, fs_in.FragPos, viewDir);
+            spotLightTotal += compSpotLight(spLight[i], normal, fs_in.FragPos, viewDir);
         }
         color += spotLightTotal;
     }
@@ -179,7 +179,9 @@ vec4 compSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         vec4 diffuse = diff * vec4(light.diffuse, 1.0) * texture(material.texDiff1, fs_in.TexCoords);
         
         vec3 reflectDir = reflect(lightDir, normal);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+        float spec = 0.0;
+        if (dot(normal, -lightDir) >= 0.0)
+            spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
         vec4 specular = spec * vec4(light.specular, 1.0) * texture(material.texSpec1, fs_in.TexCoords);
         
         float distance = length(light.position - fragPos);
