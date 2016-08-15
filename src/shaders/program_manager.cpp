@@ -30,6 +30,45 @@ std::uint64_t lastModifyTime(std::string const& path)
 }
 
 
+ProgramProps::ProgramProps()
+{
+}
+
+ProgramProps::~ProgramProps()
+{
+}
+
+ProgramProps& ProgramProps::vert(std::string const& path)
+{
+    return *this;
+}
+
+ProgramProps& ProgramProps::geom(std::string const& path)
+{
+    return *this;
+}
+
+ProgramProps& ProgramProps::frag(std::string const& path)
+{
+    return *this;
+}
+
+ProgramProps& ProgramProps::vertCommon(std::string const& path)
+{
+    return *this;
+}
+
+ProgramProps& ProgramProps::geomCommon(std::string const& path)
+{
+    return *this;
+}
+
+ProgramProps& ProgramProps::fragCommon(std::string const& path)
+{
+    return *this;
+}
+
+
 struct ShaderFiles
 {
     ShaderFiles(std::string vertPath, std::uint64_t vertMod, std::string geomPath, std::uint64_t geomMod, std::string fragPath, std::uint64_t fragMod)
@@ -57,7 +96,7 @@ struct ProgramManager::impl
     {
     }
 
-    Program create(std::string const& vertShaderPath, std::string const& fragShaderPath)
+    Program create(std::string const& vertShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
     {
         Program prog;
         prog.create(vertShaderPath, fragShaderPath);
@@ -66,7 +105,7 @@ struct ProgramManager::impl
         return prog;
     }
 
-    Program create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
+    Program create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
     {
         Program prog;
         prog.create(vertShaderPath, geomShaderPath, fragShaderPath);
@@ -129,14 +168,14 @@ ProgramManager const& ProgramManager::operator=(ProgramManager&& rhs)
     return *this;
 }
 
-Program ProgramManager::create(std::string const& vertShaderPath, std::string const& fragShaderPath)
+Program ProgramManager::create(std::string const& vertShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
 {
-    return mImpl->create(vertShaderPath, fragShaderPath);
+    return mImpl->create(vertShaderPath, fragShaderPath, icc);
 }
 
-Program ProgramManager::create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
+Program ProgramManager::create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
 {
-    return mImpl->create(vertShaderPath, geomShaderPath, fragShaderPath);
+    return mImpl->create(vertShaderPath, geomShaderPath, fragShaderPath, icc);
 }
 
 void ProgramManager::checkChanges()

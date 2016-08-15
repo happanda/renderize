@@ -11,6 +11,9 @@ struct ProgramManager
     ProgramManager(ProgramManager&& rhs);
     ProgramManager const& operator=(ProgramManager&& rhs);
 
+    void addShader(std::string const& path, GLenum type);    
+    void addShader(std::vector<std::string> const& paths, GLenum type);
+
     Program create(std::string const& vertShaderPath, std::string const& fragShaderPath);
     Program create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath);
     void checkChanges();

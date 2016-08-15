@@ -1,7 +1,6 @@
-#include <fstream>
-#include <sstream>
 #include <vector>
 #include "shader.h"
+#include "program.h"
 
 
 Shader::Shader()
@@ -28,28 +27,17 @@ Shader const& Shader::operator=(Shader const& rhs)
     return *this;
 }
 
-bool Shader::compile(GLstring const& code, GLenum type, IncludeCommonCode inc)
+bool Shader::compile(GLstring const& code, ShaderType type)
 {
     mLastError.clear();
+    GLenum glType = GL_VERTEX_SHADER;
+    if (type == ShaderType::Geometry)
+        glType = GL_GEOMETRY_SHADER;
+    else if (type == ShaderType::Fragment)
+        glType = GL_FRAGMENT_SHADER;
 
     GLchar const* text = code.c_str();
-    std::string common;
-    if (inc == IncludeCommonCode::Yes)
-    {
-        if (type == GL_FRAGMENT_SHADER)
-        {
-            common = readAllText("Shaders/common.frag");
-            if (common.empty())
-            {
-                mLastError = "Cannot read file Shaders/common.frag";
-                return false;
-            }
-            common += code;
-            text = static_cast<GLchar const*>(common.c_str());
-        }
-    }
-
-    mShader = glCreateShader(type);
+    mShader = glCreateShader(glType);
     if (!mShader)
         return false;
 
@@ -88,16 +76,6 @@ GLenum Shader::type() const
 Shader::operator GLenum() const
 {
     return mShader;
-}
-
-std::string readAllText(std::string const& path)
-{
-    std::ifstream ifstr(path);
-    if (!ifstr)
-        return std::string();
-    std::stringstream text;
-    ifstr >> text.rdbuf();
-    return text.str();
 }
 
 void Shader::free()

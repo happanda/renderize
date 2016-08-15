@@ -12,6 +12,13 @@ enum class IncludeCommonCode
     No
 };
 
+enum class ShaderType
+{
+    Vertex,
+    Geometry,
+    Fragment
+};
+
 
 struct Shader
     : public RefCounted
@@ -21,7 +28,7 @@ struct Shader
     Shader(Shader const&);
     Shader const& operator=(Shader const&);
 
-    bool compile(GLstring const& code, GLenum type, IncludeCommonCode inc = IncludeCommonCode::No);
+    bool compile(GLstring const& code, ShaderType type);
 
     GLenum get() const;
     GLenum type() const;
@@ -36,5 +43,3 @@ private:
     GLuint mShader;
     GLstring mLastError;
 };
-
-std::string readAllText(std::string const& path);

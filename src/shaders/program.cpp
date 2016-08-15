@@ -5,6 +5,9 @@
 using std::swap;
 
 
+std::string Program::sShadersPath;
+
+
 Program::Program()
     : mProg(0)
 {
@@ -30,18 +33,18 @@ Program const& Program::operator=(Program const& rhs)
     return *this;
 }
 
-bool Program::create(std::string const& vertShaderPath, std::string const& fragShaderPath)
+bool Program::create(std::string const& vertShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
 {
     if (!create())
         return false;
     // Shaders
     Shader vertexShader, fragShader;
-    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
+    if (!vertexShader.compile(readAllText(fullShaderPath(vertShaderPath)), GL_VERTEX_SHADER))
     {
         std::cerr << vertexShader.lastError();
         return false;
     }
-    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    if (!fragShader.compile(readAllText(fullShaderPath(fragShaderPath)), GL_FRAGMENT_SHADER, icc))
     {
         std::cerr << fragShader.lastError();
         return false;
@@ -56,23 +59,23 @@ bool Program::create(std::string const& vertShaderPath, std::string const& fragS
     return true;
 }
 
-bool Program::create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath)
+bool Program::create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc)
 {
     if (!create())
         return false;
     // Shaders
     Shader vertexShader, geomShader, fragShader;
-    if (!vertexShader.compile(readAllText(vertShaderPath), GL_VERTEX_SHADER))
+    if (!vertexShader.compile(readAllText(fullShaderPath(vertShaderPath)), GL_VERTEX_SHADER))
     {
         std::cerr << vertexShader.lastError();
         return false;
     }
-    if (!geomShader.compile(readAllText(geomShaderPath), GL_GEOMETRY_SHADER))
+    if (!geomShader.compile(readAllText(fullShaderPath(geomShaderPath)), GL_GEOMETRY_SHADER, icc))
     {
         std::cerr << geomShader.lastError();
         return false;
     }
-    if (!fragShader.compile(readAllText(fragShaderPath), GL_FRAGMENT_SHADER))
+    if (!fragShader.compile(readAllText(fullShaderPath(fragShaderPath)), GL_FRAGMENT_SHADER))
     {
         std::cerr << fragShader.lastError();
         return false;
@@ -88,9 +91,10 @@ bool Program::create(std::string const& vertShaderPath, std::string const& geomS
     return true;
 }
 
-void Program::attach(Shader const& sh)
+Program& Program::attach(Shader const& sh)
 {
     glAttachShader(mProg, sh);
+    return *this;
 }
 
 bool Program::link()
@@ -145,6 +149,14 @@ void Program::free()
         glDeleteProgram(mProg);
         mProg = 0;
     }
+}
+
+std::string Program::fullShaderPath(std::string const& path) const
+{
+    if (sShadersPath.empty())
+        return path;
+    else
+        return sShadersPath + "/" + path;
 }
 
 bool Program::create()

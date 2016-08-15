@@ -87,6 +87,8 @@ bool App::init()
     KBRD().sgnKey.connect(std::bind(&App::onKey, this, _1, _2, _3));
     glfwSetWindowSizeCallback(mWindow, windowSizeCallback);
 
+    Program::sShadersPath = "../shaders";
+
     mCamera.pos(glm::vec3(0.0f, 0.0f, 2.0f));
     mCamera.front(glm::vec3(0.0f, 0.0f, 0.0f));
     mScene.init();
@@ -214,7 +216,7 @@ void App::runFragmentDemo(std::string const& demoName)
 
 
     ProgramManager progManager;
-    Program prog = progManager.create("../shaders/fragment_demo.vert", "../shaders/" + demoName + ".frag");
+    Program prog = progManager.create("fragment_demo.vert", demoName + ".frag");
     CHECK(prog, "Error creating shader program", return;);
 
 
@@ -224,6 +226,7 @@ void App::runFragmentDemo(std::string const& demoName)
     // Game Loop
     while (!glfwWindowShouldClose(mWindow))
     {
+        progManager.checkChanges();
         glfwPollEvents();
 
         float const curTime = static_cast<float>(glfwGetTime());

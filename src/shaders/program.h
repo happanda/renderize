@@ -13,10 +13,10 @@ struct Program
     Program(Program const&);
     Program const& operator=(Program const&);
 
-    bool create(std::string const& vertShaderPath, std::string const& fragShaderPath);
-    bool create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath);
+    bool create(std::string const& vertShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc = IncludeCommonCode::No);
+    bool create(std::string const& vertShaderPath, std::string const& geomShaderPath, std::string const& fragShaderPath, IncludeCommonCode icc = IncludeCommonCode::No);
 
-    void attach(Shader const& sh);
+    Program& attach(Shader const& sh);
     bool link();
     void use() const;
 
@@ -31,7 +31,11 @@ struct Program
 
     void free();
 
+    static std::string sShadersPath; // TODO: remove this logic from this class later
+
 private:
+    std::string fullShaderPath(std::string const& path) const;
+
     bool create();
     GLenum mProg;
 };

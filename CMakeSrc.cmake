@@ -106,6 +106,8 @@ ${PROJECT_SOURCE_DIR}/shaders/render_target/rt.frag
 )
 
 set(SOURCE_FILES_UTIL
+${SourcePath}/util/cat.h
+${SourcePath}/util/cat.cpp
 ${SourcePath}/util/checked_call.h
 ${SourcePath}/util/date.h
 ${SourcePath}/util/date.cpp
